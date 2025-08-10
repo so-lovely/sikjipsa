@@ -14,7 +14,8 @@ import {
   IconBook, 
   IconRobot, 
   IconMessages, 
-  IconNotebook 
+  IconNotebook,
+  IconPlant
 } from '@tabler/icons-react';
 
 
@@ -98,7 +99,7 @@ function Home() {
               ta="center"
               style={gradientTitleStyle}
             >
-              🌱 식물과 함께하는<br/>특별한 라이프스타일
+              식물과 함께하는<br/>특별한 라이프스타일
             </Title>
             <Text
               ta="center"
@@ -116,7 +117,7 @@ function Home() {
               component={Link}
               to="/diagnosis"
               size="lg"
-              leftSection="🤖"
+              leftSection=<IconRobot size={36} />
               style={glassButtonStyle}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = 'rgba(255, 255, 255, 0.25)';
@@ -143,7 +144,7 @@ function Home() {
               color: '#1f2937',
             }}
           >
-            🌿 식집사와 함께하는 특별한 경험
+            <IconPlant stroke={1.5} width={32} height={32}/> 식집사와 함께하는 특별한 경험
           </Title>
           <Text
             ta="center"

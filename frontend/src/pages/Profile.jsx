@@ -16,7 +16,7 @@ import {
   Center,
   Loader
 } from '@mantine/core';
-import { IconUser, IconEdit, IconCheck, IconX, IconAlertCircle } from '@tabler/icons-react';
+import { IconUser, IconEdit, IconCheck, IconX, IconAlertCircle, IconUserCircle } from '@tabler/icons-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { authAPI } from '../api/auth.js';
 
@@ -107,7 +107,7 @@ function Profile() {
       {/* Hero Section */}
       <Stack align="center" gap="xl" mb={60}>
         <Title order={1} size={48} fw={700} ta="center" c="gray.8">
-          👤 <Text component="span" c="green.6">내 프로필</Text>
+          <IconUserCircle stroke={2} width={64} height={64}/> <Text component="span" c="green.6">내 프로필</Text>
         </Title>
         <Text size="lg" ta="center" c="gray.6" maw={600}>
           계정 정보를 관리하고 설정을 변경하세요

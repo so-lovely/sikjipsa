@@ -14,6 +14,15 @@ import {
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useAuth } from '../context/AuthContext.jsx';
+import { 
+  IconBook, 
+  IconRobot, 
+  IconMessages, 
+  IconNotebook,
+  IconPlant,
+  IconSeedling,
+  IconUserCircle
+} from '@tabler/icons-react';
 
 function Header() {
   const navigate = useNavigate();
@@ -33,10 +42,10 @@ function Header() {
   };
 
   const navItems = [
-    { path: '/encyclopedia', label: '📚 백과사전' },
-    { path: '/diagnosis', label: '🤖 AI진단' },
-    { path: '/community', label: '💬 커뮤니티' },
-    { path: '/diary', label: '📔 성장일기' }
+    { path: '/encyclopedia', label: <IconBook size={36} /> },
+    { path: '/diagnosis', label: <IconRobot size={36} /> },
+    { path: '/community', label: <IconMessages size={36} /> },
+    { path: '/diary', label: <IconNotebook size={36} /> }
   ];
 
   return (
@@ -64,7 +73,7 @@ function Header() {
               style={{ textDecoration: 'none' }}
             >
               <Group gap="xs">
-                <Text size="xl">🌱</Text>
+                <Text size="xl"><IconSeedling stroke={2} width={32} height={32}/></Text>
                 <Text 
                   size="xl" 
                   fw={700} 
@@ -108,7 +117,7 @@ function Header() {
                   to="/profile"
                   visibleFrom="md"
                 >
-                  👤 프로필
+                  <IconUserCircle stroke={1} width={32} height={32} />
                 </Button>
                 <Button 
                   variant="gradient"
@@ -179,7 +188,7 @@ function Header() {
                 justify="flex-start"
                 onClick={() => handleNavClick('/profile')}
               >
-                👤 프로필
+                <IconUserCircle stroke={1} width={32} height={32} />
               </Button>
               <Button
                 variant="gradient"

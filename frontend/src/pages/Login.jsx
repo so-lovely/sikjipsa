@@ -1,7 +1,15 @@
 import React from 'react';
 import { Container, Card, Title, Text, Stack, List, ThemeIcon, Center, Box } from '@mantine/core';
 import SocialLogin from '../components/SocialLogin';
-
+import { 
+  IconBook, 
+  IconRobot, 
+  IconMessages, 
+  IconNotebook,
+  IconPlant,
+  IconSeedling,
+  IconUserCircle
+} from '@tabler/icons-react';
 function Login() {
   return (
     <Container size="sm" py="xl">
