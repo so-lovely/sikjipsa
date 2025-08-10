@@ -10,9 +10,6 @@ import (
 type PlantCategory struct {
 	ID          uint      `json:"id" gorm:"primaryKey"`
 	Name        string    `json:"name" gorm:"not null"`
-	Description string    `json:"description"`
-	ImageURL    string    `json:"image_url"`
-	CreatedAt   time.Time `json:"created_at"`
 }
 
 type Plant struct {
