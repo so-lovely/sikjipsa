@@ -28,7 +28,7 @@ function Home() {
       link: '/encyclopedia' 
     },
     { 
-      icon: <IconRobot size={36}, 
+      icon: <IconRobot size={36} />, 
       title: 'AI 식물 진단', 
       description: '최신 인공지능 기술로 식물의 건강 상태를 정확하게 진단하고 맞춤 케어 솔루션을 제공받으세요.', 
       link: '/diagnosis' 
