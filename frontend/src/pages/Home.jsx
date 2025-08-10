@@ -10,29 +10,37 @@ import {
   Box,
   Stack,
 } from '@mantine/core';
+import { 
+  IconBook, 
+  IconRobot, 
+  IconMessages, 
+  IconNotebook 
+} from '@tabler/icons-react';
+
+
 
 function Home() {
   const features = [
     { 
-      icon: '📚', 
+      icon: <IconBook size={36} />, 
       title: '식물 백과사전', 
       description: '다양한 식물들의 상세한 정보와 전문적인 관리 방법을 한 곳에서 확인하세요.', 
       link: '/encyclopedia' 
     },
     { 
-      icon: '🤖', 
+      icon: <IconRobot size={36}, 
       title: 'AI 식물 진단', 
       description: '최신 인공지능 기술로 식물의 건강 상태를 정확하게 진단하고 맞춤 케어 솔루션을 제공받으세요.', 
       link: '/diagnosis' 
     },
     { 
-      icon: '💬', 
+      icon: <IconMessages size={36} />, 
       title: '커뮤니티', 
       description: '전국의 식물 애호가들과 소통하고 경험을 나누며 함께 성장해보세요.', 
       link: '/community' 
     },
     { 
-      icon: '📔', 
+      icon: <IconNotebook size={36} />, 
       title: '성장 일기', 
       description: '내 식물의 성장 과정을 체계적으로 기록하고 추적하여 더 나은 관리를 해보세요.', 
       link: '/diary' 
@@ -252,7 +260,7 @@ function Home() {
                 color: '#1f2937',
               }}
             >
-              📊 식집사의 성장하는 커뮤니티
+               식집사의 성장하는 커뮤니티
             </Title>
             <Grid style={{ width: '100%' }} gutter="md">
               {stats.map((stat, idx) => (
