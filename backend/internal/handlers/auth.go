@@ -117,12 +117,14 @@ func (h *AuthHandler) UpdateProfile(c *fiber.Ctx) error {
 		})
 	}
 
-	// 닉네임 중복 확인 (자신 제외)
-	var existingUser models.User
-	if err := h.db.Where("username = ? AND id != ?", req.Username, userID).First(&existingUser).Error; err == nil {
-		return c.Status(fiber.StatusConflict).JSON(fiber.Map{
-			"error": "Username already exists",
-		})
+	// 닉네임 중복 확인 (자신 제외) - 기본 닉네임은 중복 허용
+	if req.Username != "닉네임 없음" {
+		var existingUser models.User
+		if err := h.db.Where("username = ? AND id != ?", req.Username, userID).First(&existingUser).Error; err == nil {
+			return c.Status(fiber.StatusConflict).JSON(fiber.Map{
+				"error": "Username already exists",
+			})
+		}
 	}
 
 	// 프로필 업데이트 (닉네임만)
@@ -276,10 +278,13 @@ func (h *AuthHandler) NaverLogin(c *fiber.Ctx) error {
         userResp.Response.ID, userResp.Response.Email, userResp.Response.Name)
 
     // 3. 사용자 정보로 로그인 처리
-    // nickname이 비어있으면 name을 사용
+    // nickname이 비어있으면 name을 사용, 둘 다 없으면 기본값
     username := userResp.Response.Nickname
     if username == "" {
         username = userResp.Response.Name
+    }
+    if username == "" {
+        username = "닉네임 없음"
     }
     
     fmt.Printf("Final username to use: %s (nickname: %s, name: %s)\n", 
@@ -366,6 +371,9 @@ func (h *AuthHandler) KakaoLogin(c *fiber.Ctx) error {
 	socialID := fmt.Sprintf("%d", userResp.ID)
 	email := userResp.KakaoAccount.Email
 	username := userResp.Properties.Nickname
+	if username == "" {
+		username = "닉네임 없음"
+	}
 	profileImage := userResp.Properties.ProfileImage
 
 	return h.processSocialLogin(c, "kakao", socialID, email, username, profileImage)
