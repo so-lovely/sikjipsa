@@ -159,7 +159,7 @@ function Header() {
         onClose={close}
         title={
           <Group>
-            <Text size="lg">🌱</Text>
+            <IconSeedling size={24} color="var(--mantine-color-green-6)" />
             <Text size="lg" fw={700} c="green.6">식집사</Text>
           </Group>
         }

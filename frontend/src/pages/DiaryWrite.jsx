@@ -21,7 +21,7 @@ import {
   rem
 } from '@mantine/core';
 import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone';
-import { IconUpload, IconPhoto, IconX, IconAlertCircle, IconCalendar, IconPlant } from '@tabler/icons-react';
+import { IconUpload, IconPhoto, IconX, IconAlertCircle, IconCalendar, IconPlant, IconSeedling, IconLeaf, IconFlower, IconTree, IconMoon } from '@tabler/icons-react';
 import { useAuth } from '../context/AuthContext';
 import { diaryAPI } from '../api/diary';
 import { plantAPI } from '../api/plants';
@@ -277,7 +277,7 @@ function DiaryWrite() {
                   }}
                 >
                   <Title order={4} size="md" c="green.7" mb="lg">
-                    🌱 새 다이어리 정보
+                    <Group gap="xs"><IconSeedling size={16} color="var(--mantine-color-green-6)" />새 다이어리 정보</Group>
                   </Title>
                   
                   <Stack gap="md">
@@ -327,11 +327,11 @@ function DiaryWrite() {
                 <Select
                   label="성장 단계"
                   data={[
-                    { value: 'seedling', label: '🌱 새싹' },
-                    { value: 'growing', label: '🌿 성장중' },
-                    { value: 'flowering', label: '🌸 개화중' },
-                    { value: 'mature', label: '🌳 성숙' },
-                    { value: 'dormant', label: '😴 휴면' }
+                    { value: 'seedling', label: <Group gap="xs"><IconSeedling size={14} color="var(--mantine-color-green-6)" />새싹</Group> },
+                    { value: 'growing', label: <Group gap="xs"><IconLeaf size={14} color="var(--mantine-color-green-6)" />성장중</Group> },
+                    { value: 'flowering', label: <Group gap="xs"><IconFlower size={14} color="var(--mantine-color-pink-6)" />개화중</Group> },
+                    { value: 'mature', label: <Group gap="xs"><IconTree size={14} color="var(--mantine-color-green-7)" />성숙</Group> },
+                    { value: 'dormant', label: <Group gap="xs"><IconMoon size={14} color="var(--mantine-color-gray-6)" />휴면</Group> }
                   ]}
                   value={formData.growthStage}
                   onChange={(value) => handleInputChange('growthStage', value)}

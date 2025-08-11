@@ -10,11 +10,17 @@ import {
   Divider,
   Box
 } from '@mantine/core';
+import { 
+  IconSeedling, 
+  IconShoppingBag, 
+  IconBulb, 
+  IconClipboardList 
+} from '@tabler/icons-react';
 
 function Footer() {
   const footerSections = [
     {
-      title: '🛒 서비스',
+      title: <Group gap="xs"><IconShoppingBag size={16} color="var(--mantine-color-green-4)" /> 서비스</Group>,
       links: [
         { to: '/encyclopedia', label: '식물 백과사전' },
         { to: '/diagnosis', label: 'AI 식물 진단' },
@@ -23,14 +29,14 @@ function Footer() {
       ]
     },
     {
-      title: '💡 고객지원',
+      title: <Group gap="xs"><IconBulb size={16} color="var(--mantine-color-green-4)" /> 고객지원</Group>,
       links: [
         { to: '/contact', label: '문의하기' },
         { to: '/notice', label: '공지사항' }
       ]
     },
     {
-      title: '📋 이용정보',
+      title: <Group gap="xs"><IconClipboardList size={16} color="var(--mantine-color-green-4)" /> 이용정보</Group>,
       links: [
         { to: '/terms', label: '이용약관' },
         { to: '/privacy', label: '개인정보처리방침' }
@@ -51,7 +57,7 @@ function Footer() {
           {/* Brand Section */}
           <Stack>
             <Group>
-              <Text size="lg">🌱</Text>
+              <IconSeedling size={24} color="var(--mantine-color-green-4)" />
               <Text size="lg" fw={600} c="white">
                 식집사
               </Text>
