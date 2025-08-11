@@ -21,7 +21,8 @@ import {
   IconNotebook,
   IconPlant,
   IconSeedling,
-  IconUserCircle
+  IconUserCircle,
+  IconSpeakerphone
 } from '@tabler/icons-react';
 
 function Header() {
@@ -45,6 +46,7 @@ function Header() {
     { path: '/encyclopedia', label: <IconBook size={36} /> },
     { path: '/diagnosis', label: <IconRobot size={36} /> },
     { path: '/community', label: <IconMessages size={36} /> },
+    { path: '/announcements', label: <IconSpeakerphone size={36} /> },
     { path: '/diary', label: <IconNotebook size={36} /> }
   ];
 

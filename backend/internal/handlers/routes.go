@@ -57,6 +57,11 @@ func SetupRoutes(app fiber.Router, db *gorm.DB, cfg *config.Config) {
         log.Printf("Failed to migrate DiagnosisRequest: %v", err)
     }
     
+    log.Println("Migrating Announcement...")
+    if err := db.AutoMigrate(&models.Announcement{}); err != nil {
+        log.Printf("Failed to migrate Announcement: %v", err)
+    }
+    
     log.Println("All migrations completed successfully")
     
     // 나머지 핸들러 초기화 코드...
@@ -67,6 +72,7 @@ func SetupRoutes(app fiber.Router, db *gorm.DB, cfg *config.Config) {
 	communityHandler := NewCommunityHandler(db, cfg)
 	diaryHandler := NewDiaryHandler(db, cfg)
 	diagnosisHandler := NewDiagnosisHandler(db, cfg)
+	announcementHandler := NewAnnouncementHandler(db, cfg)
 
 	// Auth routes
 	auth := app.Group("/auth")
@@ -126,6 +132,21 @@ func SetupRoutes(app fiber.Router, db *gorm.DB, cfg *config.Config) {
 	diagnosis.Post("/analyze", middleware.AuthRequired(cfg.JWTSecret), diagnosisHandler.AnalyzePlant)
 	diagnosis.Get("/result/:id", diagnosisHandler.GetDiagnosisResult)
 	diagnosis.Get("/history", middleware.AuthRequired(cfg.JWTSecret), diagnosisHandler.GetDiagnosisHistory)
+
+	// Announcement routes
+	announcements := app.Group("/announcements")
+	announcements.Get("/", announcementHandler.GetAnnouncements)
+	announcements.Get("/:id", announcementHandler.GetAnnouncement)
+	announcements.Post("/", middleware.AuthRequired(cfg.JWTSecret), announcementHandler.CreateAnnouncement)
+	announcements.Put("/:id", middleware.AuthRequired(cfg.JWTSecret), announcementHandler.UpdateAnnouncement)
+	announcements.Delete("/:id", middleware.AuthRequired(cfg.JWTSecret), announcementHandler.DeleteAnnouncement)
+	
+	log.Println("✅ Announcement routes registered:")
+	log.Println("  GET  /api/v1/announcements")
+	log.Println("  GET  /api/v1/announcements/:id")
+	log.Println("  POST /api/v1/announcements")
+	log.Println("  PUT  /api/v1/announcements/:id")
+	log.Println("  DELETE /api/v1/announcements/:id")
 
 	// Health check
 	app.Get("/health", func(c *fiber.Ctx) error {

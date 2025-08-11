@@ -24,6 +24,8 @@ import DiaryDetail from './pages/DiaryDetail.jsx';
 import Login from './pages/Login.jsx';
 import Profile from './pages/Profile.jsx';
 import AuthCallback from './pages/AuthCallback.jsx';
+import Announcements from './pages/Announcements.jsx';
+import AnnouncementDetail from './pages/AnnouncementDetail.jsx';
 
 const queryClient = new QueryClient();
 
@@ -48,6 +50,8 @@ function App() {
                   <Route path="/diagnosis" element={<Diagnosis />} />
                   <Route path="/community" element={<Community />} />
                   <Route path="/community/post/:id" element={<PostDetail />} />
+                  <Route path="/announcements" element={<Announcements />} />
+                  <Route path="/announcements/:id" element={<AnnouncementDetail />} />
                   <Route path="/diary" element={<Diary />} />
                   <Route path="/diary/write" element={<DiaryWrite />} />
                   <Route path="/diary/write/:diaryId" element={<DiaryWrite />} />
