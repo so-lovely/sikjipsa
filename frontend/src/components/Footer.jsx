@@ -32,7 +32,7 @@ function Footer() {
       title: <Group gap="xs"><IconBulb size={16} color="var(--mantine-color-green-4)" /> 고객지원</Group>,
       links: [
         { to: '/contact', label: '문의하기' },
-        { to: '/notice', label: '공지사항' }
+        { to: '/announcements', label: '공지사항' }
       ]
     },
     {
