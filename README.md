@@ -1,3 +1,5 @@
+**[한국어 리드미](https://github.com/so-lovely/plants_community/blob/main/README.ko.md)**
+
 # Sikjipsa (식집사)
 
 > Your personal plant butler and community for all plant lovers.
