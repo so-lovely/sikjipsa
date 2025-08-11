@@ -47,18 +47,16 @@ function Footer() {
   return (
     <Box
       component="footer"
-      style={{
-        background: 'linear-gradient(135deg, #374151, #1f2937)',
-        marginTop: 'auto'
-      }}
+      bg="gray.8"
+      style={{ marginTop: 'auto' }}
     >
-      <Container size="xl" py={60}>
+      <Container size="md" py={50}>
         <SimpleGrid cols={{ base: 1, sm: 2, md: 4 }} spacing="lg">
           {/* Brand Section */}
           <Stack>
             <Group>
               <IconSeedling size={24} color="var(--mantine-color-green-4)" />
-              <Text size="lg" fw={600} c="white">
+              <Text size="lg" fw={700} c="green.4">
                 식집사
               </Text>
             </Group>
@@ -71,7 +69,7 @@ function Footer() {
           {/* Service Links */}
           {footerSections.map((section, index) => (
             <Stack key={index} gap="sm">
-              <Text fw={600} c="white" size="sm">
+              <Text fw={700} c="green.6" size="sm">
                 {section.title}
               </Text>
               <Stack gap="xs">

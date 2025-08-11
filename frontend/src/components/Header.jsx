@@ -60,12 +60,12 @@ function Header() {
         left: 0,
         right: 0,
         zIndex: 1000,
-        background: 'rgba(255, 255, 255, 0.95)',
-        backdropFilter: 'blur(10px)',
-        borderBottom: '1px solid #e9ecef'
+        background: 'rgba(255, 255, 255, 0.98)',
+        backdropFilter: 'blur(12px)',
+        borderBottom: '1px solid var(--mantine-color-gray-3)'
       }}
     >
-      <Container size="xl" h="100%">
+      <Container size="lg" h="100%">
         <Group justify="space-between" h="100%">
           {/* Logo Section */}
           <Group>
@@ -80,7 +80,6 @@ function Header() {
                   size="xl" 
                   fw={700} 
                   c="green.6"
-                  style={{ fontSize: '1.5rem' }}
                 >
                   식집사
                 </Text>

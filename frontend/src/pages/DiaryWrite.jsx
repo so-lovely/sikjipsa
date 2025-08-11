@@ -210,18 +210,18 @@ function DiaryWrite() {
   }
 
   return (
-    <Container size="lg" py="xl">
+    <Container size="md" py={50}>
       {/* Hero Section */}
-      <Stack align="center" gap="xl" mb={60}>
-        <Title order={1} size={48} fw={700} ta="center" c="gray.8">
-          📝 <Text component="span" c="green.6">성장 일기 쓰기</Text>
+      <Stack align="center" gap="lg" mb={40}>
+        <Title order={1} ta="center" c="green.7" fw={700}>
+          성장 일기 쓰기
         </Title>
-        <Text size="lg" ta="center" c="gray.6" maw={600}>
+        <Text size="md" ta="center" c="gray.6" maw={500}>
           식물의 소중한 순간을 기록해보세요
         </Text>
       </Stack>
 
-      <Card shadow="md" radius="lg" p="xl">
+      <Card shadow="sm" radius="md" p={30}>
         {error && (
           <Alert
             icon={<IconAlertCircle size={16} />}
@@ -245,7 +245,7 @@ function DiaryWrite() {
           </Center>
         ) : (
           <form onSubmit={handleSubmit}>
-            <Stack gap="xl">
+            <Stack spacing="xl">
               {/* 식물 다이어리 선택 */}
               <Box>
                 <Select
@@ -276,8 +276,8 @@ function DiaryWrite() {
                     border: '1px solid #bbf7d0'
                   }}
                 >
-                  <Title order={4} size="md" c="green.7" mb="lg">
-                    <Group gap="xs"><IconSeedling size={16} color="var(--mantine-color-green-6)" />새 다이어리 정보</Group>
+                  <Title order={3} c="green.6" mb="md">
+                    새 다이어리 정보
                   </Title>
                   
                   <Stack gap="md">

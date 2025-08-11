@@ -92,7 +92,7 @@ const PrivacyPolicy = () => {
 
           <Box mt="xl">
             <Text size="sm" c="dimmed">
-              시행일자: 2025년 11월 53일
+              시행일자: 2025년 8월 11일
             </Text>
           </Box>
         </Stack>
