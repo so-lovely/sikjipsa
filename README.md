@@ -27,6 +27,7 @@ We welcome any form of contribution to improve Sikjipsa. This includes:
 *   Enhancing security and fixing vulnerabilities
 *   Adding new features
 *   Deleting unnecessary files
+*   Improve design
 
 If you wish to contribute, please follow these steps:
 
