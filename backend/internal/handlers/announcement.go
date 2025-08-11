@@ -72,7 +72,7 @@ func (h *AnnouncementHandler) GetAnnouncement(c *fiber.Ctx) error {
 
 // CreateAnnouncement 공지사항 생성 (관리자 전용)
 func (h *AnnouncementHandler) CreateAnnouncement(c *fiber.Ctx) error {
-	userID := c.Locals("user_id").(uint)
+	userID := c.Locals("userID").(uint)
 
 	type CreateAnnouncementRequest struct {
 		Title       string `json:"title" validate:"required"`
