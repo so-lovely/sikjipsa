@@ -263,6 +263,21 @@ function PostDetail() {
     }
   };
 
+  const handleDeletePost = async () => {
+    if (!window.confirm('정말로 이 게시글을 삭제하시겠습니까?')) {
+      return;
+    }
+
+    try {
+      await communityAPI.deletePost(id);
+      alert('게시글이 성공적으로 삭제되었습니다.');
+      navigate('/community');
+    } catch (error) {
+      console.error('게시글 삭제 실패:', error);
+      alert('게시글 삭제에 실패했습니다.');
+    }
+  };
+
   const handleImageClick = (image) => {
     setSelectedImage(image);
     open();
@@ -558,14 +573,25 @@ function PostDetail() {
                 </Group>
                 
                 {isLoggedIn && user && post.user?.id === user.id && (
-                  <Button
-                    variant="light"
-                    size="xs"
-                    leftSection={<IconEdit size={14} />}
-                    onClick={handleEditPost}
-                  >
-                    수정
-                  </Button>
+                  <Group gap="xs">
+                    <Button
+                      variant="light"
+                      size="xs"
+                      leftSection={<IconEdit size={14} />}
+                      onClick={handleEditPost}
+                    >
+                      수정
+                    </Button>
+                    <Button
+                      variant="light"
+                      color="red"
+                      size="xs"
+                      leftSection={<IconTrash size={14} />}
+                      onClick={handleDeletePost}
+                    >
+                      삭제
+                    </Button>
+                  </Group>
                 )}
               </Group>
             </Box>
