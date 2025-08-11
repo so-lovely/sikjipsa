@@ -1,0 +1,30 @@
+# Sikjipsa Custom License
+
+Copyright (c) 2025 danbikim (Sikjipsa)
+
+This software is "Source Available" and is licensed under the following terms. This is not an open-source license.
+
+## 1. Definitions
+
+- "The Software" refers to the source code, assets, and all other files associated with the Sikjipsa project.
+- "Deploy" or "Deployment" means making The Software available to third parties over a network, such as the internet, by hosting it on a server.
+- "Local Environment" refers to a personal computer or development machine not accessible to the general public over a network.
+
+## 2. Permitted Uses (허용 사항)
+
+You are granted the following rights:
+- To view and fork the source code.
+- To modify the source code.
+- To run The Software in a Local Environment for personal, testing, or development purposes.
+- To submit contributions (e.g., via Pull Requests) to the original project repository. Any contributions submitted will be subject to the terms of this license.
+
+## 3. Restrictions (제한 사항)
+
+The following actions are expressly forbidden:
+- **You may not Deploy The Software.** This includes, but is not limited to, hosting it on a public or private server that allows access to anyone other than yourself.
+- You may not use The Software for any commercial purposes, other than the official service operated by the copyright holder at https://www.sikjipsa.com.
+- You may not redistribute The Software under a different license.
+
+## 4. No Warranty
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
