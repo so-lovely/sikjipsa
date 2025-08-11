@@ -72,7 +72,23 @@ func (h *AnnouncementHandler) GetAnnouncement(c *fiber.Ctx) error {
 
 // CreateAnnouncement 공지사항 생성 (관리자 전용)
 func (h *AnnouncementHandler) CreateAnnouncement(c *fiber.Ctx) error {
-	userID := c.Locals("userID").(uint)
+	userID := c.Locals("userID")
+
+
+	// userID 타입 변환 수정
+    var uid uint
+    switch v := userID.(type) {
+    case float64:
+        uid = uint(v)
+    case int:
+        uid = uint(v)
+    case uint:
+        uid = v
+    default:
+        return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+            "error": "Invalid user ID type",
+        })
+    }
 
 	type CreateAnnouncementRequest struct {
 		Title       string `json:"title" validate:"required"`
@@ -91,7 +107,7 @@ func (h *AnnouncementHandler) CreateAnnouncement(c *fiber.Ctx) error {
 	announcement := models.Announcement{
 		Title:       req.Title,
 		Content:     req.Content,
-		AuthorID:    userID,
+		AuthorID:    uid,
 		IsPinned:    req.IsPinned,
 		IsPublished: req.IsPublished,
 	}
