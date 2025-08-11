@@ -1,3 +1,6 @@
+**English** | [Read in Korean (한국어)](./README.ko.md)
+***
+
 # Sikjipsa (식집사)
 
 > Your personal plant butler and community for all plant lovers.
@@ -24,6 +27,7 @@ We welcome any form of contribution to improve Sikjipsa. This includes:
 *   Enhancing security and fixing vulnerabilities
 *   Adding new features
 *   Deleting unnecessary files
+*   Improve design
 
 If you wish to contribute, please follow these steps:
 
