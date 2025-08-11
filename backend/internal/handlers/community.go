@@ -338,6 +338,65 @@ func (h *CommunityHandler) UpdatePost(c *fiber.Ctx) error {
 }
 
 
+func (h *CommunityHandler) DeletePost(c *fiber.Ctx) error {
+	userID := c.Locals("userID")
+	if userID == nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "Unauthorized",
+		})
+	}
+
+	// userID 타입 변환
+	var uid uint
+	switch v := userID.(type) {
+	case float64:
+		uid = uint(v)
+	case int:
+		uid = uint(v)
+	case uint:
+		uid = v
+	default:
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Invalid user ID type",
+		})
+	}
+
+	postID := c.Params("id")
+
+	// 게시글 존재 확인 및 작성자 검증
+	var post models.CommunityPost
+	if err := h.db.First(&post, postID).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Post not found",
+		})
+	}
+
+	// 작성자 본인 확인
+	if post.UserID != uid {
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+			"error": "You can only delete your own posts",
+		})
+	}
+
+	// 관련 데이터 삭제 (좋아요, 댓글)
+	// 좋아요 삭제
+	h.db.Where("post_id = ?", postID).Delete(&models.PostLike{})
+	
+	// 댓글 삭제 (답글 포함)
+	h.db.Where("post_id = ?", postID).Delete(&models.PostComment{})
+
+	// 게시글 삭제
+	if err := h.db.Delete(&post).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to delete post",
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"message": "Post deleted successfully",
+	})
+}
+
 func (h *CommunityHandler) GetPost(c *fiber.Ctx) error {
 	id := c.Params("id")
 	var post models.CommunityPost

@@ -98,6 +98,7 @@ func SetupRoutes(app fiber.Router, db *gorm.DB, cfg *config.Config) {
 	community.Post("/posts", middleware.AuthRequired(cfg.JWTSecret), communityHandler.CreatePost)
 	community.Get("/posts/:id", middleware.OptionalAuth(cfg.JWTSecret), communityHandler.GetPost)
 	community.Put("/posts/:id", middleware.AuthRequired(cfg.JWTSecret), communityHandler.UpdatePost)
+	community.Delete("/posts/:id", middleware.AuthRequired(cfg.JWTSecret), communityHandler.DeletePost)
 	community.Post("/posts/:id/like", middleware.AuthRequired(cfg.JWTSecret), communityHandler.LikePost)
 	community.Post("/posts/:id/comments", middleware.AuthRequired(cfg.JWTSecret), communityHandler.AddComment)
 	community.Put("/posts/:id/comments/:commentId", middleware.AuthRequired(cfg.JWTSecret), communityHandler.UpdateComment)
