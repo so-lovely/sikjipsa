@@ -1,4 +1,5 @@
-**[한국어 리드미](https://github.com/so-lovely/plants_community/blob/main/README.ko.md)**
+**English** | [Read in Korean (한국어)](./README.ko.md)
+***
 
 # Sikjipsa (식집사)
 
