@@ -33,18 +33,23 @@ function SocialLogin({showDivider = true }) {
   };
 
   const handleKakaoLogin = () => {
+    setIsKakaoLoading(true);
+
+    setTimeout(() => {
     const KAKAO_CLIENT_ID = process.env.REACT_APP_KAKAO_CLIENT_ID;
     const REDIRECT_URI = `${window.location.origin}/auth/callback/kakao`;
     
     if (!KAKAO_CLIENT_ID) {
       console.error('REACT_APP_KAKAO_CLIENT_ID is not set in environment variables');
       alert('카카오 로그인 설정이 올바르지 않습니다.');
+      setIsKakaoLoading(false);
       return;
     }
     
     const kakaoLoginUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${KAKAO_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
     
     window.location.href = kakaoLoginUrl;
+  }, 50);
   };
 
   return (
