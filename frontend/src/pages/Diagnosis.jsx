@@ -18,7 +18,7 @@ import {
   Space, // Import Space for clarity in spacing if needed, though margin is often better
 } from '@mantine/core';
 import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone';
-import { IconUpload, IconPhoto, IconX, IconCheck, IconAlertTriangle } from '@tabler/icons-react';
+import { IconUpload, IconPhoto, IconX, IconCheck, IconAlertTriangle, IconRobot, IconSeedling, IconSearch } from '@tabler/icons-react';
 import { useAuth } from '../context/AuthContext';
 import { diagnosisAPI } from '../api/diagnosis';
 
@@ -66,7 +66,8 @@ const FEATURES = [
 const HeroSection = () => (
   <Stack align="center" gap="xl" mb={60}>
     <Title order={1} size={48} fw={700} ta="center" c="gray.8">
-      🤖 <Text component="span" c="green.6">AI 식물 진단</Text>
+      <IconRobot size={48} color="var(--mantine-color-green-6)" stroke={1.5} style={{ display: 'inline', marginRight: 12 }} />
+      <Text component="span" c="green.6">AI 식물 진단</Text>
     </Title>
     <Text size="lg" ta="center" c="gray.6" maw={600}>
       최신 인공지능 기술로 식물명과 식물의 건강 상태를 정확하게 진단하세요
@@ -146,7 +147,7 @@ const ImageDropzone = ({ onFileSelect, onReject }) => {
           size="md"
           variant="gradient"
           gradient={{ from: 'green.5', to: 'green.6' }}
-          leftSection="🌱"
+          leftSection={<IconSeedling size={16} />}
           onClick={() => openRef.current?.()}
         >
           진단하기
@@ -169,7 +170,7 @@ const ImagePreview = ({ image, onDiagnose, onClear, isLoading, isLoggedIn }) => 
       <Button
         variant="gradient"
         gradient={{ from: 'green.5', to: 'green.6' }}
-        leftSection="🔍"
+        leftSection={<IconSearch size={16} />}
         onClick={onDiagnose}
         loading={isLoading}
         disabled={!isLoggedIn}

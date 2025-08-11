@@ -22,7 +22,7 @@ import {
   ActionIcon
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { IconSearch, IconPlus, IconCalendar, IconPlant, IconAlertCircle, IconEye } from '@tabler/icons-react';
+import { IconSearch, IconPlus, IconCalendar, IconPlant, IconAlertCircle, IconEye, IconNotebook, IconEdit } from '@tabler/icons-react';
 import { useAuth } from '../context/AuthContext';
 import { diaryAPI } from '../api/diary';
 
@@ -178,7 +178,8 @@ function Diary() {
       <Container size="lg" py="xl">
         <Stack align="center" gap="xl">
           <Title order={1} size={48} fw={700} ta="center" c="gray.8">
-            📔 <Text component="span" c="green.6">성장 일기</Text>
+            <IconNotebook size={48} color="var(--mantine-color-green-6)" stroke={1.5} style={{ display: 'inline', marginRight: 12 }} />
+            <Text component="span" c="green.6">성장 일기</Text>
           </Title>
           <Text size="lg" ta="center" c="gray.6" maw={600}>
             로그인 후 내 식물들의 성장 일기를 작성해보세요
@@ -207,7 +208,8 @@ function Diary() {
       {/* Hero Section */}
       <Stack align="center" gap="xl" mb={60}>
         <Title order={1} size={48} fw={700} ta="center" c="gray.8">
-          📔 <Text component="span" c="green.6">성장 일기</Text>
+          <IconNotebook size={48} color="var(--mantine-color-green-6)" stroke={1.5} style={{ display: 'inline', marginRight: 12 }} />
+          <Text component="span" c="green.6">성장 일기</Text>
         </Title>
         <Text size="lg" ta="center" c="gray.6" maw={600}>
           내 식물들의 소중한 성장 순간을 기록하고 
@@ -236,7 +238,7 @@ function Diary() {
           variant="gradient"
           gradient={{ from: 'green.5', to: 'green.6' }}
         >
-          ✏️ 일기 쓰기
+          일기 쓰기
         </Button>
       </Group>
 

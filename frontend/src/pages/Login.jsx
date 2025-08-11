@@ -42,9 +42,7 @@ function Login() {
 
           <Stack align="center" gap="xl">
             {/* Plant Icon */}
-            <Text size={64} style={{ lineHeight: 1 }}>
-              🌱
-            </Text>
+            <IconSeedling size={64} color="var(--mantine-color-green-6)" stroke={1.5} />
 
             {/* Title */}
             <Stack align="center" gap="sm">
@@ -60,7 +58,8 @@ function Login() {
             {/* Features Section */}
             <Box w="100%">
               <Title order={3} size="lg" fw={600} ta="center" c="gray.8" mb="lg">
-                🌿 식집사에서 할 수 있는 것들
+                <IconPlant size={20} color="var(--mantine-color-green-6)" stroke={1.5} style={{ display: 'inline', marginRight: 8 }} />
+                식집사에서 할 수 있는 것들
               </Title>
               
               <Card
@@ -75,7 +74,7 @@ function Login() {
                   <List.Item
                     icon={
                       <ThemeIcon color="green" size={24} radius="xl" variant="light">
-                        📚
+                        <IconBook size={14} />
                       </ThemeIcon>
                     }
                   >
@@ -84,7 +83,7 @@ function Login() {
                   <List.Item
                     icon={
                       <ThemeIcon color="green" size={24} radius="xl" variant="light">
-                        🤖
+                        <IconRobot size={14} />
                       </ThemeIcon>
                     }
                   >
@@ -93,7 +92,7 @@ function Login() {
                   <List.Item
                     icon={
                       <ThemeIcon color="green" size={24} radius="xl" variant="light">
-                        💬
+                        <IconMessages size={14} />
                       </ThemeIcon>
                     }
                   >
@@ -102,7 +101,7 @@ function Login() {
                   <List.Item
                     icon={
                       <ThemeIcon color="green" size={24} radius="xl" variant="light">
-                        📔
+                        <IconNotebook size={14} />
                       </ThemeIcon>
                     }
                   >

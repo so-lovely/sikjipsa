@@ -20,7 +20,7 @@ import {
   Alert
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { IconAlertCircle } from '@tabler/icons-react';
+import { IconAlertCircle, IconBook, IconSearch } from '@tabler/icons-react';
 import { plantAPI } from '../api/plants.js';
 
 function Encyclopedia() {
@@ -162,7 +162,8 @@ function Encyclopedia() {
       {/* Hero Section */}
       <Stack align="center" gap="xl" mb={60}>
         <Title order={1} size={48} fw={700} ta="center" c="gray.8">
-          📚 <Text component="span" c="green.6">식물 백과사전</Text>
+          <IconBook size={48} color="var(--mantine-color-green-6)" stroke={1.5} style={{ display: 'inline', marginRight: 12 }} />
+          <Text component="span" c="green.6">식물 백과사전</Text>
         </Title>
         <Text size="lg" ta="center" c="gray.6" maw={600}>
           다양한 식물들의 상세한 정보와 전문적인 관리 방법을 
@@ -177,7 +178,7 @@ function Encyclopedia() {
             onChange={(e) => setSearchTerm(e.target.value)}
             size="md"
             style={{ flex: 1 }}
-            leftSection="🔍"
+            leftSection={<IconSearch size={16} />}
           />
         </Group>
       </Stack>

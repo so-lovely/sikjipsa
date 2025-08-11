@@ -180,7 +180,8 @@ function Community() {
       {/* Hero Section */}
       <Stack align="center" gap="xl" mb={60}>
         <Title order={1} size={48} fw={700} ta="center" c="gray.8">
-          💬 <Text component="span" c="green.6">커뮤니티</Text>
+          <IconMessage size={48} color="var(--mantine-color-green-6)" stroke={1.5} style={{ display: 'inline', marginRight: 12 }} />
+          <Text component="span" c="green.6">커뮤니티</Text>
         </Title>
         <Text size="lg" ta="center" c="gray.6" maw={600}>
           전국의 식물 애호가들과 소통하고 경험을 나누며 
