@@ -3,15 +3,15 @@ import { Container, Title, Text, Box, Paper, Stack } from '@mantine/core';
 
 const PrivacyPolicy = () => {
   return (
-    <Container size="md" py="xl">
-      <Paper shadow="md" p="xl">
-        <Title order={1} mb="lg">
+    <Container size="md" py={50}>
+      <Paper p={30} shadow="sm" radius="md">
+        <Title order={1} ta="center" c="green.7">
           개인정보처리방침
         </Title>
         
-        <Stack spacing="lg">
+        <Stack spacing="md">
           <Box>
-            <Title order={2} size="h4" mb="sm" c="green.6">
+            <Title order={3} c="green.6">
               1. 개인정보의 처리 목적
             </Title>
             <Text mb="sm">
@@ -27,7 +27,7 @@ const PrivacyPolicy = () => {
           </Box>
 
           <Box>
-            <Title order={2} size="h4" mb="sm" c="green.6">
+            <Title order={3} c="green.6">
               2. 처리하는 개인정보의 항목
             </Title>
             <Text mb="sm">
@@ -41,7 +41,7 @@ const PrivacyPolicy = () => {
           </Box>
 
           <Box>
-            <Title order={2} size="h4" mb="sm" c="green.6">
+            <Title order={3} c="green.6">
               3. 개인정보의 보유 및 이용기간
             </Title>
             <Text>
@@ -50,7 +50,7 @@ const PrivacyPolicy = () => {
           </Box>
 
           <Box>
-            <Title order={2} size="h4" mb="sm" c="green.6">
+            <Title order={3} c="green.6">
               4. 개인정보의 제3자 제공
             </Title>
             <Text>
@@ -59,7 +59,7 @@ const PrivacyPolicy = () => {
           </Box>
 
           <Box>
-            <Title order={2} size="h4" mb="sm" c="green.6">
+            <Title order={3} c="green.6">
               5. 개인정보처리의 위탁
             </Title>
             <Text>
@@ -68,7 +68,7 @@ const PrivacyPolicy = () => {
           </Box>
 
           <Box>
-            <Title order={2} size="h4" mb="sm" c="green.6">
+            <Title order={3} c="green.6">
               6. 정보주체의 권리·의무 및 행사방법
             </Title>
             <Text>
@@ -77,7 +77,7 @@ const PrivacyPolicy = () => {
           </Box>
 
           <Box>
-            <Title order={2} size="h4" mb="sm" c="green.6">
+            <Title order={3} c="green.6">
               7. 개인정보의 안전성 확보조치
             </Title>
             <Text mb="sm">
@@ -91,7 +91,7 @@ const PrivacyPolicy = () => {
           </Box>
 
           <Box mt="xl">
-            <Text size="sm" c="dimmed">
+            <Text size="sm" c="gray.6" ta="right">
               시행일자: 2025년 8월 11일
             </Text>
           </Box>
