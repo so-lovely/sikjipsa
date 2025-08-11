@@ -26,6 +26,7 @@ import Profile from './pages/Profile.jsx';
 import AuthCallback from './pages/AuthCallback.jsx';
 import Announcements from './pages/Announcements.jsx';
 import AnnouncementDetail from './pages/AnnouncementDetail.jsx';
+import Terms from './pages/Terms.jsx';
 
 const queryClient = new QueryClient();
 
@@ -59,6 +60,7 @@ function App() {
                   <Route path="/diary/:diaryId/:entryId" element={<DiaryDetail />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/profile" element={<Profile />} />
+                  <Route path="/terms" element={<Terms />} />
                   <Route path="/auth/callback/:provider" element={<AuthCallback />} />
                 </Routes>
               </main>
