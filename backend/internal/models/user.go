@@ -10,7 +10,7 @@ type User struct {
 	ID             uint   `json:"id" gorm:"primaryKey"`
 	Email          string `json:"email" gorm:"uniqueIndex;not null"`
 	Username       string `json:"username" gorm:"uniqueIndex;not null"`
-	PasswordHash   string `json:"-"`
+	Role           string `json:"role" gorm:"default:user;not null"`
 	ProfileImage   string `json:"profile_image"`
 	SocialProvider string `json:"social_provider"`
 	SocialID       string `json:"social_id"`

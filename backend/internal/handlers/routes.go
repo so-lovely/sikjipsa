@@ -74,18 +74,14 @@ func SetupRoutes(app fiber.Router, db *gorm.DB, cfg *config.Config) {
 	diagnosisHandler := NewDiagnosisHandler(db, cfg)
 	announcementHandler := NewAnnouncementHandler(db, cfg)
 
-	// Auth routes
+	// Auth routes - Social login only
 	auth := app.Group("/auth")
-	auth.Post("/register", authHandler.Register)
-	auth.Post("/login", authHandler.Login)
 	auth.Post("/naver", authHandler.NaverLogin)
 	auth.Post("/kakao", authHandler.KakaoLogin)
 	auth.Get("/me", middleware.AuthRequired(cfg.JWTSecret), authHandler.Me)
 	auth.Put("/profile", middleware.AuthRequired(cfg.JWTSecret), authHandler.UpdateProfile)
 	
 	log.Println("✅ Auth routes registered:")
-	log.Println("  POST /api/v1/auth/register")
-	log.Println("  POST /api/v1/auth/login") 
 	log.Println("  POST /api/v1/auth/naver")
 	log.Println("  POST /api/v1/auth/kakao")
 	log.Println("  GET  /api/v1/auth/me")

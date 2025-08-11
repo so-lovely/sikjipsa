@@ -9,7 +9,6 @@ import (
 	"sikjipsa-backend/internal/models"
 	"sikjipsa-backend/pkg/config"
 	"sikjipsa-backend/pkg/utils"
-	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -25,16 +24,7 @@ func NewAuthHandler(db *gorm.DB, cfg *config.Config) *AuthHandler {
 	return &AuthHandler{db: db, cfg: cfg}
 }
 
-type RegisterRequest struct {
-	Email    string `json:"email" validate:"required,email"`
-	Username string `json:"username" validate:"required,min=3"`
-	Password string `json:"password" validate:"required,min=6"`
-}
-
-type LoginRequest struct {
-	Email    string `json:"email" validate:"required,email"`
-	Password string `json:"password" validate:"required"`
-}
+// Removed RegisterRequest and LoginRequest structs as we only support social login
 
 type SocialLoginRequest struct {
 	Code         string `json:"code" validate:"required"`
@@ -80,86 +70,7 @@ type KakaoUserResponse struct {
 	} `json:"kakao_account"`
 }
 
-func (h *AuthHandler) Register(c *fiber.Ctx) error {
-	var req RegisterRequest
-	if err := c.BodyParser(&req); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid request body",
-		})
-	}
-
-	var existingUser models.User
-	if err := h.db.Where("email = ? OR username = ?", req.Email, req.Username).First(&existingUser).Error; err == nil {
-		return c.Status(fiber.StatusConflict).JSON(fiber.Map{
-			"error": "User already exists",
-		})
-	}
-
-	hashedPassword, err := utils.HashPassword(req.Password)
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Failed to hash password",
-		})
-	}
-
-	user := models.User{
-		Email:        req.Email,
-		Username:     req.Username,
-		PasswordHash: hashedPassword,
-	}
-
-	if err := h.db.Create(&user).Error; err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Failed to create user",
-		})
-	}
-
-	token, err := utils.GenerateJWT(user.ID, user.Email, h.cfg.JWTSecret)
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Failed to generate token",
-		})
-	}
-
-	return c.JSON(fiber.Map{
-		"user":  user,
-		"token": token,
-	})
-}
-
-func (h *AuthHandler) Login(c *fiber.Ctx) error {
-	var req LoginRequest
-	if err := c.BodyParser(&req); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid request body",
-		})
-	}
-
-	var user models.User
-	if err := h.db.Where("email = ?", req.Email).First(&user).Error; err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"error": "Invalid credentials",
-		})
-	}
-
-	if !utils.CheckPasswordHash(req.Password, user.PasswordHash) {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"error": "Invalid credentials",
-		})
-	}
-
-	token, err := utils.GenerateJWT(user.ID, user.Email, h.cfg.JWTSecret)
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Failed to generate token",
-		})
-	}
-
-	return c.JSON(fiber.Map{
-		"user":  user,
-		"token": token,
-	})
-}
+// Register and Login functions removed - only social login supported
 
 func (h *AuthHandler) Me(c *fiber.Ctx) error {
 	userID := c.Locals("userID")
@@ -493,6 +404,7 @@ func (h *AuthHandler) processSocialLogin(c *fiber.Ctx, provider, socialID, email
 					user = models.User{
 						Email:          email,
 						Username:       username,
+						Role:           "user", // Default role
 						ProfileImage:   profileImage,
 						SocialProvider: provider,
 						SocialID:       socialID,
@@ -511,6 +423,7 @@ func (h *AuthHandler) processSocialLogin(c *fiber.Ctx, provider, socialID, email
 				user = models.User{
 					Email:          fmt.Sprintf("%s_%s@%s.social", provider, socialID, provider),
 					Username:       username,
+					Role:           "user", // Default role
 					ProfileImage:   profileImage,
 					SocialProvider: provider,
 					SocialID:       socialID,
@@ -539,9 +452,17 @@ func (h *AuthHandler) processSocialLogin(c *fiber.Ctx, provider, socialID, email
 		})
 	}
 
+	// Capitalize first letter of provider name
+	var providerName string
+	if len(provider) > 0 {
+		providerName = string(provider[0]-32) + provider[1:] // Convert first char to uppercase
+	} else {
+		providerName = provider
+	}
+	
 	return c.JSON(fiber.Map{
 		"user":  user,
 		"token": token,
-		"message": fmt.Sprintf("%s 로그인 성공", strings.Title(provider)),
+		"message": fmt.Sprintf("%s 로그인 성공", providerName),
 	})
 }
