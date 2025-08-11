@@ -27,6 +27,7 @@ import AuthCallback from './pages/AuthCallback.jsx';
 import Announcements from './pages/Announcements.jsx';
 import AnnouncementDetail from './pages/AnnouncementDetail.jsx';
 import Terms from './pages/Terms.jsx';
+import PrivacyPolicy from './pages/PrivacyPolicy.jsx';
 
 const queryClient = new QueryClient();
 
@@ -61,6 +62,7 @@ function App() {
                   <Route path="/login" element={<Login />} />
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/terms" element={<Terms />} />
+                  <Route path="/privacy" element={<PrivacyPolicy />} />
                   <Route path="/auth/callback/:provider" element={<AuthCallback />} />
                 </Routes>
               </main>

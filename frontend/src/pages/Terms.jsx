@@ -63,7 +63,7 @@ const Terms = () => {
             </Text>
 
             <Text size="sm" c="gray.6" ta="right">
-              시행일자: 2024년 1월 1일
+              시행일자: 2025년 8월 11일
             </Text>
           </Stack>
         </Stack>
