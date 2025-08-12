@@ -350,6 +350,7 @@ const useDiagnosis = () => {
 
     try {
       const result = await diagnosisAPI.analyzePlant(selectedImage.file, userLocation);
+      console.log('diagnosis result:', result);
       setDiagnosisResult(result);
     } catch (error) {
       console.error('Diagnosis error:', error);
