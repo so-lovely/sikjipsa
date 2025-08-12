@@ -439,15 +439,23 @@ func (h *AuthHandler) processSocialLogin(c *fiber.Ctx, provider, socialID, email
 					}
 				}
 			} else {
-				// 이메일이 없는 경우 (일부 소셜 서비스)
-				fallbackEmail := fmt.Sprintf("%s_%s@%s.social", provider, socialID, provider)
-				fmt.Printf("=== EMAIL FALLBACK ===\n")
-				fmt.Printf("Provider: %s, SocialID: %s\n", provider, socialID)
-				fmt.Printf("Generated fallback email: %s\n", fallbackEmail)
-				fmt.Printf("======================\n")
+				// 새로운 사용자 생성 - 실제 카카오 이메일 사용
+				actualEmail := email
+				if actualEmail == "" {
+					// 카카오에서 이메일을 제공하지 않는 경우에만 fallback 사용
+					actualEmail = fmt.Sprintf("%s_%s@%s.social", provider, socialID, provider)
+					fmt.Printf("=== EMAIL FALLBACK (no email from Kakao) ===\n")
+					fmt.Printf("Provider: %s, SocialID: %s\n", provider, socialID)
+					fmt.Printf("Generated fallback email: %s\n", actualEmail)
+					fmt.Printf("==========================================\n")
+				} else {
+					fmt.Printf("=== USING ACTUAL KAKAO EMAIL ===\n")
+					fmt.Printf("Kakao provided email: %s\n", actualEmail)
+					fmt.Printf("================================\n")
+				}
 				
 				user = models.User{
-					Email:          fallbackEmail,
+					Email:          actualEmail,
 					Username:       username,
 					Role:           "user", // Default role
 					ProfileImage:   profileImage,
