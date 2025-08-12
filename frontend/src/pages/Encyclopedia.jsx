@@ -350,7 +350,7 @@ function Encyclopedia() {
                   {selectedPlant.difficulty_level && (
                     <Box>
                       <Text fw={600} size="sm" c="gray.8" mb="xs">
-                        🎯 키우기 난이도
+                        키우기 난이도
                       </Text>
                       <Text size="sm" c="gray.6">
                         {selectedPlant.difficulty_level === 'easy' && '쉬움'}
