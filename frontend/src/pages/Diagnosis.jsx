@@ -17,7 +17,7 @@ import {
   rem,
 } from '@mantine/core';
 import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone';
-import { IconUpload, IconPhoto, IconX, IconCheck, IconAlertTriangle, IconRobot, IconSeedling, IconSearch } from '@tabler/icons-react';
+import { IconUpload, IconPhoto, IconX, IconCheck, IconAlertTriangle, IconRobot, IconSeedling, IconSearch, IconZoomScan, IconBolt, IconPill, IconBulb, IconEye } from '@tabler/icons-react';
 import { useAuth } from '../context/AuthContext';
 import { diagnosisAPI } from '../api/diagnosis';
 
@@ -45,17 +45,17 @@ const HEALTH_STATUS_CONFIG = {
 
 const FEATURES = [
   {
-    icon: '🔍',
+    icon: <IconZoomScan size={32} color="var(--mantine-color-green-6)" stroke={1.5} />,
     title: 'AI 정확도 95%',
     description: '최신 딥러닝 기술로 식물의 종류와 상태를 정확하게 분석합니다.'
   },
   {
-    icon: '⚡',
+    icon: <IconBolt size={32} color="var(--mantine-color-blue-6)" stroke={1.5} />,
     title: '즉시 진단',
     description: '사진 업로드 후 몇 초 내에 결과를 확인할 수 있습니다.'
   },
   {
-    icon: '💊',
+    icon: <IconPill size={32} color="var(--mantine-color-teal-6)" stroke={1.5} />,
     title: '맞춤 처방',
     description: '진단 결과에 따른 구체적인 관리 방법을 제시해드립니다.'
   }
@@ -264,11 +264,11 @@ const DiagnosisResults = ({ result }) => {
 
         <SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg">
           {result?.issues?.length > 0 && (
-            <ResultSection title="🔍 발견된 문제점" items={result.issues} color="orange.6" />
+            <ResultSection title={<Group gap="xs"><IconEye size={16} color="var(--mantine-color-orange-6)" />발견된 문제점</Group>} items={result.issues} color="orange.6" />
           )}
 
           {result?.recommendations?.length > 0 && (
-            <ResultSection title="💡 관리 방법" items={result.recommendations} color="green.6" />
+            <ResultSection title={<Group gap="xs"><IconBulb size={16} color="var(--mantine-color-green-6)" />관리 방법</Group>} items={result.recommendations} color="green.6" />
           )}
         </SimpleGrid>
       </Stack>
@@ -315,7 +315,7 @@ const FeaturesSection = () => (
       {FEATURES.map((feature) => (
         // 4. Refined the layout of each feature item for better alignment and readability.
         <Group key={feature.title} align="flex-start" gap="md" wrap="nowrap">
-          <Text fz={32} mt={4}>{feature.icon}</Text>
+          <Box mt={4}>{feature.icon}</Box>
           <Stack gap={4}>
             <Text fz="md" fw={600} c="gray.8">
               {feature.title}
