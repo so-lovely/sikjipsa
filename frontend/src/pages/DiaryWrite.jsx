@@ -38,7 +38,7 @@ function DiaryWrite() {
     diaryId: diaryId || '',
     title: '',
     content: '',
-    growthStage: 'growing',
+    growthStage: 'seedling',
     entryDate: new Date().toISOString().split('T')[0]
   });
   const [newDiaryData, setNewDiaryData] = useState({
@@ -261,7 +261,14 @@ function DiaryWrite() {
                   value={showNewDiaryForm ? 'new' : formData.diaryId}
                   onChange={(value) => handleDiarySelectChange(value)}
                   required
-                  leftSection={<IconPlant size={16} />}
+                  leftSection={
+                    formData.growthStage === 'seedling' ? <IconSeedling size={16} color="var(--mantine-color-green-6)" /> :
+                    formData.growthStage === 'growing' ? <IconLeaf size={16} color="var(--mantine-color-green-6)" /> :
+                    formData.growthStage === 'flowering' ? <IconFlower size={16} color="var(--mantine-color-pink-6)" /> :
+                    formData.growthStage === 'mature' ? <IconTree size={16} color="var(--mantine-color-green-7)" /> :
+                    formData.growthStage === 'dormant' ? <IconMoon size={16} color="var(--mantine-color-gray-6)" /> :
+                    <IconSeedling size={16} color="var(--mantine-color-green-6)" />
+                  }
                 />
               </Box>
 
@@ -327,14 +334,29 @@ function DiaryWrite() {
                 <Select
                   label="성장 단계"
                   data={[
-                    { value: 'seedling', label: <Group gap="xs"><IconSeedling size={14} color="var(--mantine-color-green-6)" />새싹</Group> },
-                    { value: 'growing', label: <Group gap="xs"><IconLeaf size={14} color="var(--mantine-color-green-6)" />성장중</Group> },
-                    { value: 'flowering', label: <Group gap="xs"><IconFlower size={14} color="var(--mantine-color-pink-6)" />개화중</Group> },
-                    { value: 'mature', label: <Group gap="xs"><IconTree size={14} color="var(--mantine-color-green-7)" />성숙</Group> },
-                    { value: 'dormant', label: <Group gap="xs"><IconMoon size={14} color="var(--mantine-color-gray-6)" />휴면</Group> }
+                    { value: 'seedling', label: '새싹' },
+                    { value: 'growing', label: '성장중' },
+                    { value: 'flowering', label: '개화중' },
+                    { value: 'mature', label: '성숙' },
+                    { value: 'dormant', label: '휴면' }
                   ]}
                   value={formData.growthStage}
                   onChange={(value) => handleInputChange('growthStage', value)}
+                  renderOption={({ option }) => {
+                    const icons = {
+                      seedling: <IconSeedling size={14} color="var(--mantine-color-green-6)" />,
+                      growing: <IconLeaf size={14} color="var(--mantine-color-green-6)" />,
+                      flowering: <IconFlower size={14} color="var(--mantine-color-pink-6)" />,
+                      mature: <IconTree size={14} color="var(--mantine-color-green-7)" />,
+                      dormant: <IconMoon size={14} color="var(--mantine-color-gray-6)" />
+                    };
+                    return (
+                      <Group gap="xs">
+                        {icons[option.value]}
+                        {option.label}
+                      </Group>
+                    );
+                  }}
                 />
               </Group>
 
