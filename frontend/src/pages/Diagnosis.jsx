@@ -212,6 +212,7 @@ const LoadingState = () => (
 );
 
 const DiagnosisResults = ({ result }) => {
+  console.log('DiagnosisResults received:', result, 'type of confidence:', typeof result?.confidence);
   const statusConfig = HEALTH_STATUS_CONFIG[result.healthStatus] || HEALTH_STATUS_CONFIG.healthy;
   
   return (
