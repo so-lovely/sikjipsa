@@ -211,50 +211,65 @@ const LoadingState = () => (
   </Card>
 );
 
+const normalizeConfidence = (val) => {
+  if (val == null) return null;
+  if (typeof val === 'string') {
+    const parsed = parseFloat(val.replace('%', '').trim());
+    return Number.isFinite(parsed) ? Math.round(parsed) : null;
+  }
+  if (typeof val === 'number') {
+    if (val >= 0 && val <= 1) return Math.round(val * 100);
+    if (val >= 0 && val <= 100) return Math.round(val);
+  }
+  return null;
+};
+
+
 const DiagnosisResults = ({ result }) => {
-  console.log('DiagnosisResults received:', result, 'type of confidence:', typeof result?.confidence);
-  const statusConfig = HEALTH_STATUS_CONFIG[result.healthStatus] || HEALTH_STATUS_CONFIG.healthy;
-  
+  const rawConfidence = result?.confidence ?? result?.score ?? result?.probability ?? null;
+  const confidence = normalizeConfidence(rawConfidence);
+
+  // 80 미만이면 오직 한 줄 텍스트만 렌더
+  if (confidence != null && confidence < 80) {
+    return (
+      <Card shadow="md" radius="lg" mb="xl">
+        <Center style={{ padding: '1.5rem' }}>
+          <Text size="lg" fw={700} c="red.6">
+            식물이 식별되지 않았어요
+          </Text>
+        </Center>
+      </Card>
+    );
+  }
+
+  // confidence가 없거나 >= 80이면 기존 결과 전체 렌더(필요없으면 아래 블록 삭제)
+  const statusConfig = HEALTH_STATUS_CONFIG[result?.healthStatus] || HEALTH_STATUS_CONFIG.healthy;
+  const plantName = result?.plantName ?? '알 수 없는 식물';
+
   return (
     <Card shadow="md" radius="lg" mb="xl">
       <Stack gap="lg">
         <Group justify="space-between" align="flex-start">
           <div>
-            <Title order={2} size="xl" c="gray.8" mb="xs">
-              진단 결과
-            </Title>
-            <Text size="lg" fw={600} c="green.6" mb="sm">
-              {result.plantName}
-            </Text>
+            <Title order={2} size="xl" c="gray.8" mb="xs">진단 결과</Title>
+            <Text size="lg" fw={600} c="green.6" mb="sm">{plantName}</Text>
             <Text size="sm" c="dimmed">
-              {result.confidence >= 80 ? `정확도: ${result.confidence}%` : '식물이 식별되지 않았어요'}
+              {confidence == null ? '정확도 정보를 받을 수 없습니다' : `정확도: ${confidence}%`}
             </Text>
           </div>
-          <Badge
-            color={statusConfig.color}
-            size="lg"
-            variant="light"
-            leftSection={statusConfig.icon}
-          >
+
+          <Badge color={statusConfig.color} size="lg" variant="light" leftSection={statusConfig.icon}>
             {statusConfig.label}
           </Badge>
         </Group>
 
         <SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg">
-          {result.issues?.length > 0 && (
-            <ResultSection
-              title="🔍 발견된 문제점"
-              items={result.issues}
-              color="orange.6"
-            />
+          {result?.issues?.length > 0 && (
+            <ResultSection title="🔍 발견된 문제점" items={result.issues} color="orange.6" />
           )}
 
-          {result.recommendations?.length > 0 && (
-            <ResultSection
-              title="💡 관리 방법"
-              items={result.recommendations}
-              color="green.6"
-            />
+          {result?.recommendations?.length > 0 && (
+            <ResultSection title="💡 관리 방법" items={result.recommendations} color="green.6" />
           )}
         </SimpleGrid>
       </Stack>
