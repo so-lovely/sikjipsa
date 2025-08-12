@@ -141,17 +141,8 @@ export const communityAPI = {
     return response.data;
   },
 
-  // 게시글 조회수 증가
-  incrementViews: async (postId) => {
-    const response = await apiClient.post(`/community/posts/${postId}/views`);
-    return response.data;
-  },
 
-  // 인기 게시글 조회
-  getPopularPosts: async (period = 'week') => {
-    const response = await apiClient.get(`/community/posts/popular?period=${period}`);
-    return response.data;
-  },
+  
 
   // 내가 작성한 게시글 조회
   getMyPosts: async (params = {}) => {
