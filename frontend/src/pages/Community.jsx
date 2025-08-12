@@ -19,6 +19,7 @@ import {
   ActionIcon,
   FileInput,
   Image,
+  Select,
   Loader // Loader를 import 했는지 확인하세요.
 } from '@mantine/core';
 import { useDisclosure, useDebouncedValue } from '@mantine/hooks';
@@ -123,7 +124,7 @@ const loadPosts = useCallback(async (options = {}) => {
 }, [debouncedSearchTerm, selectedCategory]); // debouncedSearchTerm이나 selectedCategory가 바뀔 때마다 이 useEffect가 실행됩니다.
 
   // --- 3. 스크롤 감지 로직 ---
-
+const observer = useRef();
 const lastPostElementRef = useCallback(node => {
   if (isLoading) return;
   if (observer.current) observer.current.disconnect();
