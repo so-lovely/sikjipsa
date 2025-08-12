@@ -1,10 +1,11 @@
 package handlers
 
 import (
+	"log"
 	"sikjipsa-backend/internal/middleware"
 	"sikjipsa-backend/internal/models"
 	"sikjipsa-backend/pkg/config"
-	"log"
+
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )

@@ -6,7 +6,7 @@ export const communityAPI = {
     const queryParams = new URLSearchParams();
     
     if (params.category && params.category !== 'all') {
-      queryParams.append('category', params.category);
+      queryParams.append('type', params.category);
     }
     if (params.search) {
       queryParams.append('search', params.search);
