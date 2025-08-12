@@ -19,6 +19,7 @@ func main() {
 
 	app := fiber.New(fiber.Config{
 		ErrorHandler: middleware.ErrorHandler,
+		BodyLimit:    25 * 1024 * 1024, // 25MB limit for multiple image uploads
 	})
 
 	app.Use(logger.New())
