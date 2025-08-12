@@ -226,7 +226,7 @@ const DiagnosisResults = ({ result }) => {
               {result.plantName}
             </Text>
             <Text size="sm" c="dimmed">
-              정확도: {result.confidence}%
+              {result.confidence >= 80 ? `정확도: ${result.confidence}%` : '식물이 식별되지 않았어요'}
             </Text>
           </div>
           <Badge
