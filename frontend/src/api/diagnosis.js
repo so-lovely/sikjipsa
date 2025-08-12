@@ -25,7 +25,7 @@ export const diagnosisAPI = {
       // 프론트엔드가 기대하는 형태로 데이터 변환
       return {
         plantName: result.plant_name || '식물',
-        confidence: Math.round(result.confidence || 50),
+        confidence: Math.round(result.confidence ?? 50),
         healthStatus: result.is_healthy ? 'healthy' : 'warning',
         issues: result.diseases?.map(disease => `${disease.disease_name} (${Math.round(disease.confidence)}% 확률)`) || [],
         recommendations: result.suggestions?.map(suggestion => suggestion.message) || [],

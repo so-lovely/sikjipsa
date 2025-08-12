@@ -15,7 +15,6 @@ import {
   Loader,
   Center,
   rem,
-  Space, // Import Space for clarity in spacing if needed, though margin is often better
 } from '@mantine/core';
 import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone';
 import { IconUpload, IconPhoto, IconX, IconCheck, IconAlertTriangle, IconRobot, IconSeedling, IconSearch } from '@tabler/icons-react';
@@ -23,7 +22,7 @@ import { useAuth } from '../context/AuthContext';
 import { diagnosisAPI } from '../api/diagnosis';
 
 // Constants
-const MAX_FILE_SIZE = 5 * 1024 ** 2; // 5MB
+const MAX_FILE_SIZE = 10 * 1024 ** 2; // 5MB
 const ACCEPTED_IMAGE_TYPES = IMAGE_MIME_TYPE;
 
 const HEALTH_STATUS_CONFIG = {
@@ -366,7 +365,6 @@ const useDiagnosis = () => {
 
     try {
       const result = await diagnosisAPI.analyzePlant(selectedImage.file, userLocation);
-      console.log('diagnosis result:', result);
       setDiagnosisResult(result);
     } catch (error) {
       console.error('Diagnosis error:', error);
