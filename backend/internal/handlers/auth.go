@@ -327,12 +327,18 @@ func (h *AuthHandler) KakaoLogin(c *fiber.Ctx) error {
 		})
 	}
 
+	fmt.Printf("=== KAKAO TOKEN RESPONSE ===\n%s\n=== END TOKEN RESPONSE ===\n", string(body))
+
 	var tokenResp KakaoTokenResponse
 	if err := json.Unmarshal(body, &tokenResp); err != nil {
+		fmt.Printf("Token parsing error: %v\n", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Failed to parse token response from Kakao",
 		})
 	}
+
+	fmt.Printf("=== PARSED TOKEN ===\nAccess Token: %s...\n=== END PARSED TOKEN ===\n", 
+		tokenResp.AccessToken[:min(20, len(tokenResp.AccessToken))])
 
 	// 2. 액세스 토큰으로 사용자 정보 획득
 	userInfoURL := "https://kapi.kakao.com/v2/user/me"
