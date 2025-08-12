@@ -103,20 +103,7 @@ export const diaryAPI = {
     return true;
   },
 
-  // 엔트리 날짜별 그룹화
-  groupEntriesByDate: (entries) => {
-    const grouped = {};
-    
-    entries.forEach(entry => {
-      const date = new Date(entry.entry_date).toLocaleDateString('ko-KR');
-      if (!grouped[date]) {
-        grouped[date] = [];
-      }
-      grouped[date].push(entry);
-    });
-
-    return grouped;
-  },
+  
 
   // 활동 타입별 아이콘 매핑
   getActivityIcon: (activityType) => {

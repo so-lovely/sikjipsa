@@ -36,89 +36,8 @@ export const diagnosisAPI = {
     return response.data;
   },
 
-  // 위치 정보 가져오기 (사용자 허용 시)
-  getCurrentLocation: () => {
-    return new Promise((resolve, reject) => {
-      if (!navigator.geolocation) {
-        reject(new Error('Geolocation is not supported by this browser.'));
-        return;
-      }
 
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          resolve({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-            accuracy: position.coords.accuracy
-          });
-        },
-        (error) => {
-          // 위치 정보를 가져올 수 없어도 에러로 처리하지 않음
-          console.warn('Could not get location:', error.message);
-          resolve(null);
-        },
-        {
-          enableHighAccuracy: false,
-          timeout: 10000,
-          maximumAge: 300000 // 5분 캐시
-        }
-      );
-    });
-  },
 
-  // 진단 결과 조회
-  getDiagnosisResult: async (diagnosisId) => {
-    const response = await apiClient.get(`/diagnosis/result/${diagnosisId}`);
-    return response.data;
-  },
-
-  // 진단 결과 폴링 (결과가 완료될 때까지 주기적으로 확인)
-  pollDiagnosisResult: async (diagnosisId, maxAttempts = 30, interval = 2000) => {
-    return new Promise((resolve, reject) => {
-      let attempts = 0;
-      
-      const poll = async () => {
-        try {
-          attempts++;
-          const result = await diagnosisAPI.getDiagnosisResult(diagnosisId);
-          
-          if (result.status === 'completed') {
-            resolve(result);
-          } else if (result.status === 'failed') {
-            reject(new Error(result.error_message || 'Analysis failed'));
-          } else if (attempts >= maxAttempts) {
-            reject(new Error('Analysis timeout - please try again'));
-          } else {
-            // 아직 processing 상태면 다시 시도
-            setTimeout(poll, interval);
-          }
-        } catch (error) {
-          if (attempts >= maxAttempts) {
-            reject(error);
-          } else {
-            setTimeout(poll, interval);
-          }
-        }
-      };
-      
-      poll();
-    });
-  },
-
-  // 진단 히스토리 조회
-  getDiagnosisHistory: async (params = {}) => {
-    const queryParams = new URLSearchParams();
-    
-    if (params.page) {
-      queryParams.append('page', params.page);
-    }
-    if (params.limit) {
-      queryParams.append('limit', params.limit);
-    }
-    
-    const response = await apiClient.get(`/diagnosis/history?${queryParams.toString()}`);
-    return response.data;
-  },
 
   // 이미지 파일 검증
   validateImageFile: (file) => {

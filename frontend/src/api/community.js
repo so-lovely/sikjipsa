@@ -110,11 +110,6 @@ export const communityAPI = {
     return response.data;
   },
 
-  // 댓글 조회
-  getComments: async (postId) => {
-    const response = await apiClient.get(`/community/posts/${postId}/comments`);
-    return response.data;
-  },
 
   // 댓글 작성
   createComment: async (postId, content, parentId = null) => {
@@ -142,35 +137,6 @@ export const communityAPI = {
   },
 
 
+
   
-
-  // 내가 작성한 게시글 조회
-  getMyPosts: async (params = {}) => {
-    const queryParams = new URLSearchParams();
-    
-    if (params.page) {
-      queryParams.append('page', params.page);
-    }
-    if (params.limit) {
-      queryParams.append('limit', params.limit);
-    }
-    
-    const response = await apiClient.get(`/community/my-posts?${queryParams.toString()}`);
-    return response.data;
-  },
-
-  // 내가 좋아요한 게시글 조회
-  getLikedPosts: async (params = {}) => {
-    const queryParams = new URLSearchParams();
-    
-    if (params.page) {
-      queryParams.append('page', params.page);
-    }
-    if (params.limit) {
-      queryParams.append('limit', params.limit);
-    }
-    
-    const response = await apiClient.get(`/community/liked-posts?${queryParams.toString()}`);
-    return response.data;
-  },
 };
