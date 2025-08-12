@@ -7,6 +7,7 @@ import '@mantine/core/styles.css';
 import '@mantine/dates/styles.css';
 import '@mantine/notifications/styles.css';
 import '@mantine/dropzone/styles.css';
+import './theme/global.css';
 
 import { theme } from './theme/theme';
 import { AuthProvider } from './context/AuthContext.jsx';
@@ -42,7 +43,7 @@ function App() {
               minHeight: '100vh',
               display: 'flex',
               flexDirection: 'column',
-              background: 'linear-gradient(135deg, #fafafa 0%, #f0f9ff 100%)'
+              backgroundColor: 'var(--bg)'
             }}>
               <Header />
               <main style={{ flex: 1, paddingTop: '80px' }}>

@@ -1,0 +1,142 @@
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+  /* Colors */
+  --bg: #F8FAFC;
+  --surface: #ffffff;
+  --primary-600: #16A34A;
+  --primary-500: #22C55E;
+  --primary-400: #34D399;
+  --accent: #FF7A18;
+  --charcoal: #0F1724;
+  --muted: #6B7280;
+  --glass: rgba(15, 23, 36, 0.04);
+  --shadow-sm: 0 6px 18px rgba(15, 23, 36, 0.06);
+  --shadow-md: 0 12px 30px rgba(15, 23, 36, 0.09);
+
+  /* Success, Warning colors */
+  --success: #10B981;
+  --warning: #F59E0B;
+
+  /* Primary Gradient */
+  --primary-gradient: linear-gradient(135deg, #34D399 0%, #16A34A 100%);
+
+  /* Border radius */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+
+  /* Spacing scale */
+  --space-xxs: 4px;
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 20px;
+  --space-lg: 32px;
+  --space-xl: 48px;
+  --space-xxl: 80px;
+
+  /* Typography */
+  --font-body: 'Pretendard', 'Noto Sans KR', system-ui, -apple-system, sans-serif;
+  --font-heading: 'Poppins', 'Inter', 'Pretendard', sans-serif;
+  
+  /* Font sizes */
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 16px;
+  --text-lg: 18px;
+  --text-xl: 20px;
+  --text-2xl: 24px;
+  --text-3xl: 28px;
+  --text-4xl: 36px;
+  --text-5xl: 48px;
+
+  /* Line heights */
+  --leading-tight: 1.05;
+  --leading-snug: 1.15;
+  --leading-normal: 1.6;
+
+  /* Letter spacing */
+  --tracking-tight: -0.5px;
+  --tracking-tighter: -1px;
+}
+
+/* Global styles */
+body {
+  font-family: var(--font-body);
+  background-color: var(--bg);
+  color: var(--charcoal);
+  line-height: var(--leading-normal);
+}
+
+/* Heading styles */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  color: var(--charcoal);
+}
+
+h1 {
+  font-size: clamp(32px, 5vw, 48px);
+  font-weight: 800;
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tighter);
+}
+
+h2 {
+  font-size: clamp(28px, 4vw, 36px);
+  font-weight: 700;
+}
+
+h3 {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+/* Custom utilities */
+.gradient-text {
+  background: var(--primary-gradient);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.glass-effect {
+  background: var(--glass);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.card-hover {
+  transition: transform 160ms cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 160ms cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+.card-hover:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-md);
+}
+
+.button-hover {
+  transition: transform 160ms cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 160ms cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+.button-hover:hover {
+  transform: scale(1.02) translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Focus styles for accessibility */
+*:focus-visible {
+  outline: 3px solid var(--primary-400);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}

@@ -43,17 +43,17 @@ function Header() {
   };
 
   const navItems = [
-    { path: '/encyclopedia', label: <IconBook size={36} /> },
-    { path: '/diagnosis', label: <IconRobot size={36} /> },
-    { path: '/community', label: <IconMessages size={36} /> },
-    { path: '/announcements', label: <IconSpeakerphone size={36} /> },
-    { path: '/diary', label: <IconNotebook size={36} /> }
+    { path: '/encyclopedia', label: '백과사전', icon: <IconBook size={20} /> },
+    { path: '/diagnosis', label: 'AI 진단', icon: <IconRobot size={20} /> },
+    { path: '/community', label: '커뮤니티', icon: <IconMessages size={20} /> },
+    { path: '/announcements', label: '공지사항', icon: <IconSpeakerphone size={20} /> },
+    { path: '/diary', label: '성장일기', icon: <IconNotebook size={20} /> }
   ];
 
   return (
     <Box 
       component="header"
-      h={60}
+      h={80}
       style={{
         position: 'fixed',
         top: 0,
@@ -62,7 +62,8 @@ function Header() {
         zIndex: 1000,
         background: 'rgba(255, 255, 255, 0.98)',
         backdropFilter: 'blur(12px)',
-        borderBottom: '1px solid var(--mantine-color-gray-3)'
+        borderBottom: '1px solid rgba(15, 23, 36, 0.08)',
+        boxShadow: 'var(--shadow-sm)'
       }}
     >
       <Container size="lg" h="100%">
@@ -74,12 +75,16 @@ function Header() {
               to="/" 
               style={{ textDecoration: 'none' }}
             >
-              <Group gap="xs">
-                <Text size="xl"><IconSeedling stroke={2} width={32} height={32}/></Text>
+              <Group gap="sm">
+                <IconSeedling stroke={2} size={28} color="var(--primary-600)" />
                 <Text 
                   size="xl" 
-                  fw={700} 
-                  c="green.6"
+                  style={{
+                    fontFamily: 'var(--font-heading)',
+                    fontWeight: 700,
+                    color: 'var(--primary-600)',
+                    fontSize: '24px'
+                  }}
                 >
                   식집사
                 </Text>
@@ -88,15 +93,23 @@ function Header() {
           </Group>
 
           {/* Desktop Navigation */}
-          <Group visibleFrom="md" gap="xs">
+          <Group visibleFrom="md" gap="sm">
             {navItems.map((item) => (
               <Button
                 key={item.path}
                 variant={location.pathname === item.path ? 'light' : 'subtle'}
-                color="green"
+                color="primary"
                 size="sm"
                 component={Link}
                 to={item.path}
+                leftSection={item.icon}
+                style={{
+                  fontWeight: 500,
+                  height: '40px',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: '14px',
+                  padding: '0 var(--space-md)'
+                }}
               >
                 {item.label}
               </Button>
@@ -107,22 +120,38 @@ function Header() {
           <Group>
             {isLoggedIn && user ? (
               <Group gap="sm">
-                <Text size="sm" c="dimmed" visibleFrom="sm">
+                <Text 
+                  size="sm" 
+                  visibleFrom="sm"
+                  style={{ 
+                    color: 'var(--muted)',
+                    fontWeight: 500 
+                  }}
+                >
                   안녕하세요, {user.username || user.name}님!
                 </Text>
                 <Button 
                   variant="subtle" 
-                  color="gray"
+                  color="primary"
                   size="sm"
                   component={Link}
                   to="/profile"
                   visibleFrom="md"
+                  style={{
+                    borderRadius: 'var(--radius-md)',
+                    padding: 'var(--space-xs)'
+                  }}
                 >
-                  <IconUserCircle stroke={1} width={32} height={32} />
+                  <IconUserCircle stroke={1.5} size={20} />
                 </Button>
                 <Button 
-                  variant="gradient"
-                  gradient={{ from: 'green.5', to: 'green.6' }}
+                  style={{
+                    background: 'var(--primary-gradient)',
+                    border: 'none',
+                    height: '36px',
+                    borderRadius: 'var(--radius-md)',
+                    fontWeight: 500
+                  }}
                   size="sm"
                   onClick={handleLogout}
                   visibleFrom="md"
@@ -132,8 +161,13 @@ function Header() {
               </Group>
             ) : (
               <Button 
-                variant="gradient"
-                gradient={{ from: 'green.5', to: 'green.6' }}
+                style={{
+                  background: 'var(--primary-gradient)',
+                  border: 'none',
+                  height: '36px',
+                  borderRadius: 'var(--radius-md)',
+                  fontWeight: 500
+                }}
                 size="sm"
                 component={Link}
                 to="/login"
@@ -149,6 +183,7 @@ function Header() {
               onClick={toggle}
               hiddenFrom="md"
               size="sm"
+              color="var(--primary-600)"
             />
           </Group>
         </Group>
@@ -160,21 +195,36 @@ function Header() {
         onClose={close}
         title={
           <Group>
-            <IconSeedling size={24} color="var(--mantine-color-green-6)" />
-            <Text size="lg" fw={700} c="green.6">식집사</Text>
+            <IconSeedling size={24} color="var(--primary-600)" />
+            <Text 
+              size="lg" 
+              style={{
+                fontWeight: 700,
+                color: 'var(--primary-600)',
+                fontFamily: 'var(--font-heading)'
+              }}
+            >
+              식집사
+            </Text>
           </Group>
         }
         overlayProps={{ backgroundOpacity: 0.5, blur: 4 }}
       >
-        <Stack gap="md">
+        <Stack gap="sm">
           {navItems.map((item) => (
             <Button
               key={item.path}
               variant={location.pathname === item.path ? 'light' : 'subtle'}
-              color="green"
+              color="primary"
               fullWidth
               justify="flex-start"
+              leftSection={item.icon}
               onClick={() => handleNavClick(item.path)}
+              style={{
+                borderRadius: 'var(--radius-md)',
+                height: '44px',
+                fontWeight: 500
+              }}
             >
               {item.label}
             </Button>
@@ -184,16 +234,27 @@ function Header() {
             <>
               <Button
                 variant="subtle"
-                color="gray"
+                color="primary"
                 fullWidth
                 justify="flex-start"
+                leftSection={<IconUserCircle stroke={1.5} size={20} />}
                 onClick={() => handleNavClick('/profile')}
+                style={{
+                  borderRadius: 'var(--radius-md)',
+                  height: '44px',
+                  fontWeight: 500
+                }}
               >
-                <IconUserCircle stroke={1} width={32} height={32} />
+                프로필
               </Button>
               <Button
-                variant="gradient"
-                gradient={{ from: 'green.5', to: 'green.6' }}
+                style={{
+                  background: 'var(--primary-gradient)',
+                  border: 'none',
+                  borderRadius: 'var(--radius-md)',
+                  height: '44px',
+                  fontWeight: 500
+                }}
                 fullWidth
                 onClick={handleLogout}
               >
@@ -202,8 +263,13 @@ function Header() {
             </>
           ) : (
             <Button
-              variant="gradient"
-              gradient={{ from: 'green.5', to: 'green.6' }}
+              style={{
+                background: 'var(--primary-gradient)',
+                border: 'none',
+                borderRadius: 'var(--radius-md)',
+                height: '44px',
+                fontWeight: 500
+              }}
               fullWidth
               onClick={() => handleNavClick('/login')}
             >
