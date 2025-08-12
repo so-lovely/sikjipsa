@@ -37,11 +37,17 @@ type UpdatePostRequest struct {
 }
 
 func (h *CommunityHandler) GetPosts(c *fiber.Ctx) error {
+	fmt.Printf("GetPosts called with params: page=%s, type=%s, search=%s\n", 
+		c.Query("page", "1"), c.Query("type", ""), c.Query("search", ""))
+
 	var posts []models.CommunityPost
-	query := h.db.Preload("User").Preload("Comments.User")
+	var totalCount int64
+	
+	// Base query with proper joins and exclude deleted posts
+	query := h.db.Where("deleted_at IS NULL").Preload("User").Preload("Comments.User")
 
 	// Filter by post type
-	if postType := c.Query("type"); postType != "" {
+	if postType := c.Query("type"); postType != "" && postType != "all" {
 		query = query.Where("post_type = ?", postType)
 	}
 
@@ -50,19 +56,42 @@ func (h *CommunityHandler) GetPosts(c *fiber.Ctx) error {
 		query = query.Where("title ILIKE ? OR content ILIKE ?", "%"+search+"%", "%"+search+"%")
 	}
 
+	// Get total count for pagination
+	countQuery := h.db.Model(&models.CommunityPost{}).Where("deleted_at IS NULL")
+	if postType := c.Query("type"); postType != "" && postType != "all" {
+		countQuery = countQuery.Where("post_type = ?", postType)
+	}
+	if search := c.Query("search"); search != "" {
+		countQuery = countQuery.Where("title ILIKE ? OR content ILIKE ?", "%"+search+"%", "%"+search+"%")
+	}
+	countQuery.Count(&totalCount)
+
 	// Pagination
 	page, _ := strconv.Atoi(c.Query("page", "1"))
 	limit, _ := strconv.Atoi(c.Query("limit", "20"))
 	offset := (page - 1) * limit
 
-	// Order by creation date
+	// Order by creation date and fetch posts
 	if err := query.Order("created_at DESC").Limit(limit).Offset(offset).Find(&posts).Error; err != nil {
+		fmt.Printf("Database error in GetPosts: %v\n", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Failed to fetch posts",
 		})
 	}
 
-	return c.JSON(posts)
+	// Calculate pagination metadata
+	totalPages := int((totalCount + int64(limit) - 1) / int64(limit))
+	
+	response := fiber.Map{
+		"posts":        posts,
+		"currentPage":  page,
+		"totalPages":   totalPages,
+		"totalCount":   totalCount,
+		"hasMore":      page < totalPages,
+	}
+
+	fmt.Printf("GetPosts response: found %d posts, page %d/%d\n", len(posts), page, totalPages)
+	return c.JSON(response)
 }
 
 func (h *CommunityHandler) CreatePost(c *fiber.Ctx) error {
