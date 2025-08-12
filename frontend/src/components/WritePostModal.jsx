@@ -1,246 +1,24 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import styled from 'styled-components';
-import { PrimaryButton, Input } from '../styles/GlobalStyles';
+import {
+  Modal,
+  Title,
+  Text,
+  TextInput,
+  Button,
+  Group,
+  Stack,
+  Select,
+  Textarea,
+  FileInput,
+  Image,
+  ActionIcon,
+  Box,
+  SimpleGrid,
+  Text as MantineText
+} from '@mantine/core';
+import { IconPhoto, IconX, IconSend } from '@tabler/icons-react';
 import { useAuth } from '../context/AuthContext.jsx';
-
-const ModalOverlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: ${props => props.theme.spacing[4]};
-`;
-
-const ModalContent = styled.div`
-  background: white;
-  border-radius: ${props => props.theme.borderRadius.xl};
-  width: 100%;
-  max-width: 600px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: ${props => props.theme.shadows.xl};
-`;
-
-const ModalHeader = styled.div`
-  padding: ${props => props.theme.spacing[6]} ${props => props.theme.spacing[6]} ${props => props.theme.spacing[4]};
-  border-bottom: 1px solid ${props => props.theme.colors.gray[200]};
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const ModalTitle = styled.h2`
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: ${props => props.theme.colors.gray[800]};
-  margin: 0;
-`;
-
-const CloseButton = styled.button`
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  color: ${props => props.theme.colors.gray[500]};
-  cursor: pointer;
-  padding: ${props => props.theme.spacing[1]};
-  border-radius: ${props => props.theme.borderRadius.md};
-  
-  &:hover {
-    background: ${props => props.theme.colors.gray[100]};
-    color: ${props => props.theme.colors.gray[700]};
-  }
-`;
-
-const ModalBody = styled.div`
-  padding: ${props => props.theme.spacing[6]};
-`;
-
-const FormGroup = styled.div`
-  margin-bottom: ${props => props.theme.spacing[6]};
-`;
-
-const Label = styled.label`
-  display: block;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: ${props => props.theme.colors.gray[700]};
-  margin-bottom: ${props => props.theme.spacing[2]};
-`;
-
-const CategorySelect = styled.select`
-  width: 100%;
-  padding: ${props => props.theme.spacing[3]} ${props => props.theme.spacing[4]};
-  border: 1px solid ${props => props.theme.colors.gray[300]};
-  border-radius: ${props => props.theme.borderRadius.lg};
-  font-size: 1rem;
-  background: white;
-  color: ${props => props.theme.colors.gray[700]};
-  
-  &:focus {
-    outline: none;
-    border-color: ${props => props.theme.colors.primary[500]};
-    box-shadow: 0 0 0 3px ${props => props.theme.colors.primary[100]};
-  }
-`;
-
-const TitleInput = styled(Input)`
-  width: 100%;
-  padding: ${props => props.theme.spacing[3]} ${props => props.theme.spacing[4]};
-  font-size: 1rem;
-`;
-
-const ContentTextarea = styled.textarea`
-  width: 100%;
-  min-height: 200px;
-  padding: ${props => props.theme.spacing[4]};
-  border: 1px solid ${props => props.theme.colors.gray[300]};
-  border-radius: ${props => props.theme.borderRadius.lg};
-  font-size: 1rem;
-  font-family: inherit;
-  resize: vertical;
-  
-  &:focus {
-    outline: none;
-    border-color: ${props => props.theme.colors.primary[500]};
-    box-shadow: 0 0 0 3px ${props => props.theme.colors.primary[100]};
-  }
-  
-  &::placeholder {
-    color: ${props => props.theme.colors.gray[400]};
-  }
-`;
-
-const ImageUploadSection = styled.div`
-  border: 2px dashed ${props => props.theme.colors.gray[300]};
-  border-radius: ${props => props.theme.borderRadius.lg};
-  padding: ${props => props.theme.spacing[6]};
-  text-align: center;
-  transition: all ${props => props.theme.transitions.fast};
-  cursor: pointer;
-  
-  &:hover, &.dragover {
-    border-color: ${props => props.theme.colors.primary[400]};
-    background: ${props => props.theme.colors.primary[50]};
-  }
-  
-  &.has-image {
-    border-style: solid;
-    border-color: ${props => props.theme.colors.primary[300]};
-    background: ${props => props.theme.colors.primary[50]};
-  }
-`;
-
-const ImageUploadText = styled.div`
-  color: ${props => props.theme.colors.gray[600]};
-  
-  .icon {
-    font-size: 2rem;
-    margin-bottom: ${props => props.theme.spacing[2]};
-  }
-  
-  .main-text {
-    font-size: 1rem;
-    margin-bottom: ${props => props.theme.spacing[1]};
-  }
-  
-  .sub-text {
-    font-size: 0.875rem;
-    color: ${props => props.theme.colors.gray[500]};
-  }
-`;
-
-const ImagePreview = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: ${props => props.theme.spacing[3]};
-  margin-top: ${props => props.theme.spacing[4]};
-`;
-
-const PreviewImage = styled.div`
-  position: relative;
-  width: 100px;
-  height: 100px;
-  border-radius: ${props => props.theme.borderRadius.lg};
-  overflow: hidden;
-  
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-`;
-
-const RemoveImageButton = styled.button`
-  position: absolute;
-  top: ${props => props.theme.spacing[1]};
-  right: ${props => props.theme.spacing[1]};
-  background: rgba(0, 0, 0, 0.7);
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  font-size: 0.75rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  
-  &:hover {
-    background: rgba(0, 0, 0, 0.9);
-  }
-`;
-
-const HiddenFileInput = styled.input`
-  display: none;
-`;
-
-const ErrorMessage = styled.div`
-  color: ${props => props.theme.colors.red[600]};
-  font-size: 0.875rem;
-  margin-top: ${props => props.theme.spacing[1]};
-`;
-
-const ModalFooter = styled.div`
-  padding: ${props => props.theme.spacing[4]} ${props => props.theme.spacing[6]} ${props => props.theme.spacing[6]};
-  border-top: 1px solid ${props => props.theme.colors.gray[200]};
-  display: flex;
-  gap: ${props => props.theme.spacing[3]};
-  justify-content: flex-end;
-`;
-
-const SecondaryButton = styled.button`
-  padding: ${props => props.theme.spacing[3]} ${props => props.theme.spacing[6]};
-  border: 1px solid ${props => props.theme.colors.gray[300]};
-  border-radius: ${props => props.theme.borderRadius.lg};
-  background: white;
-  color: ${props => props.theme.colors.gray[700]};
-  font-weight: 500;
-  cursor: pointer;
-  transition: all ${props => props.theme.transitions.fast};
-  
-  &:hover {
-    background: ${props => props.theme.colors.gray[50]};
-    border-color: ${props => props.theme.colors.gray[400]};
-  }
-`;
-
-const SubmitButton = styled(PrimaryButton)`
-  padding: ${props => props.theme.spacing[3]} ${props => props.theme.spacing[6]};
-  
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-`;
 
 const categories = [
   { value: '질문답변', label: '질문답변' },
@@ -254,7 +32,6 @@ function WritePostModal({ isOpen, onClose, onSubmit }) {
   const { user, isLoggedIn } = useAuth();
   const [images, setImages] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [dragOver, setDragOver] = useState(false);
   
   const {
     register,
@@ -271,6 +48,8 @@ function WritePostModal({ isOpen, onClose, onSubmit }) {
   };
 
   const handleFileSelect = (files) => {
+    if (!files || files.length === 0) return;
+    
     const newImages = Array.from(files).map(file => ({
       file,
       preview: URL.createObjectURL(file),
@@ -278,35 +57,6 @@ function WritePostModal({ isOpen, onClose, onSubmit }) {
     }));
     
     setImages(prev => [...prev, ...newImages].slice(0, 5)); // 최대 5개
-  };
-
-  const handleFileInputChange = (e) => {
-    if (e.target.files.length > 0) {
-      handleFileSelect(e.target.files);
-    }
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    setDragOver(false);
-    
-    const files = Array.from(e.dataTransfer.files).filter(file => 
-      file.type.startsWith('image/')
-    );
-    
-    if (files.length > 0) {
-      handleFileSelect(files);
-    }
-  };
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    setDragOver(true);
-  };
-
-  const handleDragLeave = (e) => {
-    e.preventDefault();
-    setDragOver(false);
   };
 
   const removeImage = (imageId) => {
@@ -343,11 +93,11 @@ function WritePostModal({ isOpen, onClose, onSubmit }) {
       }
       
       const formData = {
-            ...data,
-            post_type: data.category,  // category를 post_type으로 매핑
-            images: images,
-            author: authorName,
-        };
+        ...data,
+        post_type: data.category,  // category를 post_type으로 매핑
+        images: images,
+        author: authorName,
+      };
       console.log('Submitting form data:', formData);
       await onSubmit(formData);
       handleClose();
@@ -362,140 +112,153 @@ function WritePostModal({ isOpen, onClose, onSubmit }) {
   if (!isOpen) return null;
 
   return (
-    <ModalOverlay onClick={(e) => e.target === e.currentTarget && handleClose()}>
-      <ModalContent>
-        <ModalHeader>
-          <ModalTitle>✏️ 새 글 작성</ModalTitle>
-          <CloseButton onClick={handleClose}>✕</CloseButton>
-        </ModalHeader>
+    <Modal 
+      opened={isOpen} 
+      onClose={handleClose} 
+      title={<Title order={3} c="gray.8">✏️ 새 글 작성</Title>}
+      size="lg" 
+      centered
+      radius="xl"
+      styles={{
+        header: { borderBottom: '1px solid var(--mantine-color-gray-2)' },
+        body: { padding: 'var(--mantine-spacing-xl)' }
+      }}
+    >
+      <form onSubmit={handleSubmit(onFormSubmit)}>
+        <Stack gap="xl">
+          {/* Category Selection */}
+          <div>
+            <MantineText size="sm" fw={500} mb="xs" c="gray.7">카테고리</MantineText>
+            <Select
+              placeholder="카테고리를 선택하세요"
+              data={categories}
+              {...register('category', { required: '카테고리를 선택해주세요' })}
+              error={errors.category?.message}
+              size="md"
+              radius="lg"
+            />
+          </div>
 
-        <form onSubmit={handleSubmit(onFormSubmit)}>
-          <ModalBody>
-            <FormGroup>
-              <Label htmlFor="category">카테고리</Label>
-              <CategorySelect
-                id="category"
-                {...register('category', { required: '카테고리를 선택해주세요' })}
-              >
-                <option value="">카테고리를 선택하세요</option>
-                {categories.map(category => (
-                  <option key={category.value} value={category.value}>
-                    {category.label}
-                  </option>
+          {/* Title Input */}
+          <div>
+            <MantineText size="sm" fw={500} mb="xs" c="gray.7">제목</MantineText>
+            <TextInput
+              placeholder="제목을 입력하세요"
+              {...register('title', {
+                required: '제목을 입력해주세요',
+                minLength: {
+                  value: 2,
+                  message: '제목은 최소 2글자 이상이어야 합니다'
+                },
+                maxLength: {
+                  value: 100,
+                  message: '제목은 100글자를 초과할 수 없습니다'
+                }
+              })}
+              error={errors.title?.message}
+              size="md"
+              radius="lg"
+            />
+          </div>
+
+          {/* Content Input */}
+          <div>
+            <MantineText size="sm" fw={500} mb="xs" c="gray.7">내용</MantineText>
+            <Textarea
+              placeholder="식물에 관한 이야기를 자유롭게 나누어보세요..."
+              {...register('content', {
+                required: '내용을 입력해주세요',
+                minLength: {
+                  value: 10,
+                  message: '내용은 최소 10글자 이상이어야 합니다'
+                }
+              })}
+              error={errors.content?.message}
+              minRows={6}
+              size="md"
+              radius="lg"
+            />
+          </div>
+
+          {/* Image Upload */}
+          <div>
+            <MantineText size="sm" fw={500} mb="xs" c="gray.7">이미지 첨부 (선택사항)</MantineText>
+            <FileInput
+              placeholder="클릭하거나 드래그하여 이미지 업로드"
+              leftSection={<IconPhoto size={16} />}
+              accept="image/*"
+              multiple
+              onChange={handleFileSelect}
+              disabled={images.length >= 5}
+              size="md"
+              radius="lg"
+              style={{
+                border: '2px dashed var(--mantine-color-gray-3)',
+                backgroundColor: images.length > 0 ? 'var(--mantine-color-green-0)' : 'transparent'
+              }}
+            />
+            <MantineText size="xs" c="dimmed" mt="xs">
+              JPG, PNG 파일만 가능, 최대 5개
+            </MantineText>
+
+            {/* Image Preview */}
+            {images.length > 0 && (
+              <SimpleGrid cols={3} spacing="sm" mt="md">
+                {images.map(image => (
+                  <Box key={image.id} pos="relative">
+                    <Image
+                      src={image.preview}
+                      alt="미리보기"
+                      radius="lg"
+                      h={80}
+                      fit="cover"
+                    />
+                    <ActionIcon
+                      size="sm"
+                      color="red"
+                      variant="filled"
+                      pos="absolute"
+                      top={4}
+                      right={4}
+                      onClick={() => removeImage(image.id)}
+                    >
+                      <IconX size={12} />
+                    </ActionIcon>
+                  </Box>
                 ))}
-              </CategorySelect>
-              {errors.category && (
-                <ErrorMessage>{errors.category.message}</ErrorMessage>
-              )}
-            </FormGroup>
+              </SimpleGrid>
+            )}
+          </div>
 
-            <FormGroup>
-              <Label htmlFor="title">제목</Label>
-              <TitleInput
-                id="title"
-                placeholder="제목을 입력하세요"
-                {...register('title', {
-                  required: '제목을 입력해주세요',
-                  minLength: {
-                    value: 2,
-                    message: '제목은 최소 2글자 이상이어야 합니다'
-                  },
-                  maxLength: {
-                    value: 100,
-                    message: '제목은 100글자를 초과할 수 없습니다'
-                  }
-                })}
-              />
-              {errors.title && (
-                <ErrorMessage>{errors.title.message}</ErrorMessage>
-              )}
-            </FormGroup>
-
-            <FormGroup>
-              <Label htmlFor="content">내용</Label>
-              <ContentTextarea
-                id="content"
-                placeholder="식물에 관한 이야기를 자유롭게 나누어보세요..."
-                {...register('content', {
-                  required: '내용을 입력해주세요',
-                  minLength: {
-                    value: 10,
-                    message: '내용은 최소 10글자 이상이어야 합니다'
-                  }
-                })}
-              />
-              {errors.content && (
-                <ErrorMessage>{errors.content.message}</ErrorMessage>
-              )}
-            </FormGroup>
-
-            <FormGroup>
-              <Label>이미지 첨부 (선택사항)</Label>
-              <ImageUploadSection
-                className={`${dragOver ? 'dragover' : ''} ${images.length > 0 ? 'has-image' : ''}`}
-                onClick={() => document.getElementById('file-input').click()}
-                onDrop={handleDrop}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-              >
-                <ImageUploadText>
-                  <div className="icon">📷</div>
-                  <div className="main-text">
-                    {images.length > 0 
-                      ? `${images.length}개 이미지 선택됨`
-                      : '클릭하거나 드래그하여 이미지 업로드'
-                    }
-                  </div>
-                  <div className="sub-text">
-                    JPG, PNG 파일만 가능, 최대 5개
-                  </div>
-                </ImageUploadText>
-              </ImageUploadSection>
-              
-              <HiddenFileInput
-                id="file-input"
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={handleFileInputChange}
-              />
-
-              {images.length > 0 && (
-                <ImagePreview>
-                  {images.map(image => (
-                    <PreviewImage key={image.id}>
-                      <img src={image.preview} alt="미리보기" />
-                      <RemoveImageButton 
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          removeImage(image.id);
-                        }}
-                      >
-                        ✕
-                      </RemoveImageButton>
-                    </PreviewImage>
-                  ))}
-                </ImagePreview>
-              )}
-            </FormGroup>
-          </ModalBody>
-
-          <ModalFooter>
-            <SecondaryButton type="button" onClick={handleClose}>
+          {/* Form Actions */}
+          <Group justify="flex-end" gap="md" pt="md">
+            <Button
+              variant="light"
+              onClick={handleClose}
+              size="md"
+              radius="lg"
+            >
               취소
-            </SecondaryButton>
-            <SubmitButton 
-              type="submit" 
+            </Button>
+            <Button
+              type="submit"
+              leftSection={<IconSend size={16} />}
               disabled={isSubmitting}
-              style={{ pointerEvents: isSubmitting ? 'none' : 'auto' }}
+              loading={isSubmitting}
+              variant="gradient"
+              gradient={{ from: 'green.5', to: 'green.6' }}
+              size="md"
+              radius="lg"
+              style={{ 
+                pointerEvents: isSubmitting ? 'none' : 'auto' 
+              }}
             >
               {isSubmitting ? '게시하는 중...' : '게시하기'}
-            </SubmitButton>
-          </ModalFooter>
-        </form>
-      </ModalContent>
-    </ModalOverlay>
+            </Button>
+          </Group>
+        </Stack>
+      </form>
+    </Modal>
   );
 }
 

@@ -13,17 +13,11 @@ import {
   Stack,
   Badge,
   Avatar,
-  Modal,
-  Textarea,
   ScrollArea,
-  ActionIcon,
-  FileInput,
-  Image,
-  Select,
-  Loader // Loader를 import 했는지 확인하세요.
+  Loader
 } from '@mantine/core';
-import { useDisclosure, useDebouncedValue } from '@mantine/hooks';
-import { IconSearch, IconHeart, IconMessage, IconPlus, IconSend, IconPhoto, IconX } from '@tabler/icons-react';
+import { useDebouncedValue } from '@mantine/hooks';
+import { IconSearch, IconHeart, IconMessage, IconPlus } from '@tabler/icons-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { communityAPI } from '../api/community.js';
 
@@ -43,11 +37,7 @@ function Community() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
 
-  // 모달 및 새 게시글 상태
-  const [opened, { open, close }] = useDisclosure(false);
-  const [newPost, setNewPost] = useState({ title: '', content: '', category: 'general' });
-  const [selectedImages, setSelectedImages] = useState([]);
-  const [imageFiles, setImageFiles] = useState([]);
+  // 새 게시글 상태 (모달 제거)
 
   const categories = [
     { value: 'all', label: '전체', emoji: '🌿' },
@@ -58,13 +48,7 @@ function Community() {
     { value: 'trade', label: '나눔', emoji: '🤝' }
   ];
 
-  const categoryOptions = [
-    { value: 'general', label: '일반' },
-    { value: 'question', label: '질문' },
-    { value: 'tip', label: '꿀팁' },
-    { value: 'share', label: '자랑' },
-    { value: 'trade', label: '나눔' }
-  ];
+
 
   // --- 2. 데이터 로딩 로직 ---
 
@@ -143,38 +127,19 @@ const lastPostElementRef = useCallback(node => {
     navigate(`/community/post/${postId}`);
   };
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmitPost = async () => {
-    if (!newPost.title.trim() || !newPost.content.trim()) return;
-    if (isSubmitting) return; // Prevent multiple submissions
-    
-    setIsSubmitting(true);
-    try {
-      const createdPost = await communityAPI.createPost(newPost, imageFiles);
-      setPosts(prev => [createdPost, ...prev]);
-      setNewPost({ title: '', content: '', category: 'general' });
-      setSelectedImages([]);
-      setImageFiles([]);
-      close();
-    } catch (error) {
-      console.error('Error creating post:', error);
-      setError('게시글 작성에 실패했습니다.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
-  // ... getCategoryColor, getCategoryLabel, formatDate, handleImageSelect, removeImage 등 기존 함수들 ...
-  // (이 함수들은 수정할 필요가 없으므로 생략합니다. 기존 코드를 그대로 두시면 됩니다.)
+  // Utility functions
   const getCategoryColor = (category) => {
     const colors = { general: 'gray', question: 'blue', tip: 'green', share: 'pink', trade: 'orange' };
     return colors[category] || 'gray';
   };
+  
   const getCategoryLabel = (category) => {
     const labels = { general: '일반', question: '질문', tip: '꿀팁', share: '자랑', trade: '나눔' };
     return labels[category] || category;
   };
+  
   const formatDate = (dateString) => {
     if (!dateString) return '알 수 없음';
     const date = new Date(dateString);
@@ -187,27 +152,6 @@ const lastPostElementRef = useCallback(node => {
     if (diffHours < 24) return `${diffHours}시간 전`;
     if (diffDays < 7) return `${diffDays}일 전`;
     return date.toLocaleDateString('ko-KR');
-  };
-  const handleImageSelect = (files) => {
-    if (!files || files.length === 0) return;
-    const newFiles = Array.from(files).slice(0, 5 - selectedImages.length);
-    newFiles.forEach((file) => {
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          setSelectedImages(prev => [...prev, { id: Date.now() + Math.random(), url: e.target.result, file: file }]);
-          setImageFiles(prev => [...prev, { file: file }]);
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-  };
-  const removeImage = (imageId) => {
-    const imageToRemove = selectedImages.find(img => img.id === imageId);
-    if (imageToRemove) {
-      setSelectedImages(prev => prev.filter(img => img.id !== imageId));
-      setImageFiles(prev => prev.filter(f => f.file !== imageToRemove.file));
-    }
   };
 
 
@@ -237,7 +181,7 @@ const lastPostElementRef = useCallback(node => {
         </Group>
         <Button
           leftSection={<IconPlus size={16} />}
-          onClick={open}
+          onClick={() => navigate('/community/write')}
           disabled={!isLoggedIn}
           variant="gradient"
           gradient={{ from: 'green.5', to: 'green.6' }}
@@ -337,44 +281,7 @@ const lastPostElementRef = useCallback(node => {
         </Card>
       )}
 
-      {/* ... Write Post Modal, 로그인 유도 카드 등 나머지 UI는 그대로 ... */}
-      <Modal opened={opened} onClose={close} title={<Title order={3} c="gray.8">새 게시글 작성</Title>} size="lg" centered>
-        <Stack gap="md">
-          <TextInput label="제목" placeholder="게시글 제목을 입력하세요..." value={newPost.title} onChange={(e) => setNewPost(prev => ({ ...prev, title: e.target.value }))} required />
-          <Select label="카테고리" placeholder="카테고리를 선택하세요" value={newPost.category} onChange={(value) => setNewPost(prev => ({ ...prev, category: value }))} data={categoryOptions} required />
-          <Textarea label="내용" placeholder="내용을 입력하세요..." minRows={6} value={newPost.content} onChange={(e) => setNewPost(prev => ({ ...prev, content: e.target.value }))} required />
-          <div>
-            <Text size="sm" fw={500} mb="xs">이미지 첨부 (최대 5개)</Text>
-            <FileInput placeholder="이미지를 선택하세요..." leftSection={<IconPhoto size={16} />} accept="image/*" multiple onChange={handleImageSelect} disabled={selectedImages.length >= 5} />
-            {selectedImages.length > 0 && (
-              <SimpleGrid cols={3} spacing="xs" mt="sm">
-                {selectedImages.map((image) => (
-                  <Box key={image.id} pos="relative">
-                    <Image src={image.url} alt="Preview" radius="sm" h={80} fit="cover" />
-                    <ActionIcon size="sm" color="red" variant="filled" pos="absolute" top={4} right={4} onClick={() => removeImage(image.id)}>
-                      <IconX size={12} />
-                    </ActionIcon>
-                  </Box>
-                ))}
-              </SimpleGrid>
-            )}
-          </div>
-          <Group justify="flex-end" gap="sm">
-            <Button variant="light" onClick={close}>취소</Button>
-            <Button 
-              leftSection={<IconSend size={16} />} 
-              onClick={handleSubmitPost} 
-              disabled={!newPost.title.trim() || !newPost.content.trim() || isSubmitting} 
-              loading={isSubmitting}
-              variant="gradient" 
-              gradient={{ from: 'green.5', to: 'green.6' }}
-              style={{ pointerEvents: isSubmitting ? 'none' : 'auto' }}
-            >
-              {isSubmitting ? '게시하는 중...' : '게시하기'}
-            </Button>
-          </Group>
-        </Stack>
-      </Modal>
+
       {!isLoggedIn && (
         <Card shadow="sm" radius="md" padding="lg" mt="xl" style={{ textAlign: 'center' }}>
           <Stack align="center" gap="sm">

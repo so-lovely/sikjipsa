@@ -17,6 +17,7 @@ import Home from './pages/Home.jsx';
 import Encyclopedia from './pages/Encyclopedia.jsx';
 import Diagnosis from './pages/Diagnosis.jsx';
 import Community from './pages/Community.jsx';
+import CommunityWrite from './pages/CommunityWrite.jsx';
 import PostDetail from './pages/PostDetail.jsx';
 import Diary from './pages/Diary.jsx';
 import DiaryWrite from './pages/DiaryWrite.jsx';
@@ -52,6 +53,7 @@ function App() {
                   <Route path="/encyclopedia" element={<Encyclopedia />} />
                   <Route path="/diagnosis" element={<Diagnosis />} />
                   <Route path="/community" element={<Community />} />
+                  <Route path="/community/write" element={<CommunityWrite />} />
                   <Route path="/community/post/:id" element={<PostDetail />} />
                   <Route path="/announcements" element={<Announcements />} />
                   <Route path="/announcements/:id" element={<AnnouncementDetail />} />
