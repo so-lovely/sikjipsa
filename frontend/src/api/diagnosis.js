@@ -37,7 +37,10 @@ export const diagnosisAPI = {
   },
 
 
-
+  getDiagnosisResult: async (diagnosisId) => {
+    const response = await apiClient.get(`/diagnosis/result/${diagnosisId}`);
+    return response.data;
+  },
 
 
 
