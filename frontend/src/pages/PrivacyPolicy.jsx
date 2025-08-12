@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Title, Text, Box, Paper, Stack } from '@mantine/core';
+import { Container, Title, Text, Paper, Stack } from '@mantine/core';
 
 const PrivacyPolicy = () => {
   return (

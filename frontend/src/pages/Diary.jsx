@@ -11,7 +11,6 @@ import {
   SimpleGrid,
   Box,
   Stack,
-  Badge,
   Image,
   SegmentedControl,
   Select,

@@ -11,9 +11,7 @@ import {
   Avatar,
   TextInput,
   Alert,
-  Divider,
   Badge,
-  Center,
   Loader
 } from '@mantine/core';
 import { IconUser, IconEdit, IconCheck, IconX, IconAlertCircle, IconUserCircle } from '@tabler/icons-react';

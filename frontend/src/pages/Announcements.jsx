@@ -8,13 +8,11 @@ import {
   Button,
   Group,
   Card,
-  SimpleGrid,
   Stack,
   Badge,
   Avatar,
   Modal,
   Textarea,
-  ActionIcon,
   Switch
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
@@ -25,8 +23,6 @@ import {
   IconSend, 
   IconPin,
   IconEye,
-  IconEdit,
-  IconTrash
 } from '@tabler/icons-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { announcementAPI } from '../api/announcements.js';

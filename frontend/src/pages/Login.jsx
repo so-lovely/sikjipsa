@@ -8,7 +8,6 @@ import {
   IconNotebook,
   IconPlant,
   IconSeedling,
-  IconUserCircle
 } from '@tabler/icons-react';
 function Login() {
   return (
