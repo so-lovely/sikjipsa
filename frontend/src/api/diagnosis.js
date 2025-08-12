@@ -39,6 +39,41 @@ export const diagnosisAPI = {
 
 
 
+
+
+  // 진단 결과 폴링 (결과가 완료될 때까지 주기적으로 확인)
+  pollDiagnosisResult: async (diagnosisId, maxAttempts = 30, interval = 2000) => {
+    return new Promise((resolve, reject) => {
+      let attempts = 0;
+      
+      const poll = async () => {
+        try {
+          attempts++;
+          const result = await diagnosisAPI.getDiagnosisResult(diagnosisId);
+          
+          if (result.status === 'completed') {
+            resolve(result);
+          } else if (result.status === 'failed') {
+            reject(new Error(result.error_message || 'Analysis failed'));
+          } else if (attempts >= maxAttempts) {
+            reject(new Error('Analysis timeout - please try again'));
+          } else {
+            // 아직 processing 상태면 다시 시도
+            setTimeout(poll, interval);
+          }
+        } catch (error) {
+          if (attempts >= maxAttempts) {
+            reject(error);
+          } else {
+            setTimeout(poll, interval);
+          }
+        }
+      };
+      
+      poll();
+    });
+  },
+
   // 이미지 파일 검증
   validateImageFile: (file) => {
     // 파일 타입 검증
