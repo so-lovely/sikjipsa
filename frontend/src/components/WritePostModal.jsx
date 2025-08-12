@@ -327,6 +327,10 @@ function WritePostModal({ isOpen, onClose, onSubmit }) {
       return;
     }
 
+    if (isSubmitting) {
+      return; // Prevent multiple submissions
+    }
+
     setIsSubmitting(true);
     
     try {
@@ -334,6 +338,7 @@ function WritePostModal({ isOpen, onClose, onSubmit }) {
       
       if (!authorName) {
         alert('사용자 정보를 불러올 수 없습니다. 다시 로그인해주세요.');
+        setIsSubmitting(false);
         return;
       }
       
@@ -483,8 +488,9 @@ function WritePostModal({ isOpen, onClose, onSubmit }) {
             <SubmitButton 
               type="submit" 
               disabled={isSubmitting}
+              style={{ pointerEvents: isSubmitting ? 'none' : 'auto' }}
             >
-              {isSubmitting ? '작성 중...' : '글 작성하기'}
+              {isSubmitting ? '게시하는 중...' : '게시하기'}
             </SubmitButton>
           </ModalFooter>
         </form>

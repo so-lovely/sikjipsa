@@ -143,8 +143,13 @@ const lastPostElementRef = useCallback(node => {
     navigate(`/community/post/${postId}`);
   };
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleSubmitPost = async () => {
     if (!newPost.title.trim() || !newPost.content.trim()) return;
+    if (isSubmitting) return; // Prevent multiple submissions
+    
+    setIsSubmitting(true);
     try {
       const createdPost = await communityAPI.createPost(newPost, imageFiles);
       setPosts(prev => [createdPost, ...prev]);
@@ -155,6 +160,8 @@ const lastPostElementRef = useCallback(node => {
     } catch (error) {
       console.error('Error creating post:', error);
       setError('게시글 작성에 실패했습니다.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -354,7 +361,17 @@ const lastPostElementRef = useCallback(node => {
           </div>
           <Group justify="flex-end" gap="sm">
             <Button variant="light" onClick={close}>취소</Button>
-            <Button leftSection={<IconSend size={16} />} onClick={handleSubmitPost} disabled={!newPost.title.trim() || !newPost.content.trim()} variant="gradient" gradient={{ from: 'green.5', to: 'green.6' }}>게시하기</Button>
+            <Button 
+              leftSection={<IconSend size={16} />} 
+              onClick={handleSubmitPost} 
+              disabled={!newPost.title.trim() || !newPost.content.trim() || isSubmitting} 
+              loading={isSubmitting}
+              variant="gradient" 
+              gradient={{ from: 'green.5', to: 'green.6' }}
+              style={{ pointerEvents: isSubmitting ? 'none' : 'auto' }}
+            >
+              {isSubmitting ? '게시하는 중...' : '게시하기'}
+            </Button>
           </Group>
         </Stack>
       </Modal>
