@@ -152,6 +152,13 @@ func (h *CommunityHandler) CreatePost(c *fiber.Ctx) error {
 		files := form.File["images"]
 		fmt.Printf("Found %d image files\n", len(files))
 		
+		// Limit to maximum 5 images
+		if len(files) > 5 {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Maximum 5 images allowed per post",
+			})
+		}
+		
 		for _, file := range files {
 			// 파일 검증
 			if !isValidImageFile(file) {
@@ -296,6 +303,13 @@ func (h *CommunityHandler) UpdatePost(c *fiber.Ctx) error {
 	if err == nil && form.File["images"] != nil {
 		files := form.File["images"]
 		fmt.Printf("Found %d new image files\n", len(files))
+		
+		// Check total image count (existing + new) doesn't exceed 5
+		if len(existingImages)+len(files) > 5 {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Maximum 5 images allowed per post",
+			})
+		}
 		
 		for _, file := range files {
 			// 파일 검증
