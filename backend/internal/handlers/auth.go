@@ -360,8 +360,12 @@ func (h *AuthHandler) KakaoLogin(c *fiber.Ctx) error {
 		})
 	}
 
+	// Print the exact JSON response from Kakao
+	fmt.Printf("=== EXACT KAKAO API RESPONSE ===\n%s\n=== END RESPONSE ===\n", string(userBody))
+
 	var userResp KakaoUserResponse
 	if err := json.Unmarshal(userBody, &userResp); err != nil {
+		fmt.Printf("JSON parsing error: %v\n", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Failed to parse user info from Kakao",
 		})
@@ -477,7 +481,7 @@ func (h *AuthHandler) processSocialLogin(c *fiber.Ctx, provider, socialID, email
 			})
 		}
 	}
-
+	
 	// JWT 토큰 생성
 	token, err := utils.GenerateJWT(user.ID, user.Email, h.cfg.JWTSecret)
 	if err != nil {
