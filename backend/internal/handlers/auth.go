@@ -376,14 +376,26 @@ func (h *AuthHandler) KakaoLogin(c *fiber.Ctx) error {
 	}
 	profileImage := userResp.Properties.ProfileImage
 
+	// Debug logging to identify the issue
+	fmt.Printf("=== KAKAO LOGIN DEBUG ===\n")
+	fmt.Printf("Raw ID from Kakao: %d\n", userResp.ID)
+	fmt.Printf("SocialID string: %s\n", socialID)
+	fmt.Printf("Email from Kakao: '%s'\n", email)
+	fmt.Printf("Username: %s\n", username)
+	fmt.Printf("========================\n")
+
 	return h.processSocialLogin(c, "kakao", socialID, email, username, profileImage)
 }
 
 // 소셜 로그인 공통 처리 로직
 func (h *AuthHandler) processSocialLogin(c *fiber.Ctx, provider, socialID, email, username, profileImage string) error {
 	var user models.User
-	fmt.Printf("Processing social login - Provider: %s, ID: %s, Email: %s, Username: %s\n", 
-        provider, socialID, email, username)
+	fmt.Printf("=== PROCESS SOCIAL LOGIN ===\n")
+	fmt.Printf("Provider: %s\n", provider)
+	fmt.Printf("SocialID: '%s'\n", socialID) 
+	fmt.Printf("Email: '%s'\n", email)
+	fmt.Printf("Username: %s\n", username)
+	fmt.Printf("===========================\n")
 	// 소셜 ID로 기존 사용자 찾기
 	err := h.db.Where("social_provider = ? AND social_id = ?", provider, socialID).First(&user).Error
 	
@@ -428,8 +440,14 @@ func (h *AuthHandler) processSocialLogin(c *fiber.Ctx, provider, socialID, email
 				}
 			} else {
 				// 이메일이 없는 경우 (일부 소셜 서비스)
+				fallbackEmail := fmt.Sprintf("%s_%s@%s.social", provider, socialID, provider)
+				fmt.Printf("=== EMAIL FALLBACK ===\n")
+				fmt.Printf("Provider: %s, SocialID: %s\n", provider, socialID)
+				fmt.Printf("Generated fallback email: %s\n", fallbackEmail)
+				fmt.Printf("======================\n")
+				
 				user = models.User{
-					Email:          fmt.Sprintf("%s_%s@%s.social", provider, socialID, provider),
+					Email:          fallbackEmail,
 					Username:       username,
 					Role:           "user", // Default role
 					ProfileImage:   profileImage,
