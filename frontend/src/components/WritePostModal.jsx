@@ -54,7 +54,13 @@ function WritePostModal({ isOpen, onClose, onSubmit }) {
     formState: { errors },
     reset,
     control,
-  } = useForm();
+  } = useForm({
+    defaultValues: {
+      category: '',
+      title: '',
+      content: ''
+    }
+  });
 
   const handleClose = () => {
     reset();
@@ -192,13 +198,21 @@ function WritePostModal({ isOpen, onClose, onSubmit }) {
           {/* Category Selection */}
           <div>
             <MantineText size="sm" fw={500} mb="xs" c="gray.7">카테고리</MantineText>
-            <Select
-              placeholder="카테고리를 선택하세요"
-              data={categories}
-              {...register('category', { required: '카테고리를 선택해주세요' })}
-              error={errors.category?.message}
-              size="md"
-              radius="lg"
+            <Controller
+              name="category"
+              control={control}
+              rules={{ required: '카테고리를 선택해주세요' }}
+              render={({ field: { onChange, value } }) => (
+                <Select
+                  placeholder="카테곦0를 선택하세요"
+                  data={categories}
+                  value={value}
+                  onChange={onChange}
+                  error={errors.category?.message}
+                  size="md"
+                  radius="lg"
+                />
+              )}
             />
           </div>
 
@@ -227,37 +241,59 @@ function WritePostModal({ isOpen, onClose, onSubmit }) {
           {/* Rich Text Editor */}
           <div>
             <MantineText size="sm" fw={500} mb="xs" c="gray.7">내용</MantineText>
-            <RichTextEditor 
-              editor={editor}
-              styles={{
-                root: {
-                  minHeight: 'clamp(250px, 30vh, 400px)',
-                  backgroundColor: '#ffffff',
-                  border: '1px solid #e9ecef',
-                  borderRadius: '8px',
-                  '@media (max-width: 768px)': {
-                    minHeight: '250px',
-                    fontSize: '16px'
+            <Controller
+              name="content"
+              control={control}
+              rules={{ 
+                required: '내용을 입력해주세요',
+                validate: (value) => {
+                  const content = editor?.getHTML() || '';
+                  const textContent = editor?.getText() || '';
+                  if (!textContent.trim() || content === '<p></p>') {
+                    return '내용을 입력해주세요';
                   }
-                },
-                toolbar: {
-                  flexWrap: 'wrap',
-                  gap: '4px',
-                  padding: 'clamp(6px, 1.5vw, 10px)',
-                  '@media (max-width: 768px)': {
-                    padding: '6px',
-                    gap: '2px'
+                  if (textContent.trim().length < 10) {
+                    return '내용은 최소 10글자 이상이어야 합니다';
                   }
-                },
-                controlsGroup: {
-                  '@media (max-width: 768px)': {
-                    gap: '2px'
-                  }
+                  return true;
                 }
               }}
-              onDrop={handleImageDrop}
-              onDragOver={handleImageDragOver}
-            >
+              render={({ field: { onChange } }) => (
+                <RichTextEditor 
+                  editor={editor}
+                  styles={{
+                    root: {
+                      minHeight: 'clamp(250px, 30vh, 400px)',
+                      backgroundColor: '#ffffff',
+                      border: errors.content ? '1px solid #fa5252' : '1px solid #e9ecef',
+                      borderRadius: '8px',
+                      '@media (max-width: 768px)': {
+                        minHeight: '250px',
+                        fontSize: '16px'
+                      }
+                    },
+                    toolbar: {
+                      flexWrap: 'wrap',
+                      gap: '4px',
+                      padding: 'clamp(6px, 1.5vw, 10px)',
+                      '@media (max-width: 768px)': {
+                        padding: '6px',
+                        gap: '2px'
+                      }
+                    },
+                    controlsGroup: {
+                      '@media (max-width: 768px)': {
+                        gap: '2px'
+                      }
+                    }
+                  }}
+                  onDrop={handleImageDrop}
+                  onDragOver={handleImageDragOver}
+                  onChange={() => {
+                    const content = editor?.getHTML() || '';
+                    onChange(content);
+                  }}
+                >
               <RichTextEditor.Toolbar>
                 <RichTextEditor.ControlsGroup>
                   <RichTextEditor.Bold />
@@ -312,8 +348,10 @@ function WritePostModal({ isOpen, onClose, onSubmit }) {
                 onDragOver={handleImageDragOver}
               />
             </RichTextEditor>
+              )}
+            />
             {errors.content && (
-              <Text size="xs" c="red" mt="xs">{errors.content.message}</Text>
+              <MantineText size="xs" c="red" mt="xs">{errors.content.message}</MantineText>
             )}
             <MantineText size="xs" c="dimmed" mt="xs">
               💡 이미지 업로드 팁: 위의 이미지를 클릭하거나 에디터로 드래그하여 삽입할 수 있습니다.

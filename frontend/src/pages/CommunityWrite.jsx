@@ -56,7 +56,13 @@ function CommunityWrite() {
     handleSubmit,
     formState: { errors },
     control,
-  } = useForm();
+  } = useForm({
+    defaultValues: {
+      category: '',
+      title: '',
+      content: ''
+    }
+  });
 
   if (!isLoggedIn) {
     navigate('/login');
@@ -213,27 +219,39 @@ function CommunityWrite() {
             
             {/* Category & Title */}
             <Group grow>
-              <Select
-                label="카테고리"
-                placeholder="카테고리를 선택하세요"
-                data={categories}
-                {...register('category', { required: '카테고리를 선택해주세요' })}
-                error={errors.category?.message}
-                size="md"
-                radius="lg"
-              />
-              <TextInput
-                label="제목"
-                placeholder="제목을 입력하세요"
-                {...register('title', {
-                  required: '제목을 입력해주세요',
-                  minLength: { value: 2, message: '제목은 최소 2글자 이상이어야 합니다' },
-                  maxLength: { value: 100, message: '제목은 100글자를 초과할 수 없습니다' }
-                })}
-                error={errors.title?.message}
-                size="md"
-                radius="lg"
-              />
+              <div>
+                <Text size="sm" fw={500} mb="xs">카테고리</Text>
+                <Controller
+                  name="category"
+                  control={control}
+                  rules={{ required: '카테고리를 선택해주세요' }}
+                  render={({ field: { onChange, value } }) => (
+                    <Select
+                      placeholder="카테고리를 선택하세요"
+                      data={categories}
+                      value={value}
+                      onChange={onChange}
+                      error={errors.category?.message}
+                      size="md"
+                      radius="lg"
+                    />
+                  )}
+                />
+              </div>
+              <div>
+                <Text size="sm" fw={500} mb="xs">제목</Text>
+                <TextInput
+                  placeholder="제목을 입력하세요"
+                  {...register('title', {
+                    required: '제목을 입력해주세요',
+                    minLength: { value: 2, message: '제목은 최소 2글자 이상이어야 합니다' },
+                    maxLength: { value: 100, message: '제목은 100글자를 초과할 수 없습니다' }
+                  })}
+                  error={errors.title?.message}
+                  size="md"
+                  radius="lg"
+                />
+              </div>
             </Group>
 
             {/* Image Upload */}
@@ -297,37 +315,56 @@ function CommunityWrite() {
                 flexDirection: 'column' 
               }}>
               <Text size="sm" fw={500} mb="xs">내용</Text>
-              <RichTextEditor 
-                editor={editor}
-                styles={{
-                  root: {
-                    minHeight: 'clamp(40vh, 60vh, 70vh)',
-                    backgroundColor: '#ffffff',
-                    border: '1px solid #e9ecef',
-                    borderRadius: '8px',
-                    '@media (max-width: 768px)': {
-                      minHeight: '40vh',
-                      fontSize: '16px'
+              <Controller
+                name="content"
+                control={control}
+                rules={{ 
+                  required: '내용을 입력해주세요',
+                  validate: (value) => {
+                    const content = editor?.getHTML() || '';
+                    const textContent = editor?.getText() || '';
+                    if (!textContent.trim() || content === '<p></p>') {
+                      return '내용을 입력해주세요';
                     }
-                  },
-                  toolbar: {
-                    flexWrap: 'wrap',
-                    gap: '4px',
-                    padding: 'clamp(8px, 2vw, 12px)',
-                    '@media (max-width: 768px)': {
-                      padding: '8px',
-                      gap: '2px'
-                    }
-                  },
-                  controlsGroup: {
-                    '@media (max-width: 768px)': {
-                      gap: '2px'
-                    }
+                    return true;
                   }
                 }}
-                onDrop={handleImageDrop}
-                onDragOver={handleImageDragOver}
-              >
+                render={({ field: { onChange } }) => (
+                  <RichTextEditor 
+                    editor={editor}
+                    styles={{
+                      root: {
+                        minHeight: 'clamp(40vh, 60vh, 70vh)',
+                        backgroundColor: '#ffffff',
+                        border: errors.content ? '1px solid #fa5252' : '1px solid #e9ecef',
+                        borderRadius: '8px',
+                        '@media (max-width: 768px)': {
+                          minHeight: '40vh',
+                          fontSize: '16px'
+                        }
+                      },
+                      toolbar: {
+                        flexWrap: 'wrap',
+                        gap: '4px',
+                        padding: 'clamp(8px, 2vw, 12px)',
+                        '@media (max-width: 768px)': {
+                          padding: '8px',
+                          gap: '2px'
+                        }
+                      },
+                      controlsGroup: {
+                        '@media (max-width: 768px)': {
+                          gap: '2px'
+                        }
+                      }
+                    }}
+                    onDrop={handleImageDrop}
+                    onDragOver={handleImageDragOver}
+                    onChange={() => {
+                      const content = editor?.getHTML() || '';
+                      onChange(content);
+                    }}
+                  >
                 <RichTextEditor.Toolbar sticky stickyOffset={60}>
                   <RichTextEditor.ControlsGroup>
                     <RichTextEditor.Bold />
@@ -382,6 +419,8 @@ function CommunityWrite() {
                   onDragOver={handleImageDragOver}
                 />
               </RichTextEditor>
+                )}
+              />
               {errors.content && (
                 <Text size="xs" c="red" mt="xs">{errors.content.message}</Text>
               )}
