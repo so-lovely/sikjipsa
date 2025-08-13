@@ -80,26 +80,27 @@ function CommunityWrite() {
 
   // 에디터 내부에서만 브라우저 기본 동작 방지 (Mantine onImageUpload가 작동하도록)
   useEffect(() => {
-    // 에디터가 아직 준비되지 않았으면 대기
-    if (!editor) return;
-    
-    const preventImageDrop = (e) => {
-      // 에디터 내부에서만 기본 동작 방지
-      if (e.target.closest('.mantine-RichTextEditor-content')) {
-        if (e.dataTransfer?.types?.includes('Files')) {
-          e.preventDefault(); // 새 탭 열기 방지
-        }
+    const editorElement = document.querySelector('.mantine-RichTextEditor-root');
+    if (!editorElement) return;
+
+    const handleDragOver = (e) => {
+      // 파일이 드래그될 때만 기본 동작을 막습니다.
+      if (e.dataTransfer?.types?.includes('Files')) {
+        e.preventDefault();
       }
     };
-    
-    document.addEventListener('dragover', preventImageDrop);
-    document.addEventListener('drop', preventImageDrop);
-    
+
+    // document 대신 에디터 요소에 직접 이벤트 리스너를 추가하여
+    // 다른 영역에 영향을 주지 않도록 범위를 좁힙니다.
+    editorElement.addEventListener('dragover', handleDragOver);
+
+    // drop 이벤트 리스너는 제거합니다. Tiptap이 알아서 처리합니다.
+
     return () => {
-      document.removeEventListener('dragover', preventImageDrop);
-      document.removeEventListener('drop', preventImageDrop);
+      editorElement.removeEventListener('dragover', handleDragOver);
     };
-  }, [editor]); // editor가 준비되면 실행
+  }, [editor]); // editor가 초기화되면 실행
+
 
   if (!isLoggedIn) {
     navigate('/login');
