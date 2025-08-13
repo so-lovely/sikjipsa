@@ -29,31 +29,18 @@ export const communityAPI = {
   },
 
   // 새 게시글 작성
-  createPost: async (postData, images = []) => {
-    const formData = new FormData();
-    
-    // 텍스트 데이터 추가
-    formData.append('title', postData.title);
-    formData.append('content', postData.content);
-    formData.append('post_type', postData.post_type || postData.category);
-    
-    // 이미지 파일들 추가
-    images.forEach((image, index) => {
-      if (image.file) {
-        formData.append('images', image.file);
-      }
-    });
-
-    console.log('Sending FormData to API:', {
+  createPost: async (postData) => {
+    const requestData = {
       title: postData.title,
       content: postData.content,
-      post_type: postData.category,
-      imageCount: images.length
-    });
+      post_type: postData.post_type || postData.category,
+    };
 
-    const response = await apiClient.post('/community/posts', formData, {
+    console.log('Sending post data to API:', requestData);
+
+    const response = await apiClient.post('/community/posts', requestData, {
       headers: {
-        'Content-Type': 'multipart/form-data',
+        'Content-Type': 'application/json',
       },
     });
     
@@ -139,4 +126,17 @@ export const communityAPI = {
 
 
   
+  // 단일 이미지 업로드 (onImageUpload용)
+  uploadImage: async (imageFile) => {
+    const formData = new FormData();
+    formData.append('image', imageFile);
+    
+    const response = await apiClient.post('/community/upload-image', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    
+    return response.data.url;
+  },
 };

@@ -106,6 +106,9 @@ func SetupRoutes(app fiber.Router, db *gorm.DB, cfg *config.Config) {
 	community.Post("/posts/:id/comments", middleware.AuthRequired(cfg.JWTSecret), communityHandler.AddComment)
 	community.Put("/posts/:id/comments/:commentId", middleware.AuthRequired(cfg.JWTSecret), communityHandler.UpdateComment)
 	community.Delete("/posts/:id/comments/:commentId", middleware.AuthRequired(cfg.JWTSecret), communityHandler.DeleteComment)
+	
+	// Image upload for rich text editor
+	community.Post("/upload-image", middleware.AuthRequired(cfg.JWTSecret), communityHandler.UploadImage)
 
 	// Diary routes
 	diary := app.Group("/diary")

@@ -117,10 +117,28 @@ func (h *CommunityHandler) CreatePost(c *fiber.Ctx) error {
         })
     }
 
-	// 폼 데이터에서 텍스트 필드 읽기
-	title := c.FormValue("title")
-	content := c.FormValue("content")
-	postType := c.FormValue("post_type")
+	// JSON과 Form 데이터 모두 지원
+	var title, content, postType string
+	
+	// Content-Type 확인
+	contentType := c.Get("Content-Type")
+	if contentType == "application/json" {
+		// JSON 형태로 데이터 받기 (onImageUpload 방식)
+		var req CreatePostRequest
+		if err := c.BodyParser(&req); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Invalid request body",
+			})
+		}
+		title = req.Title
+		content = req.Content
+		postType = req.PostType
+	} else {
+		// 폼 데이터에서 텍스트 필드 읽기 (기존 방식)
+		title = c.FormValue("title")
+		content = c.FormValue("content")
+		postType = c.FormValue("post_type")
+	}
 
 	if title == "" || content == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -133,61 +151,66 @@ func (h *CommunityHandler) CreatePost(c *fiber.Ctx) error {
 		postType = "general"
 	}
 
-	fmt.Printf("Creating post - Title: %s, Content: %s, PostType: %s\n", title, content, postType)
+	fmt.Printf("Creating post - Title: %s, PostType: %s\n", title, postType)
 
-	// Cloudinary 설정
-	cld, err := cloudinary.NewFromParams(h.cfg.CloudinaryCloudName, h.cfg.CloudinaryAPIKey, h.cfg.CloudinaryAPISecret)
-	if err != nil {
-		fmt.Printf("Cloudinary initialization error: %v\n", err)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Failed to initialize image upload service",
-		})
-	}
-
-	// 이미지 파일 처리
-	form, err := c.MultipartForm()
+	// JSON 방식인 경우 이미지 업로드 처리 없음 (이미 content에 포함됨)
+	// Form 방식인 경우에만 이미지 파일 처리
 	var imageUrls []string
 	
-	if err == nil && form.File["images"] != nil {
-		files := form.File["images"]
-		fmt.Printf("Found %d image files\n", len(files))
-		
-		// Limit to maximum 5 images
-		if len(files) > 5 {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": "Maximum 5 images allowed per post",
+	if contentType != "application/json" {
+		// Cloudinary 설정
+		cld, err := cloudinary.NewFromParams(h.cfg.CloudinaryCloudName, h.cfg.CloudinaryAPIKey, h.cfg.CloudinaryAPISecret)
+		if err != nil {
+			fmt.Printf("Cloudinary initialization error: %v\n", err)
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": "Failed to initialize image upload service",
 			})
 		}
+
+		// 이미지 파일 처리
+		form, err := c.MultipartForm()
 		
-		for _, file := range files {
-			// 파일 검증
-			if !isValidImageFile(file) {
-				fmt.Printf("Invalid file: %s\n", file.Filename)
-				continue
+		if err == nil && form.File["images"] != nil {
+			files := form.File["images"]
+			fmt.Printf("Found %d image files\n", len(files))
+			
+			// Limit to maximum 5 images
+			if len(files) > 5 {
+				return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+					"error": "Maximum 5 images allowed per post",
+				})
 			}
 			
-			// 파일 열기
-			src, err := file.Open()
-			if err != nil {
-				fmt.Printf("Error opening file %s: %v\n", file.Filename, err)
-				continue
-			}
-			defer src.Close()
+			for _, file := range files {
+				// 파일 검증
+				if !isValidImageFile(file) {
+					fmt.Printf("Invalid file: %s\n", file.Filename)
+					continue
+				}
+				
+				// 파일 열기
+				src, err := file.Open()
+				if err != nil {
+					fmt.Printf("Error opening file %s: %v\n", file.Filename, err)
+					continue
+				}
+				defer src.Close()
 
-			// Cloudinary에 업로드
-			uploadResult, err := cld.Upload.Upload(context.Background(), src, uploader.UploadParams{
-				Folder:         "sikjipsa/community",
-				ResourceType:   "image",
-				Transformation: "c_limit,w_800,h_800,q_auto:good",
-			})
-			
-			if err != nil {
-				fmt.Printf("Error uploading to Cloudinary: %v\n", err)
-				continue
-			}
+				// Cloudinary에 업로드
+				uploadResult, err := cld.Upload.Upload(context.Background(), src, uploader.UploadParams{
+					Folder:         "sikjipsa/community",
+					ResourceType:   "image",
+					Transformation: "c_limit,w_800,h_800,q_auto:good",
+				})
+				
+				if err != nil {
+					fmt.Printf("Error uploading to Cloudinary: %v\n", err)
+					continue
+				}
 
-			imageUrls = append(imageUrls, uploadResult.SecureURL)
-			fmt.Printf("Successfully uploaded: %s\n", uploadResult.SecureURL)
+				imageUrls = append(imageUrls, uploadResult.SecureURL)
+				fmt.Printf("Successfully uploaded: %s\n", uploadResult.SecureURL)
+			}
 		}
 	}
 
@@ -221,6 +244,68 @@ func (h *CommunityHandler) CreatePost(c *fiber.Ctx) error {
 
 	fmt.Printf("Post created successfully with ID: %d\n", post.ID)
 	return c.JSON(post)
+}
+
+// UploadImage handles single image upload for onImageUpload
+func (h *CommunityHandler) UploadImage(c *fiber.Ctx) error {
+	// Check authentication
+	userID := c.Locals("userID")
+	if userID == nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "Unauthorized",
+		})
+	}
+
+	// Get the image file
+	file, err := c.FormFile("image")
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "No image file provided",
+		})
+	}
+
+	// Validate image file
+	if !isValidImageFile(file) {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid image file. Only JPG, PNG, GIF are allowed",
+		})
+	}
+
+	// Open the file
+	src, err := file.Open()
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to process image file",
+		})
+	}
+	defer src.Close()
+
+	// Initialize Cloudinary
+	cld, err := cloudinary.NewFromParams(h.cfg.CloudinaryCloudName, h.cfg.CloudinaryAPIKey, h.cfg.CloudinaryAPISecret)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to initialize image upload service",
+		})
+	}
+
+	// Upload to Cloudinary
+	uploadResult, err := cld.Upload.Upload(context.Background(), src, uploader.UploadParams{
+		Folder:         "sikjipsa/community/editor",
+		ResourceType:   "image",
+		Transformation: "c_limit,w_1200,h_1200,q_auto:good",
+	})
+
+	if err != nil {
+		fmt.Printf("Error uploading to Cloudinary: %v\n", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to upload image",
+		})
+	}
+
+	// Return the image URL
+	return c.JSON(fiber.Map{
+		"url": uploadResult.SecureURL,
+	})
 }
 
 func (h *CommunityHandler) UpdatePost(c *fiber.Ctx) error {
