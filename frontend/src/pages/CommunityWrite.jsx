@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import {
   Container,
   Title,
@@ -11,13 +11,15 @@ import {
   Stack,
   Card,
   Select,
-  Textarea,
   FileInput,
   Image,
   ActionIcon,
   Box,
   SimpleGrid,
 } from '@mantine/core';
+import { RichTextEditor, Link } from '@mantine/tiptap';
+import { useEditor } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
 import { IconPencilPlus, IconPhoto, IconX, IconSend } from '@tabler/icons-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { communityAPI } from '../api/community.js';
@@ -35,12 +37,19 @@ function CommunityWrite() {
   const { user, isLoggedIn } = useAuth();
   const [images, setImages] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const contentRef = useRef(null);
+  const [draggedImage, setDraggedImage] = useState(null);
+  
+  const editor = useEditor({
+    extensions: [StarterKit, Link],
+    content: '',
+  });
   
   const {
     register,
     handleSubmit,
     formState: { errors },
+    control,
+    setValue,
   } = useForm();
 
   if (!isLoggedIn) {
@@ -58,7 +67,7 @@ function CommunityWrite() {
     const newImages = Array.from(files).map(file => ({
       file,
       preview: URL.createObjectURL(file),
-      id: Math.random().toString(36).substr(2, 9)
+      id: Math.random().toString(36).substring(2, 11)
     }));
     
     setImages(prev => [...prev, ...newImages].slice(0, 10));
@@ -74,24 +83,28 @@ function CommunityWrite() {
     });
   };
 
-  // This is the function that inserts the image tag into the textarea. It was never removed.
-  const insertImageAtCursor = (image) => {
-    if (!contentRef.current) return;
+  const insertImageIntoEditor = (image) => {
+    if (!editor) return;
     
-    const textarea = contentRef.current;
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const text = textarea.value;
+    const imageTag = `<div class="embedded-image" data-image-id="${image.id}" style="margin: 16px 0; text-align: center; border: 2px dashed #e9ecef; border-radius: 8px; padding: 16px;"><img src="${image.preview}" alt="Uploaded image" style="max-width: 100%; height: auto; border-radius: 4px;" /><p style="margin: 8px 0 0; font-size: 14px; color: #868e96;">[이미지: ${image.id}]</p></div>`;
     
-    const imageTag = `\n[이미지:${image.id}]\n`;
-    const newText = text.substring(0, start) + imageTag + text.substring(end);
-    
-    textarea.value = newText;
-    textarea.focus();
-    textarea.setSelectionRange(start + imageTag.length, start + imageTag.length);
-    
-    const event = new Event('input', { bubbles: true });
-    textarea.dispatchEvent(event);
+    editor.chain().focus().insertContent(imageTag).run();
+  };
+  
+  const handleImageDrop = (e) => {
+    e.preventDefault();
+    if (draggedImage && editor) {
+      insertImageIntoEditor(draggedImage);
+      setDraggedImage(null);
+    }
+  };
+  
+  const handleImageDragStart = (image) => {
+    setDraggedImage(image);
+  };
+  
+  const handleImageDragOver = (e) => {
+    e.preventDefault();
   };
 
   const onFormSubmit = async (data) => {
@@ -108,6 +121,7 @@ function CommunityWrite() {
       
       const formData = {
         ...data,
+        content: editor?.getHTML() || data.content,
         post_type: data.category,
         images: images,
         author: authorName,
@@ -140,7 +154,7 @@ function CommunityWrite() {
           size="lg" 
           style={{ maxWidth: 600, margin: '0 auto', color: 'var(--muted)', fontSize: '18px', lineHeight: '1.6' }}
         >
-          식물에 관한 이야기를 자유롭게 나누어보세요. 이미지를 원하는 위치에 삽입할 수 있습니다.
+          식물에 관한 이야기를 자유롭게 나누어보세요. 리치 텍스트 에디터로 이미지를 드래그하여 삽입할 수 있습니다.
         </Text>
       </Stack>
 
@@ -211,8 +225,18 @@ function CommunityWrite() {
                 <SimpleGrid cols={{ base: 3, sm: 4, md: 5 }} spacing="sm" mt="md">
                   {images.map(image => (
                     <Box key={image.id} pos="relative">
-                      {/* The onClick handler below is what enables the click-to-insert feature. It is preserved. */}
-                      <Image src={image.preview} alt="미리보기" radius="md" h={80} fit="cover" style={{ cursor: 'pointer' }} onClick={() => insertImageAtCursor(image)} title="클릭하여 내용에 삽입" />
+                      <Image 
+                        src={image.preview} 
+                        alt="미리보기" 
+                        radius="md" 
+                        h={80} 
+                        fit="cover" 
+                        style={{ cursor: 'grab' }} 
+                        draggable
+                        onDragStart={() => handleImageDragStart(image)}
+                        onClick={() => insertImageIntoEditor(image)} 
+                        title="클릭하거나 드래그하여 에디터에 삽입" 
+                      />
                       <ActionIcon size="sm" color="red" variant="filled" pos="absolute" top={4} right={4} onClick={() => removeImage(image.id)}>
                         <IconX size={12} />
                       </ActionIcon>
@@ -222,35 +246,69 @@ function CommunityWrite() {
               )}
             </div>
 
-            {/* Content Editor */}
+            {/* Rich Text Editor */}
             <Box style={{ 
                 flex: 1,
                 display: 'flex', 
                 flexDirection: 'column' 
               }}>
               <Text size="sm" fw={500} mb="xs">내용</Text>
-              <Textarea
-                ref={contentRef}
-                // I have restored the helpful placeholder text. My apologies for changing it.
-                placeholder="💡 이미지 업로드 팁:\n- 아래의 이미지 미리보기를 클릭하면 내용에 삽입됩니다.\n- 텍스트와 이미지를 자유롭게 배치하여 풍부한 내용을 작성해보세요."
-                {...register('content', { required: '내용을 입력해주세요' })}
-                error={errors.content?.message}
-                size="md"
-                radius="lg"
-                mih="60vh"
-                styles={{
-                  wrapper: { 
-                    flex: 1,
-                    display: 'flex',
-                    flexDirection: 'column'
-                  }, 
-                  input: { 
-                    flex: 1,
-                    minHeight: '60vh',
-                    resize: 'vertical'
-                  } 
-                }}
+              <Controller
+                name="content"
+                control={control}
+                rules={{ required: '내용을 입력해주세요' }}
+                render={({ field }) => (
+                  <RichTextEditor 
+                    editor={editor}
+                    style={{ minHeight: '60vh' }}
+                    onDrop={handleImageDrop}
+                    onDragOver={handleImageDragOver}
+                    {...field}
+                    onChange={(value) => {
+                      field.onChange(value);
+                      setValue('content', value);
+                    }}
+                  >
+                    <RichTextEditor.Toolbar sticky stickyOffset={60}>
+                      <RichTextEditor.ControlsGroup>
+                        <RichTextEditor.Bold />
+                        <RichTextEditor.Italic />
+                        <RichTextEditor.Underline />
+                        <RichTextEditor.Strikethrough />
+                        <RichTextEditor.ClearFormatting />
+                        <RichTextEditor.Code />
+                      </RichTextEditor.ControlsGroup>
+
+                      <RichTextEditor.ControlsGroup>
+                        <RichTextEditor.H1 />
+                        <RichTextEditor.H2 />
+                        <RichTextEditor.H3 />
+                        <RichTextEditor.H4 />
+                      </RichTextEditor.ControlsGroup>
+
+                      <RichTextEditor.ControlsGroup>
+                        <RichTextEditor.Blockquote />
+                        <RichTextEditor.Hr />
+                        <RichTextEditor.BulletList />
+                        <RichTextEditor.OrderedList />
+                      </RichTextEditor.ControlsGroup>
+
+                      <RichTextEditor.ControlsGroup>
+                        <RichTextEditor.Link />
+                        <RichTextEditor.Unlink />
+                      </RichTextEditor.ControlsGroup>
+                    </RichTextEditor.Toolbar>
+
+                    <RichTextEditor.Content style={{ minHeight: '50vh' }} />
+                  </RichTextEditor>
+                )}
               />
+              {errors.content && (
+                <Text size="xs" c="red" mt="xs">{errors.content.message}</Text>
+              )}
+              <Text size="xs" c="dimmed" mt="xs">
+                💡 이미지 업로드 팁: 위의 이미지를 클릭하거나 에디터로 드래그하여 삽입할 수 있습니다.
+              </Text>
             </Box>
           </Box>
 

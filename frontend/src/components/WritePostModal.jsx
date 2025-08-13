@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import {
   Modal,
   Title,
@@ -9,7 +9,6 @@ import {
   Group,
   Stack,
   Select,
-  Textarea,
   FileInput,
   Image,
   ActionIcon,
@@ -17,6 +16,9 @@ import {
   SimpleGrid,
   Text as MantineText
 } from '@mantine/core';
+import { RichTextEditor, Link } from '@mantine/tiptap';
+import { useEditor } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
 import { IconPhoto, IconX, IconSend, IconPencilPlus } from '@tabler/icons-react';
 import { useAuth } from '../context/AuthContext.jsx';
 
@@ -32,18 +34,26 @@ function WritePostModal({ isOpen, onClose, onSubmit }) {
   const { user, isLoggedIn } = useAuth();
   const [images, setImages] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [draggedImage, setDraggedImage] = useState(null);
+  
+  const editor = useEditor({
+    extensions: [StarterKit, Link],
+    content: '',
+  });
   
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
-    watch,
+    control,
+    setValue,
   } = useForm();
 
   const handleClose = () => {
     reset();
     setImages([]);
+    editor?.commands.clearContent();
     onClose();
   };
 
@@ -53,7 +63,7 @@ function WritePostModal({ isOpen, onClose, onSubmit }) {
     const newImages = Array.from(files).map(file => ({
       file,
       preview: URL.createObjectURL(file),
-      id: Math.random().toString(36).substr(2, 9)
+      id: Math.random().toString(36).substring(2, 11)
     }));
     
     setImages(prev => [...prev, ...newImages].slice(0, 5)); // 최대 5개
@@ -62,13 +72,36 @@ function WritePostModal({ isOpen, onClose, onSubmit }) {
   const removeImage = (imageId) => {
     setImages(prev => {
       const updated = prev.filter(img => img.id !== imageId);
-      // URL 정리
       const removed = prev.find(img => img.id === imageId);
       if (removed) {
         URL.revokeObjectURL(removed.preview);
       }
       return updated;
     });
+  };
+  
+  const insertImageIntoEditor = (image) => {
+    if (!editor) return;
+    
+    const imageTag = `<div class="embedded-image" data-image-id="${image.id}" style="margin: 16px 0; text-align: center; border: 2px dashed #e9ecef; border-radius: 8px; padding: 16px;"><img src="${image.preview}" alt="Uploaded image" style="max-width: 100%; height: auto; border-radius: 4px;" /><p style="margin: 8px 0 0; font-size: 14px; color: #868e96;">[이미지: ${image.id}]</p></div>`;
+    
+    editor.chain().focus().insertContent(imageTag).run();
+  };
+  
+  const handleImageDrop = (e) => {
+    e.preventDefault();
+    if (draggedImage && editor) {
+      insertImageIntoEditor(draggedImage);
+      setDraggedImage(null);
+    }
+  };
+  
+  const handleImageDragStart = (image) => {
+    setDraggedImage(image);
+  };
+  
+  const handleImageDragOver = (e) => {
+    e.preventDefault();
   };
 
   const onFormSubmit = async (data) => {
@@ -94,7 +127,8 @@ function WritePostModal({ isOpen, onClose, onSubmit }) {
       
       const formData = {
         ...data,
-        post_type: data.category,  // category를 post_type으로 매핑
+        content: editor?.getHTML() || data.content,
+        post_type: data.category,
         images: images,
         author: authorName,
       };
@@ -161,23 +195,71 @@ function WritePostModal({ isOpen, onClose, onSubmit }) {
             />
           </div>
 
-          {/* Content Input */}
+          {/* Rich Text Editor */}
           <div>
             <MantineText size="sm" fw={500} mb="xs" c="gray.7">내용</MantineText>
-            <Textarea
-              placeholder="식물에 관한 이야기를 자유롭게 나누어보세요..."
-              {...register('content', {
+            <Controller
+              name="content"
+              control={control}
+              rules={{ 
                 required: '내용을 입력해주세요',
                 minLength: {
                   value: 10,
                   message: '내용은 최소 10글자 이상이어야 합니다'
                 }
-              })}
-              error={errors.content?.message}
-              minRows={10}
-              size="md"
-              radius="lg"
+              }}
+              render={({ field }) => (
+                <RichTextEditor 
+                  editor={editor}
+                  style={{ minHeight: '300px' }}
+                  onDrop={handleImageDrop}
+                  onDragOver={handleImageDragOver}
+                  {...field}
+                  onChange={(value) => {
+                    field.onChange(value);
+                    setValue('content', value);
+                  }}
+                >
+                  <RichTextEditor.Toolbar>
+                    <RichTextEditor.ControlsGroup>
+                      <RichTextEditor.Bold />
+                      <RichTextEditor.Italic />
+                      <RichTextEditor.Underline />
+                      <RichTextEditor.Strikethrough />
+                      <RichTextEditor.ClearFormatting />
+                      <RichTextEditor.Code />
+                    </RichTextEditor.ControlsGroup>
+
+                    <RichTextEditor.ControlsGroup>
+                      <RichTextEditor.H1 />
+                      <RichTextEditor.H2 />
+                      <RichTextEditor.H3 />
+                      <RichTextEditor.H4 />
+                    </RichTextEditor.ControlsGroup>
+
+                    <RichTextEditor.ControlsGroup>
+                      <RichTextEditor.Blockquote />
+                      <RichTextEditor.Hr />
+                      <RichTextEditor.BulletList />
+                      <RichTextEditor.OrderedList />
+                    </RichTextEditor.ControlsGroup>
+
+                    <RichTextEditor.ControlsGroup>
+                      <RichTextEditor.Link />
+                      <RichTextEditor.Unlink />
+                    </RichTextEditor.ControlsGroup>
+                  </RichTextEditor.Toolbar>
+
+                  <RichTextEditor.Content style={{ minHeight: '250px' }} />
+                </RichTextEditor>
+              )}
             />
+            {errors.content && (
+              <Text size="xs" c="red" mt="xs">{errors.content.message}</Text>
+            )}
+            <MantineText size="xs" c="dimmed" mt="xs">
+              💡 이미지 업로드 팁: 위의 이미지를 클릭하거나 에디터로 드래그하여 삽입할 수 있습니다.
+            </MantineText>
           </div>
 
           {/* Image Upload */}
@@ -212,6 +294,11 @@ function WritePostModal({ isOpen, onClose, onSubmit }) {
                       radius="lg"
                       h={80}
                       fit="cover"
+                      style={{ cursor: 'grab' }}
+                      draggable
+                      onDragStart={() => handleImageDragStart(image)}
+                      onClick={() => insertImageIntoEditor(image)}
+                      title="클릭하거나 드래그하여 에디터에 삽입"
                     />
                     <ActionIcon
                       size="sm"
