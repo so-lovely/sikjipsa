@@ -223,7 +223,7 @@ function CommunityWrite() {
             </div>
 
             {/* Content Editor */}
-            <Box style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: '40vh' }}>
+            <Box>
               <Text size="sm" fw={500} mb="xs">내용</Text>
               <Textarea
                 ref={contentRef}
@@ -233,11 +233,7 @@ function CommunityWrite() {
                 error={errors.content?.message}
                 size="md"
                 radius="lg"
-                styles={{
-                  root: { height: '100%' },
-                  wrapper: { height: '100%' },
-                  input: { height: '100%', resize: 'none' }
-                }}
+                minRows={15}
               />
             </Box>
           </Box>
