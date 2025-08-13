@@ -154,10 +154,11 @@ function CommunityWrite() {
           flex: '1',
           display: 'flex',
           flexDirection: 'column',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          minHeight: 0
         }}
       >
-        <form onSubmit={handleSubmit(onFormSubmit)} style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <form onSubmit={handleSubmit(onFormSubmit)} style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0 }}>
           {/* Form Header */}
           <Box p="xl" style={{ borderBottom: '1px solid rgba(15, 23, 36, 0.08)', backgroundColor: 'var(--surface)' }}>
             <Title order={3} m={0} style={{ color: 'var(--charcoal)', fontWeight: 600 }}>
@@ -166,7 +167,7 @@ function CommunityWrite() {
           </Box>
 
           {/* Form Body */}
-          <Box p="xl" style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 'var(--mantine-spacing-xl)', overflowY: 'auto' }}>
+          <Box p="xl" style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 'var(--mantine-spacing-xl)', overflowY: 'auto', minHeight: 0 }}>
             
             {/* Category & Title */}
             <Group grow>
