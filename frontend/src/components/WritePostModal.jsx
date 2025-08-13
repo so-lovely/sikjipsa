@@ -109,6 +109,22 @@ function WritePostModal({ isOpen, onClose, onSubmit }) {
   const handleImageDragOver = (e) => {
     e.preventDefault();
   };
+  
+  const handleTouchStart = (image) => {
+    setDraggedImage(image);
+  };
+  
+  const handleTouchEnd = (e) => {
+    if (draggedImage) {
+      const touch = e.changedTouches[0];
+      const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+      
+      if (elementBelow && elementBelow.closest('.mantine-RichTextEditor-content')) {
+        insertImageIntoEditor(draggedImage);
+      }
+      setDraggedImage(null);
+    }
+  };
 
   const onFormSubmit = async (data) => {
     if (!isLoggedIn) {
@@ -213,7 +229,32 @@ function WritePostModal({ isOpen, onClose, onSubmit }) {
             <MantineText size="sm" fw={500} mb="xs" c="gray.7">내용</MantineText>
             <RichTextEditor 
               editor={editor}
-              style={{ minHeight: '300px' }}
+              styles={{
+                root: {
+                  minHeight: 'clamp(250px, 30vh, 400px)',
+                  backgroundColor: '#ffffff',
+                  border: '1px solid #e9ecef',
+                  borderRadius: '8px',
+                  '@media (max-width: 768px)': {
+                    minHeight: '250px',
+                    fontSize: '16px'
+                  }
+                },
+                toolbar: {
+                  flexWrap: 'wrap',
+                  gap: '4px',
+                  padding: 'clamp(6px, 1.5vw, 10px)',
+                  '@media (max-width: 768px)': {
+                    padding: '6px',
+                    gap: '2px'
+                  }
+                },
+                controlsGroup: {
+                  '@media (max-width: 768px)': {
+                    gap: '2px'
+                  }
+                }
+              }}
               onDrop={handleImageDrop}
               onDragOver={handleImageDragOver}
             >
@@ -248,7 +289,25 @@ function WritePostModal({ isOpen, onClose, onSubmit }) {
               </RichTextEditor.Toolbar>
 
               <RichTextEditor.Content 
-                style={{ minHeight: '250px' }}
+                styles={{
+                  content: {
+                    minHeight: 'clamp(200px, 25vh, 300px)',
+                    backgroundColor: '#ffffff',
+                    padding: 'clamp(8px, 1.5vw, 12px)',
+                    fontSize: 'clamp(14px, 2.5vw, 16px)',
+                    lineHeight: '1.6',
+                    '@media (max-width: 768px)': {
+                      minHeight: '200px',
+                      padding: '8px',
+                      fontSize: '16px'
+                    },
+                    '@media (max-width: 480px)': {
+                      minHeight: '180px',
+                      padding: '8px',
+                      fontSize: '16px'
+                    }
+                  }
+                }}
                 onDrop={handleImageDrop}
                 onDragOver={handleImageDragOver}
               />
@@ -284,31 +343,38 @@ function WritePostModal({ isOpen, onClose, onSubmit }) {
 
             {/* Image Preview */}
             {images.length > 0 && (
-              <SimpleGrid cols={3} spacing="sm" mt="md">
+              <SimpleGrid 
+                cols={{ base: 2, xs: 3, sm: 4 }} 
+                spacing={{ base: 'xs', sm: 'sm' }} 
+                mt="md"
+              >
                 {images.map(image => (
                   <Box key={image.id} pos="relative">
                     <Image
                       src={image.preview}
                       alt="미리보기"
                       radius="lg"
-                      h={80}
+                      h={{ base: 60, xs: 70, sm: 80 }}
                       fit="cover"
-                      style={{ cursor: 'grab' }}
+                      style={{ cursor: 'grab', touchAction: 'manipulation' }}
                       draggable
                       onDragStart={() => handleImageDragStart(image)}
+                      onTouchStart={() => handleTouchStart(image)}
+                      onTouchEnd={handleTouchEnd}
                       onClick={() => insertImageIntoEditor(image)}
                       title="클릭하거나 드래그하여 에디터에 삽입"
                     />
                     <ActionIcon
-                      size="sm"
+                      size={{ base: 'xs', sm: 'sm' }}
                       color="red"
                       variant="filled"
                       pos="absolute"
                       top={4}
                       right={4}
                       onClick={() => removeImage(image.id)}
+                      style={{ touchAction: 'manipulation' }}
                     >
-                      <IconX size={12} />
+                      <IconX size={{ base: 10, sm: 12 }} />
                     </ActionIcon>
                   </Box>
                 ))}

@@ -112,6 +112,22 @@ function CommunityWrite() {
   const handleImageDragOver = (e) => {
     e.preventDefault();
   };
+  
+  const handleTouchStart = (image) => {
+    setDraggedImage(image);
+  };
+  
+  const handleTouchEnd = (e) => {
+    if (draggedImage) {
+      const touch = e.changedTouches[0];
+      const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+      
+      if (elementBelow && elementBelow.closest('.mantine-RichTextEditor-content')) {
+        insertImageIntoEditor(draggedImage);
+      }
+      setDraggedImage(null);
+    }
+  };
 
   const onFormSubmit = async (data) => {
     if (isSubmitting) return;
@@ -235,23 +251,38 @@ function CommunityWrite() {
               />
               <Text size="xs" c="dimmed" mt="xs">JPG, PNG 파일만 가능, 최대 10개</Text>
               {images.length > 0 && (
-                <SimpleGrid cols={{ base: 3, sm: 4, md: 5 }} spacing="sm" mt="md">
+                <SimpleGrid 
+                  cols={{ base: 2, xs: 3, sm: 4, md: 5, lg: 6 }} 
+                  spacing={{ base: 'xs', sm: 'sm' }} 
+                  mt="md"
+                >
                   {images.map(image => (
                     <Box key={image.id} pos="relative">
                       <Image 
                         src={image.preview} 
                         alt="미리보기" 
                         radius="md" 
-                        h={80} 
+                        h={{ base: 60, xs: 70, sm: 80 }}
                         fit="cover" 
-                        style={{ cursor: 'grab' }} 
+                        style={{ cursor: 'grab', touchAction: 'manipulation' }} 
                         draggable
                         onDragStart={() => handleImageDragStart(image)}
+                        onTouchStart={() => handleTouchStart(image)}
+                        onTouchEnd={handleTouchEnd}
                         onClick={() => insertImageIntoEditor(image)} 
                         title="클릭하거나 드래그하여 에디터에 삽입" 
                       />
-                      <ActionIcon size="sm" color="red" variant="filled" pos="absolute" top={4} right={4} onClick={() => removeImage(image.id)}>
-                        <IconX size={12} />
+                      <ActionIcon 
+                        size={{ base: 'xs', sm: 'sm' }}
+                        color="red" 
+                        variant="filled" 
+                        pos="absolute" 
+                        top={4} 
+                        right={4} 
+                        onClick={() => removeImage(image.id)}
+                        style={{ touchAction: 'manipulation' }}
+                      >
+                        <IconX size={{ base: 10, sm: 12 }} />
                       </ActionIcon>
                     </Box>
                   ))}
@@ -268,7 +299,32 @@ function CommunityWrite() {
               <Text size="sm" fw={500} mb="xs">내용</Text>
               <RichTextEditor 
                 editor={editor}
-                style={{ minHeight: '60vh' }}
+                styles={{
+                  root: {
+                    minHeight: 'clamp(40vh, 60vh, 70vh)',
+                    backgroundColor: '#ffffff',
+                    border: '1px solid #e9ecef',
+                    borderRadius: '8px',
+                    '@media (max-width: 768px)': {
+                      minHeight: '40vh',
+                      fontSize: '16px'
+                    }
+                  },
+                  toolbar: {
+                    flexWrap: 'wrap',
+                    gap: '4px',
+                    padding: 'clamp(8px, 2vw, 12px)',
+                    '@media (max-width: 768px)': {
+                      padding: '8px',
+                      gap: '2px'
+                    }
+                  },
+                  controlsGroup: {
+                    '@media (max-width: 768px)': {
+                      gap: '2px'
+                    }
+                  }
+                }}
                 onDrop={handleImageDrop}
                 onDragOver={handleImageDragOver}
               >
@@ -303,7 +359,25 @@ function CommunityWrite() {
                 </RichTextEditor.Toolbar>
 
                 <RichTextEditor.Content 
-                  style={{ minHeight: '50vh' }} 
+                  styles={{
+                    content: {
+                      minHeight: 'clamp(35vh, 50vh, 60vh)',
+                      backgroundColor: '#ffffff',
+                      padding: 'clamp(8px, 2vw, 16px)',
+                      fontSize: 'clamp(14px, 2.5vw, 16px)',
+                      lineHeight: '1.6',
+                      '@media (max-width: 768px)': {
+                        minHeight: '35vh',
+                        padding: '12px',
+                        fontSize: '16px'
+                      },
+                      '@media (max-width: 480px)': {
+                        minHeight: '30vh',
+                        padding: '8px',
+                        fontSize: '16px'
+                      }
+                    }
+                  }}
                   onDrop={handleImageDrop}
                   onDragOver={handleImageDragOver}
                 />
