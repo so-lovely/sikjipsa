@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import {
@@ -13,11 +13,14 @@ import {
   Select,
   Box,
 } from '@mantine/core';
-import { RichTextEditor, Link } from '@mantine/tiptap';
+import { RichTextEditor } from '@mantine/tiptap';
 import { useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
 import Highlight from '@tiptap/extension-highlight';
+import Link from '@tiptap/extension-link';
+import Image from '@tiptap/extension-image';
+import Dropcursor from '@tiptap/extension-dropcursor';
 import { IconPencilPlus, IconSend } from '@tabler/icons-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { communityAPI } from '../api/community.js';
@@ -37,10 +40,27 @@ function CommunityWrite() {
   
   const editor = useEditor({
     extensions: [
-      StarterKit,
-      Link,
+      StarterKit.configure({
+        // StarterKit에서 기본 Link를 제외하고 우리가 직접 설정한 Link 사용
+        link: false,
+        // StarterKit에 이미 dropcursor가 포함되어 있으므로 별도 추가 불필요
+      }),
+      Link.configure({
+        openOnClick: false,
+        HTMLAttributes: {
+          class: 'editor-link',
+        },
+      }),
       Underline,
-      Highlight.configure({ multicolor: true })
+      Highlight.configure({ multicolor: true }),
+      Image.configure({
+        inline: true,
+        allowBase64: true,
+      }),
+      Dropcursor.configure({
+        color: 'var(--mantine-primary-color)',
+        width: 2,
+      }),
     ],
     content: '',
   });
