@@ -138,7 +138,7 @@ function CommunityWrite() {
   return (
     <Container size="xl" py="xl">
       {/* Header */}
-      <Stack align="center" gap="md" mb={60}>
+      <Stack gap="xl" style={{ flex: 1}}>
         <Title 
           order={1} 
           ta="center" 
@@ -176,7 +176,11 @@ function CommunityWrite() {
         p={0} 
         style={{ 
           overflow: 'hidden',
-          border: '1px solid rgba(15, 23, 36, 0.08)'
+          border: '1px solid rgba(15, 23, 36, 0.08)',
+          display: 'flex',
+          flexDirection: 'column',
+          height: 'min(80vh, 1000px)'
+
         }}
       >
         {/* Form Header */}
@@ -197,7 +201,7 @@ function CommunityWrite() {
         </Box>
 
         {/* Form Body */}
-        <Box p="xl">
+        <Box p="xl" style={{ flex: 1, overflow: 'auto'}}>
           <form onSubmit={handleSubmit(onFormSubmit)}>
             <Stack gap="xl">
               {/* Category Selection */}
