@@ -303,6 +303,15 @@ function PostDetail() {
     }
   };
 
+  const cleanContent = (content) => {
+    if (!content) return '';
+    // Remove embedded image divs and image placeholders
+    return content
+      .replace(/<div class="embedded-image"[^>]*>.*?<\/div>/gs, '')
+      .replace(/\[이미지:\s*[^\]]*\]/g, '')
+      .trim();
+  };
+
   const getCategoryColor = (category) => {
     const colors = {
       '질문답변': 'blue',
@@ -599,7 +608,7 @@ function PostDetail() {
             <Divider />
 
             <Text size="md" lh={1.8} c="gray.7" style={{ whiteSpace: 'pre-wrap' }}>
-              {post.content}
+              <div dangerouslySetInnerHTML={{ __html: cleanContent(post.content) }} />
             </Text>
 
             {images.length > 0 && (
