@@ -154,6 +154,21 @@ const lastPostElementRef = useCallback(node => {
     return date.toLocaleDateString('ko-KR');
   };
 
+  const cleanContent = (content) => {
+    if (!content) return '';
+    // Remove HTML tags and image placeholders
+    return content
+      .replace(/<div class="embedded-image"[^>]*>.*?<\/div>/gs, '')
+      .replace(/\[이미지:\s*[^\]]*\]/g, '')
+      .replace(/<[^>]*>/g, '')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .trim();
+  };
+
 
   // --- 5. JSX 렌더링 ---
   return (
@@ -238,7 +253,7 @@ const lastPostElementRef = useCallback(node => {
                 </Group>
                 <div>
                   <Title order={3} size="lg" fw={600} mb="xs" c="gray.8">{post.title}</Title>
-                  <Text size="sm" c="gray.6" lineClamp={2}>{post.content}</Text>
+                  <Text size="sm" c="gray.6" lineClamp={2}>{cleanContent(post.content)}</Text>
                 </div>
                 <Group gap="lg" justify="flex-start">
                   <Group gap="xs">
