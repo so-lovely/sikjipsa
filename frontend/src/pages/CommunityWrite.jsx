@@ -124,7 +124,7 @@ function CommunityWrite() {
   };
 
   return (
-    <Container size="fluid" py="xl" style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: '200vh' }}>
+    <Container size="fluid" py="xl" style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: '150vh' }}>
       {/* Header */}
       <Stack gap="xl" mb="xl">
         <Title 
