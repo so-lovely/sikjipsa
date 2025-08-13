@@ -292,30 +292,26 @@ function CommunityWrite() {
               </div>
 
               {/* Content Editor */}
-              <div>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column'}}>
                 <Text size="sm" fw={500} mb="xs" c="gray.7">내용</Text>
                 <Textarea
                   ref={contentRef}
-                  placeholder="식물에 관한 이야기를 자유롭게 나누어보세요...
-
+                  placeholder="
 💡 이미지 업로드 팁:
-- 이미지를 업로드한 후, 원하는 위치에 클릭하여 삽입할 수 있습니다
-- 이미지를 드래그해서 원하는 곳에 놓을 수도 있습니다
+- 이미지를 드래그해서 원하는 곳에 놓을 수 있습니다
 - 텍스트와 이미지를 자유롭게 배치하여 풍부한 내용을 작성해보세요"
                   {...register('content', {
-                    required: '내용을 입력해주세요',
-                    minLength: {
-                      value: 10,
-                      message: '내용은 최소 10글자 이상이어야 합니다'
-                    }
+                    required: '내용을 입력해주세요'
                   })}
                   error={errors.content?.message}
                   minRows={32}
                   size="md"
                   radius="lg"
                   style={{ 
-                    minHeight: 'min(75vh, 900px)',
-                    maxHeight: '90vh'
+                    height: '100%',
+                    minHeight: 'auto',
+                    maxHeight: 'none',
+                    resize: 'vertical'
                   }}
                 />
               </div>
