@@ -237,7 +237,7 @@ function CommunityWrite() {
                 error={errors.content?.message}
                 size="md"
                 radius="lg"
-                mih="30vh"
+                mih="60vh"
                 styles={{
                   wrapper: { 
                     flex: 1,
@@ -246,7 +246,7 @@ function CommunityWrite() {
                   }, 
                   input: { 
                     flex: 1,
-                    minHeight: '30vh',
+                    minHeight: '60vh',
                     resize: 'vertical'
                   } 
                 }}
