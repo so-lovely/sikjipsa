@@ -310,11 +310,11 @@ function CommunityWrite() {
                     }
                   })}
                   error={errors.content?.message}
-                  minRows={25}
+                  minRows={32}
                   size="md"
                   radius="lg"
                   style={{ 
-                    minHeight: 'min(70vh, 800px)',
+                    minHeight: 'min(75vh, 900px)',
                     maxHeight: '90vh'
                   }}
                 />
