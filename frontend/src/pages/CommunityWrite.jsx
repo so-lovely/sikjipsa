@@ -246,7 +246,7 @@ function CommunityWrite() {
           <Box p="xl" style={{ borderTop: '1px solid rgba(15, 23, 36, 0.08)', backgroundColor: 'var(--surface)' }}>
             <Group justify="flex-end" gap="md">
               <Button variant="light" onClick={handleClose} size="md" radius="lg">취소</Button>
-              <Button type="submit" leftSection={<IconSend size={16} />} disabled={isSubmitting} loading={isSubstituting} variant="gradient" gradient={{ from: 'green.5', to: 'green.6' }} size="md" radius="lg">
+              <Button type="submit" leftSection={<IconSend size={16} />} disabled={isSubmitting} loading={isSubmitting} variant="gradient" gradient={{ from: 'green.5', to: 'green.6' }} size="md" radius="lg">
                 {isSubmitting ? '게시하는 중...' : '게시하기'}
               </Button>
             </Group>
