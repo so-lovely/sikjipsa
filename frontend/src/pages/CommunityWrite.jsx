@@ -49,7 +49,6 @@ function CommunityWrite() {
     handleSubmit,
     formState: { errors },
     control,
-    setValue,
   } = useForm();
 
   if (!isLoggedIn) {
@@ -119,9 +118,16 @@ function CommunityWrite() {
         return;
       }
       
+      const editorContent = editor?.getHTML() || '';
+      if (!editorContent || editorContent === '<p></p>') {
+        alert('내용을 입력해주세요.');
+        setIsSubmitting(false);
+        return;
+      }
+      
       const formData = {
         ...data,
-        content: editor?.getHTML() || data.content,
+        content: editorContent,
         post_type: data.category,
         images: images,
         author: authorName,
@@ -253,56 +259,61 @@ function CommunityWrite() {
                 flexDirection: 'column' 
               }}>
               <Text size="sm" fw={500} mb="xs">내용</Text>
-              <Controller
-                name="content"
-                control={control}
-                rules={{ required: '내용을 입력해주세요' }}
-                render={({ field }) => (
-                  <RichTextEditor 
-                    editor={editor}
-                    style={{ minHeight: '60vh' }}
-                    onDrop={handleImageDrop}
-                    onDragOver={handleImageDragOver}
-                    {...field}
-                    onChange={(value) => {
-                      field.onChange(value);
-                      setValue('content', value);
-                    }}
-                  >
-                    <RichTextEditor.Toolbar sticky stickyOffset={60}>
-                      <RichTextEditor.ControlsGroup>
-                        <RichTextEditor.Bold />
-                        <RichTextEditor.Italic />
-                        <RichTextEditor.Underline />
-                        <RichTextEditor.Strikethrough />
-                        <RichTextEditor.ClearFormatting />
-                        <RichTextEditor.Code />
-                      </RichTextEditor.ControlsGroup>
+              {editor ? (
+                <Controller
+                  name="content"
+                  control={control}
+                  rules={{ required: '내용을 입력해주세요' }}
+                  render={() => (
+                    <RichTextEditor 
+                      editor={editor}
+                      style={{ minHeight: '60vh' }}
+                      onDrop={handleImageDrop}
+                      onDragOver={handleImageDragOver}
+                    >
+                      <RichTextEditor.Toolbar sticky stickyOffset={60}>
+                        <RichTextEditor.ControlsGroup>
+                          <RichTextEditor.Bold />
+                          <RichTextEditor.Italic />
+                          <RichTextEditor.Underline />
+                          <RichTextEditor.Strikethrough />
+                          <RichTextEditor.ClearFormatting />
+                          <RichTextEditor.Code />
+                        </RichTextEditor.ControlsGroup>
 
-                      <RichTextEditor.ControlsGroup>
-                        <RichTextEditor.H1 />
-                        <RichTextEditor.H2 />
-                        <RichTextEditor.H3 />
-                        <RichTextEditor.H4 />
-                      </RichTextEditor.ControlsGroup>
+                        <RichTextEditor.ControlsGroup>
+                          <RichTextEditor.H1 />
+                          <RichTextEditor.H2 />
+                          <RichTextEditor.H3 />
+                          <RichTextEditor.H4 />
+                        </RichTextEditor.ControlsGroup>
 
-                      <RichTextEditor.ControlsGroup>
-                        <RichTextEditor.Blockquote />
-                        <RichTextEditor.Hr />
-                        <RichTextEditor.BulletList />
-                        <RichTextEditor.OrderedList />
-                      </RichTextEditor.ControlsGroup>
+                        <RichTextEditor.ControlsGroup>
+                          <RichTextEditor.Blockquote />
+                          <RichTextEditor.Hr />
+                          <RichTextEditor.BulletList />
+                          <RichTextEditor.OrderedList />
+                        </RichTextEditor.ControlsGroup>
 
-                      <RichTextEditor.ControlsGroup>
-                        <RichTextEditor.Link />
-                        <RichTextEditor.Unlink />
-                      </RichTextEditor.ControlsGroup>
-                    </RichTextEditor.Toolbar>
+                        <RichTextEditor.ControlsGroup>
+                          <RichTextEditor.Link />
+                          <RichTextEditor.Unlink />
+                        </RichTextEditor.ControlsGroup>
+                      </RichTextEditor.Toolbar>
 
-                    <RichTextEditor.Content style={{ minHeight: '50vh' }} />
-                  </RichTextEditor>
-                )}
-              />
+                      <RichTextEditor.Content 
+                        style={{ minHeight: '50vh' }} 
+                        onDrop={handleImageDrop}
+                        onDragOver={handleImageDragOver}
+                      />
+                    </RichTextEditor>
+                  )}
+                />
+              ) : (
+                <Box style={{ minHeight: '60vh', border: '1px solid #e9ecef', borderRadius: '8px', padding: '16px' }}>
+                  <Text c="dimmed">에디터를 로딩 중...</Text>
+                </Box>
+              )}
               {errors.content && (
                 <Text size="xs" c="red" mt="xs">{errors.content.message}</Text>
               )}
