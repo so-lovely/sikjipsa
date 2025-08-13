@@ -237,11 +237,18 @@ function CommunityWrite() {
                 error={errors.content?.message}
                 size="md"
                 radius="lg"
+                mih="30vh"
                 styles={{
-                  // Textarea의 전체 래퍼가 flex 아이템으로서 늘어나도록 설정
-                  wrapper: { flex: 1 }, 
-                  // 내부 input 요소가 래퍼의 전체 높이를 사용하도록 설정
-                  input: { height: '100%' } 
+                  wrapper: { 
+                    flex: 1,
+                    display: 'flex',
+                    flexDirection: 'column'
+                  }, 
+                  input: { 
+                    flex: 1,
+                    minHeight: '30vh',
+                    resize: 'vertical'
+                  } 
                 }}
               />
             </Box>
