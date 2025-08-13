@@ -314,7 +314,8 @@ function CommunityWrite() {
                   size="md"
                   radius="lg"
                   style={{ 
-                    minHeight: '600px'
+                    minHeight: 'min(70vh, 800px)',
+                    maxHeight: '90vh'
                   }}
                 />
               </div>
