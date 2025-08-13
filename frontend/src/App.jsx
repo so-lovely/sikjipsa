@@ -47,7 +47,7 @@ function App() {
               backgroundColor: 'var(--bg)'
             }}>
               <Header />
-              <main style={{ flex: 1, paddingTop: '80px' }}>
+              <main style={{ flex: 1, paddingTop: '80px', display: flex}}>
                 <Routes>
                   <Route path="/" element={<Home />} />
                   <Route path="/encyclopedia" element={<Encyclopedia />} />
