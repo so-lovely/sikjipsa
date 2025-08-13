@@ -48,26 +48,28 @@ function App() {
             }}>
               <Header />
               <main style={{ flex: 1, paddingTop: '80px', display: 'flex'}}>
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/encyclopedia" element={<Encyclopedia />} />
-                  <Route path="/diagnosis" element={<Diagnosis />} />
-                  <Route path="/community" element={<Community />} />
-                  <Route path="/community/write" element={<CommunityWrite />} />
-                  <Route path="/community/post/:id" element={<PostDetail />} />
-                  <Route path="/announcements" element={<Announcements />} />
-                  <Route path="/announcements/:id" element={<AnnouncementDetail />} />
-                  <Route path="/diary" element={<Diary />} />
-                  <Route path="/diary/write" element={<DiaryWrite />} />
-                  <Route path="/diary/write/:diaryId" element={<DiaryWrite />} />
-                  <Route path="/diary/edit/:diaryId/:entryId" element={<DiaryEdit />} />
-                  <Route path="/diary/:diaryId/:entryId" element={<DiaryDetail />} />
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/terms" element={<Terms />} />
-                  <Route path="/privacy" element={<PrivacyPolicy />} />
-                  <Route path="/auth/callback/:provider" element={<AuthCallback />} />
-                </Routes>
+                <div style={{ flex: 1 }}>
+                  <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/encyclopedia" element={<Encyclopedia />} />
+                    <Route path="/diagnosis" element={<Diagnosis />} />
+                    <Route path="/community" element={<Community />} />
+                    <Route path="/community/write" element={<CommunityWrite />} />
+                    <Route path="/community/post/:id" element={<PostDetail />} />
+                    <Route path="/announcements" element={<Announcements />} />
+                    <Route path="/announcements/:id" element={<AnnouncementDetail />} />
+                    <Route path="/diary" element={<Diary />} />
+                    <Route path="/diary/write" element={<DiaryWrite />} />
+                    <Route path="/diary/write/:diaryId" element={<DiaryWrite />} />
+                    <Route path="/diary/edit/:diaryId/:entryId" element={<DiaryEdit />} />
+                    <Route path="/diary/:diaryId/:entryId" element={<DiaryDetail />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/profile" element={<Profile />} />
+                    <Route path="/terms" element={<Terms />} />
+                    <Route path="/privacy" element={<PrivacyPolicy />} />
+                    <Route path="/auth/callback/:provider" element={<AuthCallback />} />
+                  </Routes>
+                </div>
               </main>
               <Footer />
             </div>
