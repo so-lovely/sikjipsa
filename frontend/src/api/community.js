@@ -128,6 +128,7 @@ export const communityAPI = {
   
   // 단일 이미지 업로드 (onImageUpload용)
   uploadImage: async (imageFile) => {
+    console.log("imageFileuploaded api/community.js",imageFile);
     const formData = new FormData();
     formData.append('image', imageFile);
     
@@ -136,7 +137,7 @@ export const communityAPI = {
         'Content-Type': 'multipart/form-data',
       },
     });
-    
+    console.log("imageFile response:", response, "api/community.js")
     return response.data.url;
   },
 };

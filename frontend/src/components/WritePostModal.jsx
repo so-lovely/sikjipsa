@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import {
   Modal,
   Title,
-  Text,
   TextInput,
   Button,
   Group,
@@ -93,28 +92,6 @@ function WritePostModal({ isOpen, onClose, onSubmit }) {
     }
   };
 
-  // 브라우저 기본 드래그&드롭 동작 방지 (모달이 열려있을 때만)
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const preventDefault = (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-    };
-
-    // 전체 문서에서 기본 드래그&드롭 동작 방지
-    const events = ['dragenter', 'dragover', 'dragleave', 'drop'];
-    events.forEach(eventName => {
-      document.addEventListener(eventName, preventDefault, false);
-    });
-
-    // 컴포넌트 언마운트 또는 모달 닫힐 때 이벤트 리스너 제거
-    return () => {
-      events.forEach(eventName => {
-        document.removeEventListener(eventName, preventDefault, false);
-      });
-    };
-  }, [isOpen]);
 
 
   const onFormSubmit = async (data) => {

@@ -1,16 +1,18 @@
 package handlers
 
 import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"log"
 	"sikjipsa-backend/internal/models"
 	"sikjipsa-backend/pkg/config"
 	"strconv"
-	"encoding/json"
-	"fmt"
-	"context"
-	"github.com/gofiber/fiber/v2"
-	"gorm.io/gorm"
+
 	"github.com/cloudinary/cloudinary-go/v2"
 	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
+	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 )
 
 type CommunityHandler struct {
@@ -258,6 +260,7 @@ func (h *CommunityHandler) UploadImage(c *fiber.Ctx) error {
 
 	// Get the image file
 	file, err := c.FormFile("image")
+	log.Printf("image file received: %v", file)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "No image file provided",
@@ -278,6 +281,7 @@ func (h *CommunityHandler) UploadImage(c *fiber.Ctx) error {
 			"error": "Failed to process image file",
 		})
 	}
+	log.Printf("file opened: %v", src)
 	defer src.Close()
 
 	// Initialize Cloudinary
@@ -301,7 +305,7 @@ func (h *CommunityHandler) UploadImage(c *fiber.Ctx) error {
 			"error": "Failed to upload image",
 		})
 	}
-
+	log.Printf("uploadResult: %v", uploadResult.SecureURL)
 	// Return the image URL
 	return c.JSON(fiber.Map{
 		"url": uploadResult.SecureURL,
