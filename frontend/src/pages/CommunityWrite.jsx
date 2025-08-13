@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import {
@@ -98,6 +98,27 @@ function CommunityWrite() {
       return null;
     }
   };
+
+  // 브라우저 기본 드래그&드롭 동작 방지
+  useEffect(() => {
+    const preventDefault = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    };
+
+    // 전체 문서에서 기본 드래그&드롭 동작 방지
+    const events = ['dragenter', 'dragover', 'dragleave', 'drop'];
+    events.forEach(eventName => {
+      document.addEventListener(eventName, preventDefault, false);
+    });
+
+    // 컴포넌트 언마운트 시 이벤트 리스너 제거
+    return () => {
+      events.forEach(eventName => {
+        document.removeEventListener(eventName, preventDefault, false);
+      });
+    };
+  }, []);
 
 
   const onFormSubmit = async (data) => {
