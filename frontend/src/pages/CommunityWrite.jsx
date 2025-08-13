@@ -223,7 +223,11 @@ function CommunityWrite() {
             </div>
 
             {/* Content Editor */}
-            <Box>
+            <Box style={{ 
+                flex: 1,
+                display: 'flex', 
+                flexDirection: 'column' 
+              }}>
               <Text size="sm" fw={500} mb="xs">내용</Text>
               <Textarea
                 ref={contentRef}
@@ -233,8 +237,12 @@ function CommunityWrite() {
                 error={errors.content?.message}
                 size="md"
                 radius="lg"
-                minRows={15}
-                style={{minHeight: 'calc(1.5em * 15)'}}
+                styles={{
+                  // Textarea의 전체 래퍼가 flex 아이템으로서 늘어나도록 설정
+                  wrapper: { flex: 1 }, 
+                  // 내부 input 요소가 래퍼의 전체 높이를 사용하도록 설정
+                  input: { height: '100%' } 
+                }}
               />
             </Box>
           </Box>
