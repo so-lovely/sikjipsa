@@ -136,9 +136,9 @@ function CommunityWrite() {
   };
 
   return (
-    <Container size="xl" py="xl">
+    <Container size="xl" py="xl" style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
-      <Stack gap="xl" style={{ flex: 1}}>
+      <Stack gap="xl" style={{ flexShrink: 0 }}>
         <Title 
           order={1} 
           ta="center" 
@@ -148,6 +148,7 @@ function CommunityWrite() {
             color: 'var(--charcoal)',
             display: 'flex',
             alignItems: 'center',
+            justifyContent: 'center',
             gap: 'var(--space-sm)'
           }}
         >
@@ -159,6 +160,7 @@ function CommunityWrite() {
           size="lg" 
           style={{ 
             maxWidth: 600, 
+            margin: '0 auto',
             color: 'var(--muted)',
             fontSize: '18px',
             lineHeight: '1.6'
@@ -179,14 +181,15 @@ function CommunityWrite() {
           border: '1px solid rgba(15, 23, 36, 0.08)',
           display: 'flex',
           flexDirection: 'column',
-          height: 'min(80vh, 1000px)'
-
+          flex: 1,
+          marginTop: 'var(--space-xl)'
         }}
       >
         {/* Form Header */}
         <Box p="xl" style={{ 
           borderBottom: '1px solid rgba(15, 23, 36, 0.08)', 
-          backgroundColor: 'var(--surface)' 
+          backgroundColor: 'var(--surface)',
+          flexShrink: 0
         }}>
           <Title 
             order={3} 
@@ -201,9 +204,9 @@ function CommunityWrite() {
         </Box>
 
         {/* Form Body */}
-        <Box p="xl" style={{ flex: 1, overflow: 'auto'}}>
-          <form onSubmit={handleSubmit(onFormSubmit)}>
-            <Stack gap="xl">
+        <form onSubmit={handleSubmit(onFormSubmit)} style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+          <Box p="xl" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <Stack gap="xl" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
               {/* Category Selection */}
               <div>
                 <Text size="sm" fw={500} mb="xs" c="gray.7">카테고리</Text>
@@ -296,68 +299,65 @@ function CommunityWrite() {
               </div>
 
               {/* Content Editor */}
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column'}}>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                 <Text size="sm" fw={500} mb="xs" c="gray.7">내용</Text>
                 <Textarea
                   ref={contentRef}
-                  placeholder="
-💡 이미지 업로드 팁:
+                  placeholder="💡 이미지 업로드 팁:
 - 이미지를 드래그해서 원하는 곳에 놓을 수 있습니다
 - 텍스트와 이미지를 자유롭게 배치하여 풍부한 내용을 작성해보세요"
                   {...register('content', {
                     required: '내용을 입력해주세요'
                   })}
                   error={errors.content?.message}
-                  minRows={32}
                   size="md"
                   radius="lg"
                   style={{ 
-                    height: '100%',
-                    minHeight: 'auto',
-                    maxHeight: 'none',
-                    resize: 'vertical'
+                    flex: 1,
+                    minHeight: '300px',
+                    resize: 'none'
                   }}
                 />
               </div>
             </Stack>
+          </Box>
 
-            {/* Form Footer */}
-            <Box
-              p="xl"
-              style={{
-                borderTop: '1px solid rgba(15, 23, 36, 0.08)',
-                backgroundColor: 'var(--surface)',
-                marginTop: 'var(--space-xl)'
-              }}
-            >
-              <Group justify="flex-end" gap="md">
-                <Button
-                  variant="light"
-                  onClick={handleClose}
-                  size="md"
-                  radius="lg"
-                >
-                  취소
-                </Button>
-                <Button
-                  type="submit"
-                  leftSection={<IconSend size={16} />}
-                  disabled={isSubmitting}
-                  loading={isSubmitting}
-                  variant="gradient"
-                  gradient={{ from: 'green.5', to: 'green.6' }}
-                  size="md"
-                  radius="lg"
-                  style={{ 
-                    pointerEvents: isSubmitting ? 'none' : 'auto' 
-                  }}
-                >
-                  {isSubmitting ? '게시하는 중...' : '게시하기'}
-                </Button>
-              </Group>
-            </Box>
-          </form>
-        </Box>
+          {/* Form Footer */}
+          <Box
+            p="xl"
+            style={{
+              borderTop: '1px solid rgba(15, 23, 36, 0.08)',
+              backgroundColor: 'var(--surface)',
+              flexShrink: 0
+            }}
+          >
+            <Group justify="flex-end" gap="md">
+              <Button
+                variant="light"
+                onClick={handleClose}
+                size="md"
+                radius="lg"
+              >
+                취소
+              </Button>
+              <Button
+                type="submit"
+                leftSection={<IconSend size={16} />}
+                disabled={isSubmitting}
+                loading={isSubmitting}
+                variant="gradient"
+                gradient={{ from: 'green.5', to: 'green.6' }}
+                size="md"
+                radius="lg"
+                style={{ 
+                  pointerEvents: isSubmitting ? 'none' : 'auto' 
+                }}
+              >
+                {isSubmitting ? '게시하는 중...' : '게시하기'}
+              </Button>
+            </Group>
+          </Box>
+        </form>
       </Card>
     </Container>
   );
