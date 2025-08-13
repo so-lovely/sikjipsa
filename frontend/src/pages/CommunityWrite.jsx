@@ -124,7 +124,7 @@ function CommunityWrite() {
   };
 
   return (
-    <Container size="fluid" py="xl" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+    <Container size="fluid" py="xl" style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: '150vh' }}>
       {/* Header */}
       <Stack gap="xl" mb="xl">
         <Title 
@@ -155,10 +155,9 @@ function CommunityWrite() {
           display: 'flex',
           flexDirection: 'column',
           overflow: 'hidden',
-          minHeight: 0
         }}
       >
-        <form onSubmit={handleSubmit(onFormSubmit)} style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0 }}>
+        <form onSubmit={handleSubmit(onFormSubmit)} style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden'}}>
           {/* Form Header */}
           <Box p="xl" style={{ borderBottom: '1px solid rgba(15, 23, 36, 0.08)', backgroundColor: 'var(--surface)' }}>
             <Title order={3} m={0} style={{ color: 'var(--charcoal)', fontWeight: 600 }}>
@@ -167,7 +166,7 @@ function CommunityWrite() {
           </Box>
 
           {/* Form Body */}
-          <Box p="xl" style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 'var(--mantine-spacing-xl)', overflowY: 'auto', minHeight: 0 }}>
+          <Box p="xl" style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 'var(--mantine-spacing-xl)', overflowY: 'auto' }}>
             
             {/* Category & Title */}
             <Group grow>
