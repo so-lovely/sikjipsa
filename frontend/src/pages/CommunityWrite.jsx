@@ -124,7 +124,7 @@ function CommunityWrite() {
   };
 
   return (
-    <Container size="xl" py="xl" style={{ minHeight: 'calc(100vh - var(--header-height) - var(--footer-height))', display: 'flex', flexDirection: 'column' }}>
+    <Container size="fluid" py="xl" style={{ minHeight: 'calc(100vh - var(--header-height) - var(--footer-height))', display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
       <Stack gap="xl" mb="xl">
         <Title 
