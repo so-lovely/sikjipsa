@@ -234,6 +234,7 @@ function CommunityWrite() {
                 size="md"
                 radius="lg"
                 minRows={15}
+                style={{minHeight: 'calc(1.5em * 15)'}}
               />
             </Box>
           </Box>
