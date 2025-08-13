@@ -179,7 +179,9 @@ function CommunityWrite() {
         style={{ 
           overflow: 'hidden',
           border: '1px solid rgba(15, 23, 36, 0.08)',
-          flex: '1'
+          flex: '1',
+          display: 'flex',
+          flexDirection: 'column'
         }}
       >
         {/* Form Header */}
