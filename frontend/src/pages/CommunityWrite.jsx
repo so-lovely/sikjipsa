@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import {
@@ -90,7 +90,9 @@ function CommunityWrite() {
   // 이미지 업로드 핸들러 (onImageUpload용)
   const handleImageUpload = async (file) => {
     try {
+      console.log('이미지 업로드 시작:', file.name);
       const imageUrl = await communityAPI.uploadImage(file);
+      console.log('이미지 업로드 완료:', imageUrl);
       return imageUrl;
     } catch (error) {
       console.error('이미지 업로드 실패:', error);
@@ -98,6 +100,29 @@ function CommunityWrite() {
       return null;
     }
   };
+
+  // 에디터 내부에서만 브라우저 기본 동작 방지 (Mantine onImageUpload가 작동하도록)
+  useEffect(() => {
+    // 에디터가 아직 준비되지 않았으면 대기
+    if (!editor) return;
+    
+    const preventImageDrop = (e) => {
+      // 에디터 내부에서만 기본 동작 방지
+      if (e.target.closest('.mantine-RichTextEditor-content')) {
+        if (e.dataTransfer?.types?.includes('Files')) {
+          e.preventDefault(); // 새 탭 열기 방지
+        }
+      }
+    };
+    
+    document.addEventListener('dragover', preventImageDrop);
+    document.addEventListener('drop', preventImageDrop);
+    
+    return () => {
+      document.removeEventListener('dragover', preventImageDrop);
+      document.removeEventListener('drop', preventImageDrop);
+    };
+  }, [editor]); // editor가 준비되면 실행
 
 
 
