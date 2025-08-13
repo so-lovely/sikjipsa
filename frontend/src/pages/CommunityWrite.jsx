@@ -19,16 +19,16 @@ import {
   SimpleGrid,
   Loader
 } from '@mantine/core';
-import { IconPlus, IconPhoto, IconX, IconSend } from '@tabler/icons-react';
+import { IconPlus, IconPhoto, IconX, IconSend, IconPencilPlus } from '@tabler/icons-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { communityAPI } from '../api/community.js';
 
 const categories = [
-  { value: '질문답변', label: '질문답변' },
-  { value: '자랑하기', label: '자랑하기' },
-  { value: '정보공유', label: '정보공유' },
-  { value: '팁공유', label: '팁공유' },
-  { value: '추천요청', label: '추천요청' },
+  { value: 'general', label: '일반' },
+  { value: 'question', label: '질문' },
+  { value: 'tip', label: '꿀팁' },
+  { value: 'share', label: '자랑' },
+  { value: 'trade', label: '나눔' },
 ];
 
 function CommunityWrite() {
@@ -138,24 +138,62 @@ function CommunityWrite() {
   return (
     <Container size="xl" py="xl">
       {/* Header */}
-      <Stack align="center" gap="xl" mb={60}>
-        <Title order={1} size={48} fw={700} ta="center" c="gray.8">
-          ✏️ 새 글 작성
+      <Stack align="center" gap="md" mb={60}>
+        <Title 
+          order={1} 
+          ta="center" 
+          style={{
+            fontSize: 'clamp(40px, 5vw, 48px)',
+            fontWeight: 700,
+            color: 'var(--charcoal)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 'var(--space-sm)'
+          }}
+        >
+          <IconPencilPlus size={40} style={{color: 'var(--primary-600)'}} />
+          새 글 작성
         </Title>
-        <Text size="lg" ta="center" c="gray.6" maw={600}>
+        <Text 
+          ta="center" 
+          size="lg" 
+          style={{ 
+            maxWidth: 600, 
+            color: 'var(--muted)',
+            fontSize: '18px',
+            lineHeight: '1.6'
+          }}
+        >
           식물에 관한 이야기를 자유롭게 나누어보세요. 
           이미지를 원하는 위치에 삽입할 수 있습니다.
         </Text>
       </Stack>
 
       {/* Write Form */}
-      <Card shadow="xl" radius="xl" p={0} style={{ overflow: 'hidden' }}>
+      <Card 
+        shadow="var(--shadow-md)" 
+        radius="var(--radius-lg)" 
+        p={0} 
+        style={{ 
+          overflow: 'hidden',
+          border: '1px solid rgba(15, 23, 36, 0.08)'
+        }}
+      >
         {/* Form Header */}
         <Box p="xl" style={{ 
-          borderBottom: '1px solid var(--mantine-color-gray-2)', 
-          backgroundColor: 'var(--mantine-color-gray-0)' 
+          borderBottom: '1px solid rgba(15, 23, 36, 0.08)', 
+          backgroundColor: 'var(--surface)' 
         }}>
-          <Title order={3} c="gray.8" m={0}>게시글 정보</Title>
+          <Title 
+            order={3} 
+            m={0}
+            style={{
+              color: 'var(--charcoal)',
+              fontWeight: 600
+            }}
+          >
+            게시글 정보
+          </Title>
         </Box>
 
         {/* Form Body */}
@@ -256,59 +294,29 @@ function CommunityWrite() {
               {/* Content Editor */}
               <div>
                 <Text size="sm" fw={500} mb="xs" c="gray.7">내용</Text>
-                <Box pos="relative">
-                  {/* Image Insert Toolbar */}
-                  <Box
-                    pos="absolute"
-                    top="xs"
-                    right="xs"
-                    style={{ zIndex: 10 }}
-                  >
-                    <Button
-                      size="sm"
-                      variant="filled"
-                      color="green"
-                      leftSection={<IconPhoto size={14} />}
-                      onClick={() => {
-                        if (images.length > 0) {
-                          const randomImage = images[Math.floor(Math.random() * images.length)];
-                          insertImageAtCursor(randomImage);
-                        } else {
-                          alert('먼저 이미지를 업로드해주세요.');
-                        }
-                      }}
-                      radius="md"
-                    >
-                      이미지 삽입
-                    </Button>
-                  </Box>
+                <Textarea
+                  ref={contentRef}
+                  placeholder="식물에 관한 이야기를 자유롭게 나누어보세요...
 
-                  {/* Content Textarea */}
-                  <Textarea
-                    ref={contentRef}
-                    placeholder="식물에 관한 이야기를 자유롭게 나누어보세요...
-
-💡 이미지 삽입 팁:
+💡 이미지 업로드 팁:
 - 이미지를 업로드한 후, 원하는 위치에 클릭하여 삽입할 수 있습니다
-- [이미지:ID] 형태로 자동 삽입됩니다
+- 이미지를 드래그해서 원하는 곳에 놓을 수도 있습니다
 - 텍스트와 이미지를 자유롭게 배치하여 풍부한 내용을 작성해보세요"
-                    {...register('content', {
-                      required: '내용을 입력해주세요',
-                      minLength: {
-                        value: 10,
-                        message: '내용은 최소 10글자 이상이어야 합니다'
-                      }
-                    })}
-                    error={errors.content?.message}
-                    minRows={20}
-                    size="md"
-                    radius="lg"
-                    style={{ 
-                      minHeight: '500px',
-                      paddingTop: '60px' // Make room for the toolbar
-                    }}
-                  />
-                </Box>
+                  {...register('content', {
+                    required: '내용을 입력해주세요',
+                    minLength: {
+                      value: 10,
+                      message: '내용은 최소 10글자 이상이어야 합니다'
+                    }
+                  })}
+                  error={errors.content?.message}
+                  minRows={25}
+                  size="md"
+                  radius="lg"
+                  style={{ 
+                    minHeight: '600px'
+                  }}
+                />
               </div>
             </Stack>
 
@@ -316,9 +324,9 @@ function CommunityWrite() {
             <Box
               p="xl"
               style={{
-                borderTop: '1px solid var(--mantine-color-gray-2)',
-                backgroundColor: 'var(--mantine-color-gray-0)',
-                marginTop: 'var(--mantine-spacing-xl)'
+                borderTop: '1px solid rgba(15, 23, 36, 0.08)',
+                backgroundColor: 'var(--surface)',
+                marginTop: 'var(--space-xl)'
               }}
             >
               <Group justify="flex-end" gap="md">

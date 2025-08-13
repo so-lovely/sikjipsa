@@ -17,15 +17,15 @@ import {
   SimpleGrid,
   Text as MantineText
 } from '@mantine/core';
-import { IconPhoto, IconX, IconSend } from '@tabler/icons-react';
+import { IconPhoto, IconX, IconSend, IconPencilPlus } from '@tabler/icons-react';
 import { useAuth } from '../context/AuthContext.jsx';
 
 const categories = [
-  { value: '질문답변', label: '질문답변' },
-  { value: '자랑하기', label: '자랑하기' },
-  { value: '정보공유', label: '정보공유' },
-  { value: '팁공유', label: '팁공유' },
-  { value: '추천요청', label: '추천요청' },
+  { value: 'general', label: '일반' },
+  { value: 'question', label: '질문' },
+  { value: 'tip', label: '꿀팁' },
+  { value: 'share', label: '자랑' },
+  { value: 'trade', label: '나눔' },
 ];
 
 function WritePostModal({ isOpen, onClose, onSubmit }) {
@@ -115,7 +115,7 @@ function WritePostModal({ isOpen, onClose, onSubmit }) {
     <Modal 
       opened={isOpen} 
       onClose={handleClose} 
-      title={<Title order={3} c="gray.8">✏️ 새 글 작성</Title>}
+      title={<Title order={3} c="gray.8"><IconPencilPlus size={20} style={{marginRight: '8px'}} />새 글 작성</Title>}
       size="lg" 
       centered
       radius="xl"
@@ -174,7 +174,7 @@ function WritePostModal({ isOpen, onClose, onSubmit }) {
                 }
               })}
               error={errors.content?.message}
-              minRows={6}
+              minRows={10}
               size="md"
               radius="lg"
             />
