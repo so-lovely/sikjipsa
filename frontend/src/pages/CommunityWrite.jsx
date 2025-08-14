@@ -132,10 +132,14 @@ const PostEditor = () => {
       <Box 
         style={{ 
           flex: 1, 
+          height: 'calc(100vh - max(280px, min(350px, 30vh)))',
           display: 'flex', 
           flexDirection: 'column',
           minHeight: 0,
-          overflow: 'auto'
+          border: '1px solid #e9ecef',
+          borderRadius: '16px',
+          overflow: 'hidden',
+          backgroundColor: '#fff'
         }}
       >
         <TiptapEditor 

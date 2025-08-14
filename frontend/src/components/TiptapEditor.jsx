@@ -109,6 +109,7 @@ const TiptapEditor = ({ content, onChange }) => {
         overflow: 'hidden',
         flex: 1,
         display: 'flex',
+        height: '100%',
         flexDirection: 'column',
         minHeight: 0,
         boxShadow: '0 0.625rem 2.5rem rgba(0, 0, 0, 0.08)',
@@ -123,9 +124,8 @@ const TiptapEditor = ({ content, onChange }) => {
             border: 'none',
             display: 'flex',
             flexDirection: 'column',
-            flex: 1,
-            minHeight: 0,
             height: '100%',
+            minHeight: 0,
           },
           toolbar: {
             backgroundColor: '#f8fafc',
@@ -147,10 +147,21 @@ const TiptapEditor = ({ content, onChange }) => {
             display: 'flex',
             flexDirection: 'column',
             overflow: 'auto',
+            height: '100%',
+            '&::-webkit-scrollbar-track': {
+            backgroundColor: '#f1f3f5',
+            borderRadius: '4px',
+             },
+             '&::-webkit-scrollbar-thumb': {
+           backgroundColor: '#dee2e6',
+           borderRadius: '4px',
+           '&:hover': {
+              backgroundColor: '#ced4da',
+            },
+         },
             '& .ProseMirror': {
               outline: 'none',
-              flex: 1,
-              minHeight: 'min(25rem, 50vh)',
+              minHeight: '100%',
               maxWidth: '100%',
               position: 'relative',
               zIndex: 1,
