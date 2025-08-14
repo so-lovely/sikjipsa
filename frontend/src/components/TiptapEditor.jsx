@@ -23,7 +23,7 @@ const TiptapEditor = ({ content, onChange }) => {
       method: 'POST',
       body: formData,
       headers: {
-        'Content-type':'multipart/form-data'
+        'Content-Type':'multipart/form-data'
       }
       });
       console.log('handleImageUpload에서 받은 response', response)
