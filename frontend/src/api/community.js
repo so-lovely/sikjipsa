@@ -1,5 +1,4 @@
 import apiClient from './client';
-
 export const communityAPI = {
   // 게시글 목록 조회
   getPosts: async (params = {}) => {

@@ -25,7 +25,7 @@ const TiptapEditor = ({ content, onChange }) => {
       });
       console.log('handleImageUpload에서 받은 response', response)
       const data = await response.json();
-      return data.imageUrl;
+      return data.url;
       
     } catch (error) {
       console.error('이미지 업로드 실패:', error);
