@@ -19,14 +19,9 @@ const TiptapEditor = ({ content, onChange }) => {
       const formData = new FormData();
       formData.append('image', file);
       console.log(formData, '폼데이터');
-      const response = await apiClient.post('/community/upload-image', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-      });
+      const response = await apiClient.post('/community/upload-image', formData);
       console.log('handleImageUpload에서 받은 response', response)
-      const data = await response.json();
-      return data.url;
+      return response.data.url;
       
     } catch (error) {
       console.error('이미지 업로드 실패:', error);
