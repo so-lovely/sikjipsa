@@ -80,7 +80,7 @@ const PostEditor = () => {
             size="xl"
             radius="xl"
             style={{
-              background: 'linear-gradient(135deg, #B8EBCF 0%, #8ADDAF 100%)',
+              background: 'linear-gradient(135deg, #A9E5C4 0%, #79D1A0 100%)',
               color: 'white',
               boxShadow: 'var(--shadow-md)',
               border: 'none'
