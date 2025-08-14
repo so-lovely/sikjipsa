@@ -4,9 +4,6 @@ const API_BASE_URL = process.env.REACT_APP_API_URL
 
 const apiClient = axios.create({
   baseURL: `${API_BASE_URL}/api/v1`,
-  headers: {
-    'Content-Type': 'application/json',
-  },
 });
 
 apiClient.interceptors.request.use((config) => {
