@@ -180,7 +180,7 @@ const lastPostElementRef = useCallback(node => {
           <Text component="span" c="green.6">커뮤니티</Text>
         </Title>
         <Text size="lg" ta="center" c="gray.6" maw={600}>
-          전국의 식물 애호가들과 소통하고 경험을 나누며 
+          식물 애호가들과 소통하고 경험을 나누며 
           함께 성장해보세요
         </Text>
       </Stack>

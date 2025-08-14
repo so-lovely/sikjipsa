@@ -68,22 +68,53 @@ function SocialLogin({showDivider = true }) {
       <Stack gap="md" mt="lg">
         <Button
           onClick={handleNaverLogin}
-          leftSection="🟢"
+          loading={isNaverLoading}
+          leftSection={
+            !isNaverLoading && (
+              <div style={{
+                width: '20px',
+                height: '20px',
+                backgroundColor: '#FFFFFF',
+                borderRadius: '2px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 'bold',
+                fontSize: '14px',
+                color: '#03C75A'
+              }}>
+                N
+              </div>
+            )
+          }
           variant="filled"
-          size="md"
+          size="lg"
           fullWidth
           style={{
             backgroundColor: '#03C75A',
-            '&:hover': {
-              backgroundColor: '#02B351'
-            }
+            border: 'none',
+            borderRadius: '6px',
+            height: 'clamp(45px, 8vw, 50px)',
+            fontSize: 'clamp(14px, 4vw, 16px)',
+            fontWeight: '700'
           }}
           styles={{
             root: {
               transition: 'all 0.2s ease',
               '&:hover': {
-                transform: 'translateY(-2px)'
+                backgroundColor: '#02B351',
+                transform: 'translateY(-1px)',
+                boxShadow: '0 4px 12px rgba(3, 199, 90, 0.3)'
+              },
+              '&:active': {
+                transform: 'translateY(0px)'
               }
+            },
+            inner: {
+              justifyContent: 'center'
+            },
+            section: {
+              marginRight: '12px'
             }
           }}
         >
@@ -92,21 +123,52 @@ function SocialLogin({showDivider = true }) {
         
         <Button
           onClick={handleKakaoLogin}
-          leftSection="💬"
+          loading={isKakaoLoading}
+          leftSection={
+            !isKakaoLoading && (
+              <div style={{
+                width: '20px',
+                height: '20px',
+                backgroundColor: '#3C1E1E',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '12px'
+              }}>
+                💬
+              </div>
+            )
+          }
           variant="filled"
-          size="md"
+          size="lg"
           fullWidth
           style={{
             backgroundColor: '#FEE500',
-            color: '#000000'
+            color: '#3C1E1E',
+            border: 'none',
+            borderRadius: '6px',
+            height: 'clamp(45px, 8vw, 50px)',
+            fontSize: 'clamp(14px, 4vw, 16px)',
+            fontWeight: '700'
           }}
           styles={{
             root: {
               transition: 'all 0.2s ease',
               '&:hover': {
                 backgroundColor: '#FFDD00',
-                transform: 'translateY(-2px)'
+                transform: 'translateY(-1px)',
+                boxShadow: '0 4px 12px rgba(254, 229, 0, 0.3)'
+              },
+              '&:active': {
+                transform: 'translateY(0px)'
               }
+            },
+            inner: {
+              justifyContent: 'center'
+            },
+            section: {
+              marginRight: '12px'
             }
           }}
         >
