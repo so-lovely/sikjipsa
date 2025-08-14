@@ -233,27 +233,27 @@ function WritePostModal({ isOpen, onClose, onSubmit }) {
               onImageUpload={handleImageUpload}
               styles={{
                 root: {
-                  minHeight: 'clamp(250px, 30vh, 400px)',
+                  minHeight: 'clamp(15.625rem, 30vh, 25rem)',
                   backgroundColor: '#ffffff',
-                  border: '1px solid #e9ecef',
-                  borderRadius: '8px',
-                  '@media (max-width: 768px)': {
-                    minHeight: '250px',
-                    fontSize: '16px'
+                  border: '0.125rem solid #d1d5db',
+                  borderRadius: '0.5rem',
+                  '@media (max-width: 48rem)': {
+                    minHeight: '15.625rem',
+                    fontSize: '1rem'
                   }
                 },
                 toolbar: {
                   flexWrap: 'wrap',
                   gap: '4px',
-                  padding: 'clamp(6px, 1.5vw, 10px)',
-                  '@media (max-width: 768px)': {
-                    padding: '6px',
-                    gap: '2px'
+                  padding: 'clamp(0.375rem, 1.5vw, 0.625rem)',
+                  '@media (max-width: 48rem)': {
+                    padding: '0.375rem',
+                    gap: '0.125rem'
                   }
                 },
                 controlsGroup: {
-                  '@media (max-width: 768px)': {
-                    gap: '2px'
+                  '@media (max-width: 48rem)': {
+                    gap: '0.125rem'
                   }
                 }
               }}
@@ -291,20 +291,20 @@ function WritePostModal({ isOpen, onClose, onSubmit }) {
               <RichTextEditor.Content 
                 styles={{
                   content: {
-                    minHeight: 'clamp(200px, 25vh, 300px)',
+                    minHeight: 'clamp(12.5rem, 25vh, 18.75rem)',
                     backgroundColor: '#ffffff',
-                    padding: 'clamp(8px, 1.5vw, 12px)',
-                    fontSize: 'clamp(14px, 2.5vw, 16px)',
+                    padding: 'clamp(0.5rem, 1.5vw, 0.75rem)',
+                    fontSize: 'clamp(0.875rem, 2.5vw, 1rem)',
                     lineHeight: '1.6',
-                    '@media (max-width: 768px)': {
-                      minHeight: '200px',
-                      padding: '8px',
-                      fontSize: '16px'
+                    '@media (max-width: 48rem)': {
+                      minHeight: '12.5rem',
+                      padding: '0.5rem',
+                      fontSize: '1rem'
                     },
-                    '@media (max-width: 480px)': {
-                      minHeight: '180px',
-                      padding: '8px',
-                      fontSize: '16px'
+                    '@media (max-width: 30rem)': {
+                      minHeight: '11.25rem',
+                      padding: '0.5rem',
+                      fontSize: '1rem'
                     }
                   }
                 }}

@@ -104,15 +104,15 @@ const TiptapEditor = ({ content, onChange }) => {
       radius="lg"
       p={0}
       style={{
-        border: '0.125rem solid #e5e7eb',
-        backgroundColor: 'white',
+        border: 'none',
+        backgroundColor: 'transparent',
         overflow: 'hidden',
         flex: 1,
         display: 'flex',
         height: '100%',
         flexDirection: 'column',
         minHeight: 0,
-        boxShadow: '0 0.625rem 2.5rem rgba(0, 0, 0, 0.08)',
+        boxShadow: 'none',
       }}
     >
       <RichTextEditor
@@ -144,24 +144,28 @@ const TiptapEditor = ({ content, onChange }) => {
             fontSize: 'var(--mantine-font-size-md)',
             lineHeight: '1.8',
             fontFamily: 'Pretendard, system-ui, sans-serif',
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'auto',
+            overflowY: 'auto',
+            overflowX: 'hidden',
             height: '100%',
-            '&::-webkit-scrollbar-track': {
-            backgroundColor: '#f1f3f5',
-            borderRadius: '4px',
-             },
-             '&::-webkit-scrollbar-thumb': {
-           backgroundColor: '#dee2e6',
-           borderRadius: '4px',
-           '&:hover': {
-              backgroundColor: '#ced4da',
+            minHeight: '12.5rem',
+            maxHeight: 'calc(100vh - 12.5rem)',
+            '&::-webkit-scrollbar': {
+              width: '0.5rem',
             },
-         },
+            '&::-webkit-scrollbar-track': {
+              backgroundColor: '#f1f3f5',
+              borderRadius: '0.25rem',
+            },
+            '&::-webkit-scrollbar-thumb': {
+              backgroundColor: '#dee2e6',
+              borderRadius: '0.25rem',
+              '&:hover': {
+                backgroundColor: '#ced4da',
+              },
+            },
             '& .ProseMirror': {
               outline: 'none',
-              minHeight: '100%',
+              minHeight: '12.5rem',
               maxWidth: '100%',
               position: 'relative',
               zIndex: 1,

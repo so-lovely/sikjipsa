@@ -69,7 +69,7 @@ const PostEditor = () => {
         height: '100vh',
         display: 'flex', 
         flexDirection: 'column',
-        padding: '2rem 3rem'
+        padding: 'clamp(1rem, 4vw, 3rem) clamp(1rem, 5vw, 3rem)'
       }}
     >
       {/* Header with centered pencil icon */}
@@ -132,12 +132,12 @@ const PostEditor = () => {
       <Box 
         style={{ 
           flex: 1, 
-          height: 'calc(100vh - max(280px, min(350px, 30vh)))',
+          height: 'calc(100vh - clamp(17.5rem, 25vh, 22rem))',
           display: 'flex', 
           flexDirection: 'column',
           minHeight: 0,
-          border: '1px solid #e9ecef',
-          borderRadius: '16px',
+          border: '0.125rem solid #d1d5db',
+          borderRadius: '1rem',
           overflow: 'hidden',
           backgroundColor: '#fff'
         }}
