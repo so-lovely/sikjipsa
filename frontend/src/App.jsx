@@ -31,6 +31,7 @@ import Announcements from './pages/Announcements.jsx';
 import AnnouncementDetail from './pages/AnnouncementDetail.jsx';
 import Terms from './pages/Terms.jsx';
 import PrivacyPolicy from './pages/PrivacyPolicy.jsx';
+import ContactPage from './pages/contact.jsx';
 
 const queryClient = new QueryClient();
 
@@ -53,6 +54,7 @@ function App() {
                   <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/encyclopedia" element={<Encyclopedia />} />
+                    <Route path="/contact" element={<ContactPage />} />
                     <Route path="/diagnosis" element={<Diagnosis />} />
                     <Route path="/community" element={<Community />} />
                     <Route path="/community/write" element={<CommunityWrite />} />
