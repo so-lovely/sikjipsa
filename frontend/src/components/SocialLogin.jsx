@@ -129,14 +129,14 @@ function SocialLogin({showDivider = true }) {
               <div style={{
                 width: '20px',
                 height: '20px',
-                backgroundColor: '#3C1E1E',
-                borderRadius: '50%',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '12px'
+                fontSize: '16px'
               }}>
-                💬
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M8 2C4.686 2 2 4.134 2 6.8c0 1.71 1.07 3.23 2.7 4.098l-.67 2.47c-.06.22.168.376.345.243l2.965-2.154C7.563 11.513 7.775 11.533 8 11.533c3.314 0 6-2.133 6-4.733S11.314 2 8 2z" fill="#000000"/>
+                </svg>
               </div>
             )
           }
@@ -145,9 +145,9 @@ function SocialLogin({showDivider = true }) {
           fullWidth
           style={{
             backgroundColor: '#FEE500',
-            color: '#3C1E1E',
+            color: 'rgba(0, 0, 0, 0.85)',
             border: 'none',
-            borderRadius: '6px',
+            borderRadius: '12px',
             height: 'clamp(45px, 8vw, 50px)',
             fontSize: 'clamp(14px, 4vw, 16px)',
             fontWeight: '700'
@@ -156,9 +156,9 @@ function SocialLogin({showDivider = true }) {
             root: {
               transition: 'all 0.2s ease',
               '&:hover': {
-                backgroundColor: '#FFDD00',
+                backgroundColor: '#F7E600',
                 transform: 'translateY(-1px)',
-                boxShadow: '0 4px 12px rgba(254, 229, 0, 0.3)'
+                boxShadow: '0 4px 12px rgba(254, 229, 0, 0.4)'
               },
               '&:active': {
                 transform: 'translateY(0px)'
@@ -172,7 +172,7 @@ function SocialLogin({showDivider = true }) {
             }
           }}
         >
-          카카오로 로그인
+          카카오 로그인
         </Button>
       </Stack>
     </>
