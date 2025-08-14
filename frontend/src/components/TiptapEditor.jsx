@@ -8,7 +8,7 @@ import Superscript from '@tiptap/extension-superscript';
 import SubScript from '@tiptap/extension-subscript';
 import Highlight from '@tiptap/extension-highlight';
 import Image from '@tiptap/extension-image';
-import { ActionIcon, Box, Group, Paper, rem } from '@mantine/core';
+import { ActionIcon, Box, Group, Paper } from '@mantine/core';
 import { IconPhoto } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import apiClient from '../api/client';
@@ -106,7 +106,11 @@ const TiptapEditor = ({ content, onChange }) => {
       style={{
         border: '1px solid #e5e7eb',
         backgroundColor: 'white',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: 0
       }}
     >
       <RichTextEditor
@@ -116,63 +120,73 @@ const TiptapEditor = ({ content, onChange }) => {
         styles={{
           root: {
             border: 'none',
+            display: 'flex',
+            flexDirection: 'column',
+            flex: 1,
+            minHeight: 0
           },
           toolbar: {
             backgroundColor: '#fafbfc',
             borderBottom: '1px solid #e5e7eb',
-            padding: '12px 16px',
+            padding: 'var(--space-sm) var(--space-md)',
             borderRadius: 0,
+            flexShrink: 0,
           },
           content: {
             backgroundColor: 'white',
-            minHeight: '300px',
-            padding: '20px',
+            flex: 1,
+            padding: 'var(--space-md)',
             fontSize: '16px',
             lineHeight: '1.6',
             fontFamily: 'Pretendard, system-ui, sans-serif',
+            display: 'flex',
+            flexDirection: 'column',
             '& .ProseMirror': {
               outline: 'none',
+              flex: 1,
+              minHeight: '100%',
+              overflowY: 'auto',
               '& p': {
-                marginBottom: '12px',
+                marginBottom: '0.75rem',
               },
               '& h1': {
                 fontSize: '2rem',
                 fontWeight: 700,
-                marginBottom: '16px',
-                marginTop: '24px',
+                marginBottom: '1rem',
+                marginTop: '1.5rem',
                 color: '#0f1724',
               },
               '& h2': {
                 fontSize: '1.5rem',
                 fontWeight: 600,
-                marginBottom: '14px',
-                marginTop: '20px',
+                marginBottom: '0.875rem',
+                marginTop: '1.25rem',
                 color: '#0f1724',
               },
               '& h3': {
                 fontSize: '1.25rem',
                 fontWeight: 600,
-                marginBottom: '12px',
-                marginTop: '16px',
+                marginBottom: '0.75rem',
+                marginTop: '1rem',
                 color: '#0f1724',
               },
               '& ul, & ol': {
-                paddingLeft: '24px',
-                marginBottom: '16px',
+                paddingLeft: '1.5rem',
+                marginBottom: '1rem',
               },
               '& li': {
-                marginBottom: '4px',
+                marginBottom: '0.25rem',
               },
               '& img': {
                 maxWidth: '100%',
                 height: 'auto',
-                borderRadius: '8px',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                margin: '12px 0',
+                borderRadius: 'var(--radius-sm)',
+                boxShadow: 'var(--shadow-sm)',
+                margin: '0.75rem 0',
               },
               '& blockquote': {
-                borderLeft: '4px solid #16a34a',
-                paddingLeft: '16px',
+                borderLeft: '0.25rem solid #16a34a',
+                paddingLeft: '1rem',
                 marginLeft: '0',
                 fontStyle: 'italic',
                 color: '#6b7280',
@@ -244,7 +258,7 @@ const TiptapEditor = ({ content, onChange }) => {
                 }}
                 title="Insert Image"
               >
-                <IconPhoto size={rem(16)} />
+                <IconPhoto size="1rem" />
               </ActionIcon>
               <input
                 type="file"
