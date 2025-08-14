@@ -23,6 +23,7 @@ const TiptapEditor = ({ content, onChange }) => {
       method: 'POST',
       body: formData,
       });
+      console.log('handleImageUpload에서 받은 response', response)
       const data = await response.json();
       return data.imageUrl;
       
