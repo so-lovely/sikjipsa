@@ -12,9 +12,11 @@ import {
   TextInput,
   Alert,
   Badge,
-  Loader
+  Loader,
+  Modal,
+  Divider
 } from '@mantine/core';
-import { IconUser, IconEdit, IconCheck, IconX, IconAlertCircle, IconUserCircle } from '@tabler/icons-react';
+import { IconUser, IconEdit, IconCheck, IconX, IconAlertCircle, IconUserCircle, IconTrash } from '@tabler/icons-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { authAPI } from '../api/auth.js';
 
@@ -27,6 +29,7 @@ function Profile() {
   const [formData, setFormData] = useState({
     username: user?.username || ''
   });
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   if (!user) {
     navigate('/login');
@@ -98,6 +101,27 @@ function Profile() {
       month: 'long',
       day: 'numeric'
     });
+  };
+
+  const handleDeleteAccount = async () => {
+    setIsLoading(true);
+    setMessage({ type: '', text: '' });
+
+    try {
+      await authAPI.deleteAccount();
+      logout();
+      navigate('/');
+      setMessage({ type: 'success', text: '회원탈퇴가 완료되었습니다.' });
+    } catch (error) {
+      console.error('회원탈퇴 실패:', error);
+      setMessage({ 
+        type: 'error', 
+        text: error.message || '회원탈퇴에 실패했습니다.' 
+      });
+    } finally {
+      setIsLoading(false);
+      setShowDeleteConfirm(false);
+    }
   };
 
   return (
@@ -240,6 +264,94 @@ function Profile() {
           </form>
         </Stack>
       </Card>
+
+      {/* Account Management Card */}
+      <Card shadow="md" radius="lg" p="xl" mt="xl" style={{ borderColor: '#ff6b6b', borderWidth: '1px' }}>
+        <Stack gap="lg">
+          <Title order={2} size="xl" c="red.7">
+            계정 관리
+          </Title>
+          
+          <Divider />
+          
+          <Stack gap="md">
+            <Alert
+              icon={<IconAlertCircle size={16} />}
+              color="red"
+              variant="light"
+            >
+              <Text fw={500} mb="xs">회원탈퇴 안내</Text>
+              <Text size="sm">
+                회원탈퇴 시 모든 게시글, 다이어리, 진단 기록이 삭제되며 복구할 수 없습니다.
+                신중하게 결정해 주세요.
+              </Text>
+            </Alert>
+
+            <Group justify="flex-end">
+              <Button
+                variant="filled"
+                color="red"
+                leftSection={<IconTrash size={16} />}
+                onClick={() => setShowDeleteConfirm(true)}
+                disabled={isLoading}
+              >
+                회원탈퇴
+              </Button>
+            </Group>
+          </Stack>
+        </Stack>
+      </Card>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        opened={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        title="회원탈퇴 확인"
+        centered
+        size="md"
+      >
+        <Stack gap="lg">
+          <Alert
+            icon={<IconAlertCircle size={20} />}
+            color="red"
+            variant="light"
+          >
+            <Text fw={600} mb="xs">정말로 탈퇴하시겠습니까?</Text>
+            <Text size="sm">
+              탈퇴 후에는 다음과 같은 데이터가 영구적으로 삭제됩니다:
+            </Text>
+            <ul style={{ margin: '0.5rem 0', paddingLeft: '1.2rem' }}>
+              <li>모든 게시글과 댓글</li>
+              <li>성장 다이어리 기록</li>
+              <li>식물 진단 히스토리</li>
+              <li>계정 정보</li>
+            </ul>
+            <Text size="sm" fw={500} c="red">
+              이 작업은 되돌릴 수 없습니다.
+            </Text>
+          </Alert>
+
+          <Group justify="flex-end" gap="md">
+            <Button
+              variant="light"
+              color="gray"
+              onClick={() => setShowDeleteConfirm(false)}
+              disabled={isLoading}
+            >
+              취소
+            </Button>
+            <Button
+              variant="filled"
+              color="red"
+              onClick={handleDeleteAccount}
+              disabled={isLoading}
+              leftSection={isLoading ? <Loader size={16} /> : <IconTrash size={16} />}
+            >
+              {isLoading ? '탈퇴 처리 중...' : '탈퇴하기'}
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
     </Container>
   );
 }

@@ -81,12 +81,14 @@ func SetupRoutes(app fiber.Router, db *gorm.DB, cfg *config.Config) {
 	auth.Post("/kakao", authHandler.KakaoLogin)
 	auth.Get("/me", middleware.AuthRequired(cfg.JWTSecret), authHandler.Me)
 	auth.Put("/profile", middleware.AuthRequired(cfg.JWTSecret), authHandler.UpdateProfile)
+	auth.Delete("/account", middleware.AuthRequired(cfg.JWTSecret), authHandler.DeleteAccount)
 	
 	log.Println("✅ Auth routes registered:")
 	log.Println("  POST /api/v1/auth/naver")
 	log.Println("  POST /api/v1/auth/kakao")
 	log.Println("  GET  /api/v1/auth/me")
 	log.Println("  PUT  /api/v1/auth/profile")
+	log.Println("  DELETE /api/v1/auth/account")
 
 	// Plant routes
 	plants := app.Group("/plants")

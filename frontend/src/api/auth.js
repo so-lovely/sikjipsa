@@ -40,4 +40,13 @@ export const authAPI = {
     }
     return response.data;
   },
+
+  // 회원탈퇴
+  deleteAccount: async () => {
+    const response = await apiClient.delete('/auth/account');
+    // 탈퇴 성공시 로컬 저장소 정리
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    return response.data;
+  },
 };
