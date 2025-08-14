@@ -429,7 +429,7 @@ function DiaryWrite() {
                         드래그 앤 드롭하거나 클릭하여 파일을 선택하세요
                       </Text>
                       <Text size="xs" c="dimmed">
-                        JPG, PNG 파일 최대 5MB
+                        JPG, PNG 파일 최대 10MB
                       </Text>
                     </div>
                   </Group>
