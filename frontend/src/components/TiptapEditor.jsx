@@ -6,6 +6,7 @@ import Link from '@tiptap/extension-link';
 import TextAlign from '@tiptap/extension-text-align';
 import Underline from '@tiptap/extension-underline';
 import './TiptapEditor.css'; // 스타일 파일
+import {apiClient} from  '../api/client'
 
 const TiptapEditor = ({ content, onChange }) => {
   const fileInputRef = useRef(null);
@@ -15,11 +16,10 @@ const TiptapEditor = ({ content, onChange }) => {
     console.log(file, '을 받았습니다');
     try {
       // 실제 구현 시 서버로 업로드하고 URL을 받아와야 합니다
-      // 여기서는 임시로 File API를 사용합니다
       const formData = new FormData();
       formData.append('image', file);
       console.log(formData, '폼데이터');
-      const response = await fetch('/community/upload-image', {
+      const response = await apiClient.post('/community/upload-image', {
       method: 'POST',
       body: formData,
       });
