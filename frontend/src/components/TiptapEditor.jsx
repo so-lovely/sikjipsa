@@ -1,72 +1,68 @@
 import React, { useCallback, useRef } from 'react';
-import { useEditor, EditorContent } from '@tiptap/react';
+import { RichTextEditor, Link } from '@mantine/tiptap';
+import { useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import Image from '@tiptap/extension-image';
-import Link from '@tiptap/extension-link';
-import TextAlign from '@tiptap/extension-text-align';
 import Underline from '@tiptap/extension-underline';
-import './TiptapEditor.css'; // 스타일 파일
-import apiClient from  '../api/client'
+import TextAlign from '@tiptap/extension-text-align';
+import Superscript from '@tiptap/extension-superscript';
+import SubScript from '@tiptap/extension-subscript';
+import Highlight from '@tiptap/extension-highlight';
+import Image from '@tiptap/extension-image';
+import { ActionIcon, Box, Group, Paper, rem } from '@mantine/core';
+import { IconPhoto } from '@tabler/icons-react';
+import { notifications } from '@mantine/notifications';
+import apiClient from '../api/client';
 
 const TiptapEditor = ({ content, onChange }) => {
   const fileInputRef = useRef(null);
 
-  // 이미지 업로드 처리 함수
+  // Image upload handler
   const handleImageUpload = useCallback(async (file) => {
-    console.log(file, '을 받았습니다');
     try {
-      // 실제 구현 시 서버로 업로드하고 URL을 받아와야 합니다
       const formData = new FormData();
       formData.append('image', file);
-      console.log(formData, '폼데이터');
-      const response = await apiClient.post('/community/upload-image', formData);
-      console.log('handleImageUpload에서 받은 response', response)
-      return response.data.url;
       
+      const response = await apiClient.post('/community/upload-image', formData);
+      return response.data.url;
     } catch (error) {
-      console.error('이미지 업로드 실패:', error);
-      alert('이미지 업로드에 실패했습니다.');
+      console.error('Image upload failed:', error);
+      notifications.show({
+        title: 'Upload Failed',
+        message: 'Failed to upload image. Please try again.',
+        color: 'red',
+      });
       return null;
     }
   }, []);
 
   const editor = useEditor({
     extensions: [
-      StarterKit.configure({
-        heading: {
-          levels: [1, 2, 3],
-        },
-      }),
+      StarterKit,
+      Underline,
+      Link,
+      Superscript,
+      SubScript,
+      Highlight,
+      TextAlign.configure({ types: ['heading', 'paragraph'] }),
       Image.configure({
         inline: true,
         allowBase64: true,
         HTMLAttributes: {
-          class: 'custom-image',
+          style: 'max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);'
         },
       }),
-      Link.configure({
-        openOnClick: false,
-        HTMLAttributes: {
-          class: 'custom-link',
-        },
-      }),
-      TextAlign.configure({
-        types: ['heading', 'paragraph'],
-      }),
-      Underline,
     ],
     content: content || '',
-    onUpdate: ({ editor }) => {
+    onUpdate({ editor }) {
       if (onChange) {
         onChange(editor.getHTML());
       }
     },
   });
 
-  // 이미지 삽입 함수
+  // Insert image function
   const insertImage = useCallback(async (file) => {
-    console.log(file, 'insertImage함수에서 받은')
-    if (!editor) return;
+    if (!editor || !file.type.startsWith('image/')) return;
 
     const imageUrl = await handleImageUpload(file);
     if (imageUrl) {
@@ -74,18 +70,16 @@ const TiptapEditor = ({ content, onChange }) => {
     }
   }, [editor, handleImageUpload]);
 
-  // 파일 선택 핸들러
+  // File select handler
   const handleFileSelect = useCallback((event) => {
     const file = event.target.files[0];
-    console.log(file,'handleFileSelect에서 파일받은')
-    if (file && file.type.startsWith('image/')) {
+    if (file) {
       insertImage(file);
     }
-    // 파일 input 초기화
     event.target.value = '';
   }, [insertImage]);
 
-  // 드래그 앤 드롭 핸들러
+  // Drag and drop handlers
   const handleDrop = useCallback((event) => {
     event.preventDefault();
     const files = Array.from(event.dataTransfer.files);
@@ -101,152 +95,176 @@ const TiptapEditor = ({ content, onChange }) => {
   }, []);
 
   if (!editor) {
-    return <div>에디터 로딩 중...</div>;
+    return <div>Loading editor...</div>;
   }
 
   return (
-    <div className="tiptap-editor-container">
-      {/* 툴바 */}
-      <div className="toolbar">
-        <div className="toolbar-group">
-          <button
-            onClick={() => editor.chain().focus().toggleBold().run()}
-            className={editor.isActive('bold') ? 'active' : ''}
-            title="굵게"
-          >
-            <strong>B</strong>
-          </button>
-          <button
-            onClick={() => editor.chain().focus().toggleItalic().run()}
-            className={editor.isActive('italic') ? 'active' : ''}
-            title="기울임"
-          >
-            <em>I</em>
-          </button>
-          <button
-            onClick={() => editor.chain().focus().toggleUnderline().run()}
-            className={editor.isActive('underline') ? 'active' : ''}
-            title="밑줄"
-          >
-            <u>U</u>
-          </button>
-          <button
-            onClick={() => editor.chain().focus().toggleStrike().run()}
-            className={editor.isActive('strike') ? 'active' : ''}
-            title="취소선"
-          >
-            <s>S</s>
-          </button>
-        </div>
-
-        <div className="toolbar-group">
-          <button
-            onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-            className={editor.isActive('heading', { level: 1 }) ? 'active' : ''}
-            title="제목 1"
-          >
-            H1
-          </button>
-          <button
-            onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-            className={editor.isActive('heading', { level: 2 }) ? 'active' : ''}
-            title="제목 2"
-          >
-            H2
-          </button>
-          <button
-            onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-            className={editor.isActive('heading', { level: 3 }) ? 'active' : ''}
-            title="제목 3"
-          >
-            H3
-          </button>
-        </div>
-
-        <div className="toolbar-group">
-          <button
-            onClick={() => editor.chain().focus().toggleBulletList().run()}
-            className={editor.isActive('bulletList') ? 'active' : ''}
-            title="불릿 리스트"
-          >
-            • 목록
-          </button>
-          <button
-            onClick={() => editor.chain().focus().toggleOrderedList().run()}
-            className={editor.isActive('orderedList') ? 'active' : ''}
-            title="번호 리스트"
-          >
-            1. 목록
-          </button>
-        </div>
-
-        <div className="toolbar-group">
-          <button
-            onClick={() => editor.chain().focus().setTextAlign('left').run()}
-            className={editor.isActive({ textAlign: 'left' }) ? 'active' : ''}
-            title="왼쪽 정렬"
-          >
-            ←
-          </button>
-          <button
-            onClick={() => editor.chain().focus().setTextAlign('center').run()}
-            className={editor.isActive({ textAlign: 'center' }) ? 'active' : ''}
-            title="가운데 정렬"
-          >
-            ↔
-          </button>
-          <button
-            onClick={() => editor.chain().focus().setTextAlign('right').run()}
-            className={editor.isActive({ textAlign: 'right' }) ? 'active' : ''}
-            title="오른쪽 정렬"
-          >
-            →
-          </button>
-        </div>
-
-        <div className="toolbar-group">
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            title="이미지 업로드"
-          >
-            📷 이미지
-          </button>
-          <input
-            type="file"
-            ref={fileInputRef}
-            accept="image/*"
-            onChange={handleFileSelect}
-            style={{ display: 'none' }}
-          />
-        </div>
-
-        <div className="toolbar-group">
-          <button
-            onClick={() => editor.chain().focus().undo().run()}
-            disabled={!editor.can().undo()}
-            title="되돌리기"
-          >
-            ↶
-          </button>
-          <button
-            onClick={() => editor.chain().focus().redo().run()}
-            disabled={!editor.can().redo()}
-            title="다시 실행"
-          >
-            ↷
-          </button>
-        </div>
-      </div>
-
-      {/* 에디터 영역 */}
-      <div
-        className="editor-content"
+    <Paper
+      shadow="sm"
+      radius="lg"
+      p={0}
+      style={{
+        border: '1px solid #e5e7eb',
+        backgroundColor: 'white',
+        overflow: 'hidden'
+      }}
+    >
+      <RichTextEditor
+        editor={editor}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
+        styles={{
+          root: {
+            border: 'none',
+          },
+          toolbar: {
+            backgroundColor: '#fafbfc',
+            borderBottom: '1px solid #e5e7eb',
+            padding: '12px 16px',
+            borderRadius: 0,
+          },
+          content: {
+            backgroundColor: 'white',
+            minHeight: '300px',
+            padding: '20px',
+            fontSize: '16px',
+            lineHeight: '1.6',
+            fontFamily: 'Pretendard, system-ui, sans-serif',
+            '& .ProseMirror': {
+              outline: 'none',
+              '& p': {
+                marginBottom: '12px',
+              },
+              '& h1': {
+                fontSize: '2rem',
+                fontWeight: 700,
+                marginBottom: '16px',
+                marginTop: '24px',
+                color: '#0f1724',
+              },
+              '& h2': {
+                fontSize: '1.5rem',
+                fontWeight: 600,
+                marginBottom: '14px',
+                marginTop: '20px',
+                color: '#0f1724',
+              },
+              '& h3': {
+                fontSize: '1.25rem',
+                fontWeight: 600,
+                marginBottom: '12px',
+                marginTop: '16px',
+                color: '#0f1724',
+              },
+              '& ul, & ol': {
+                paddingLeft: '24px',
+                marginBottom: '16px',
+              },
+              '& li': {
+                marginBottom: '4px',
+              },
+              '& img': {
+                maxWidth: '100%',
+                height: 'auto',
+                borderRadius: '8px',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                margin: '12px 0',
+              },
+              '& blockquote': {
+                borderLeft: '4px solid #16a34a',
+                paddingLeft: '16px',
+                marginLeft: '0',
+                fontStyle: 'italic',
+                color: '#6b7280',
+              }
+            }
+          },
+          control: {
+            border: 'none',
+            backgroundColor: 'transparent',
+            color: '#6b7280',
+            '&:hover': {
+              backgroundColor: '#f3f4f6',
+              color: '#0f1724',
+            },
+            '&[data-active]': {
+              backgroundColor: '#16a34a',
+              color: 'white',
+              '&:hover': {
+                backgroundColor: '#15803d',
+              }
+            }
+          }
+        }}
       >
-        <EditorContent editor={editor} />
-      </div>
-    </div>
+        <RichTextEditor.Toolbar sticky stickyOffset={60}>
+          <Group gap="xs">
+            <RichTextEditor.ControlsGroup>
+              <RichTextEditor.Bold />
+              <RichTextEditor.Italic />
+              <RichTextEditor.Underline />
+              <RichTextEditor.Strikethrough />
+            </RichTextEditor.ControlsGroup>
+
+            <RichTextEditor.ControlsGroup>
+              <RichTextEditor.H1 />
+              <RichTextEditor.H2 />
+              <RichTextEditor.H3 />
+            </RichTextEditor.ControlsGroup>
+
+            <RichTextEditor.ControlsGroup>
+              <RichTextEditor.BulletList />
+              <RichTextEditor.OrderedList />
+            </RichTextEditor.ControlsGroup>
+
+            <RichTextEditor.ControlsGroup>
+              <RichTextEditor.Link />
+              <RichTextEditor.Unlink />
+            </RichTextEditor.ControlsGroup>
+
+            <RichTextEditor.ControlsGroup>
+              <RichTextEditor.AlignLeft />
+              <RichTextEditor.AlignCenter />
+              <RichTextEditor.AlignRight />
+            </RichTextEditor.ControlsGroup>
+
+            <RichTextEditor.ControlsGroup>
+              <ActionIcon
+                variant="subtle"
+                size="sm"
+                onClick={() => fileInputRef.current?.click()}
+                style={{
+                  color: '#6b7280',
+                  backgroundColor: 'transparent',
+                  border: 'none',
+                  '&:hover': {
+                    backgroundColor: '#f3f4f6',
+                    color: '#0f1724',
+                  }
+                }}
+                title="Insert Image"
+              >
+                <IconPhoto size={rem(16)} />
+              </ActionIcon>
+              <input
+                type="file"
+                ref={fileInputRef}
+                accept="image/*"
+                onChange={handleFileSelect}
+                style={{ display: 'none' }}
+              />
+            </RichTextEditor.ControlsGroup>
+
+            <RichTextEditor.ControlsGroup>
+              <RichTextEditor.Undo />
+              <RichTextEditor.Redo />
+            </RichTextEditor.ControlsGroup>
+          </Group>
+        </RichTextEditor.Toolbar>
+
+        <RichTextEditor.Content />
+      </RichTextEditor>
+    </Paper>
   );
 };
 
