@@ -39,7 +39,8 @@ function DiaryWrite() {
     title: '',
     content: '',
     growthStage: 'seedling',
-    entryDate: new Date().toISOString().split('T')[0]
+    entryDate: new Date().toISOString().split('T')[0],
+    category: ''
   });
   const [newDiaryData, setNewDiaryData] = useState({
     plantId: '',

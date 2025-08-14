@@ -1,10 +1,20 @@
 import React, { useState } from 'react';
-import { Container, Box, Group, ActionIcon, Text } from '@mantine/core';
+import { Container, Box, Group, ActionIcon, Text, TextInput, Select, Stack, Button } from '@mantine/core';
 import { IconPencil } from '@tabler/icons-react';
 import TiptapEditor from '../components/TiptapEditor';
 
 const PostEditor = () => {
   const [content, setContent] = useState('');
+  const [title, setTitle] = useState('');
+  const [category, setCategory] = useState('');
+
+  const categories = [
+    { value: 'general', label: '일반' },
+    { value: 'question', label: '질문' },
+    { value: 'tip', label: '꿀팁' },
+    { value: 'share', label: '자랑' },
+    { value: 'trade', label: '나눔' },
+  ];
 
   return (
     <Container 
@@ -24,7 +34,7 @@ const PostEditor = () => {
             size="xl"
             radius="xl"
             style={{
-              background: 'var(--primary-gradient)',
+              background: 'linear-gradient(135deg, #CCF4DE 0%, #99E9BF 100%)',
               color: 'white',
               boxShadow: 'var(--shadow-md)',
               border: 'none'
@@ -46,6 +56,32 @@ const PostEditor = () => {
         </Group>
       </Box>
 
+      {/* Form fields */}
+      <Stack gap="lg" mb="xl">
+        <Group grow>
+          <Select
+            label="카테고리"
+            placeholder="카테고리를 선택하세요"
+            data={categories}
+            value={category}
+            onChange={setCategory}
+            size="md"
+            radius="lg"
+            required
+          />
+        </Group>
+        
+        <TextInput
+          label="제목"
+          placeholder="제목을 입력하세요"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          size="md"
+          radius="lg"
+          required
+        />
+      </Stack>
+
       {/* Editor container with flex: 1 */}
       <Box 
         style={{ 
@@ -61,6 +97,27 @@ const PostEditor = () => {
           onChange={setContent} 
         />
       </Box>
+
+      {/* Action buttons */}
+      <Group justify="flex-end" gap="md" pt="lg">
+        <Button
+          variant="light"
+          color="gray"
+          size="md"
+          radius="lg"
+        >
+          취소
+        </Button>
+        <Button
+          variant="gradient"
+          gradient={{ from: 'green.5', to: 'green.6' }}
+          size="md"
+          radius="lg"
+          disabled={!title.trim() || !category || !content.trim()}
+        >
+          게시하기
+        </Button>
+      </Group>
     </Container>
   );
 };
