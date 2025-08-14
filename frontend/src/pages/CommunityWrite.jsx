@@ -1,12 +1,18 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Container, Box, Group, ActionIcon, Text, TextInput, Select, Stack, Button } from '@mantine/core';
 import { IconPencil } from '@tabler/icons-react';
 import TiptapEditor from '../components/TiptapEditor';
+import { communityAPI } from '../api/community';
+import { useAuth } from '../context/AuthContext';
 
 const PostEditor = () => {
+  const navigate = useNavigate();
+  const { isLoggedIn } = useAuth();
   const [content, setContent] = useState('');
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const categories = [
     { value: 'general', label: '일반' },
@@ -15,6 +21,46 @@ const PostEditor = () => {
     { value: 'share', label: '자랑' },
     { value: 'trade', label: '나눔' },
   ];
+
+  const handleSubmit = async () => {
+    if (!isLoggedIn) {
+      alert('로그인이 필요합니다.');
+      return;
+    }
+
+    if (!title.trim()) {
+      alert('제목을 입력해주세요.');
+      return;
+    }
+    if (!category) {
+      alert('카테고리를 선택해주세요.');
+      return;
+    }
+    if (!content.trim()) {
+      alert('내용을 입력해주세요.');
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    try {
+      const postData = {
+        title: title.trim(),
+        content: content,
+        post_type: category
+      };
+      
+      await communityAPI.createPost(postData);
+      alert('게시글이 성공적으로 작성되었습니다!');
+      navigate('/community');
+    } catch (error) {
+      console.error('게시글 작성 실패:', error);
+      alert('게시글 작성에 실패했습니다. 다시 시도해주세요.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
 
   return (
     <Container 
@@ -88,8 +134,8 @@ const PostEditor = () => {
           flex: 1, 
           display: 'flex', 
           flexDirection: 'column',
-          minHeight: 0, // Important for flex child overflow
-          overflow: 'hidden'
+          minHeight: 0,
+          overflow: 'auto'
         }}
       >
         <TiptapEditor 
@@ -101,21 +147,15 @@ const PostEditor = () => {
       {/* Action buttons */}
       <Group justify="flex-end" gap="md" pt="lg">
         <Button
-          variant="light"
-          color="gray"
-          size="md"
-          radius="lg"
-        >
-          취소
-        </Button>
-        <Button
           variant="gradient"
           gradient={{ from: 'green.5', to: 'green.6' }}
           size="md"
           radius="lg"
-          disabled={!title.trim() || !category || !content.trim()}
+          onClick={handleSubmit}
+          disabled={!title.trim() || !category || !content.trim() || isSubmitting}
+          loading={isSubmitting}
         >
-          게시하기
+          {isSubmitting ? '게시하는 중...' : '게시하기'}
         </Button>
       </Group>
     </Container>
