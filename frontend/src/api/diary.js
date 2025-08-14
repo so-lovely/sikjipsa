@@ -97,7 +97,7 @@ export const diaryAPI = {
     // 파일 크기 검증 (5MB)
     const maxSize = 10 * 1024 * 1024;
     if (file.size > maxSize) {
-      throw new Error('이미지 파일은 최대 5MB까지 업로드 가능합니다.');
+      throw new Error('이미지 파일은 최대 10MB까지 업로드 가능합니다.');
     }
 
     return true;
