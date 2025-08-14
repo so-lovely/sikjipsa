@@ -160,50 +160,50 @@ func (h *AuthHandler) DeleteAccount(c *fiber.Ctx) error {
 
 	var errors []string
 
-	// 외래키 관계를 고려한 순차적 삭제 (자식부터 부모 순서로)
+	// 외래키 관계를 고려한 순차적 하드 삭제 (자식부터 부모 순서로)
 	
-	// 1. 게시글 좋아요 삭제 (가장 하위 자식)
-	if err := h.db.Where("user_id = ?", userID).Delete(&models.PostLike{}).Error; err != nil {
+	// 1. 게시글 좋아요 하드 삭제 (가장 하위 자식)
+	if err := h.db.Unscoped().Where("user_id = ?", userID).Delete(&models.PostLike{}).Error; err != nil {
 		errors = append(errors, fmt.Sprintf("Failed to delete post likes: %v", err))
 	}
 
-	// 2. 게시글 댓글 삭제 (답글부터 먼저 삭제)
+	// 2. 게시글 댓글 하드 삭제 (답글부터 먼저 삭제)
 	// 2-1. 답글(자식 댓글) 먼저 삭제
-	if err := h.db.Where("user_id = ? AND parent_id IS NOT NULL", userID).Delete(&models.PostComment{}).Error; err != nil {
+	if err := h.db.Unscoped().Where("user_id = ? AND parent_id IS NOT NULL", userID).Delete(&models.PostComment{}).Error; err != nil {
 		errors = append(errors, fmt.Sprintf("Failed to delete comment replies: %v", err))
 	}
 	// 2-2. 부모 댓글 삭제
-	if err := h.db.Where("user_id = ? AND parent_id IS NULL", userID).Delete(&models.PostComment{}).Error; err != nil {
+	if err := h.db.Unscoped().Where("user_id = ? AND parent_id IS NULL", userID).Delete(&models.PostComment{}).Error; err != nil {
 		errors = append(errors, fmt.Sprintf("Failed to delete parent comments: %v", err))
 	}
 
-	// 3. 다이어리 엔트리 삭제 (다이어리의 자식)
+	// 3. 다이어리 엔트리 하드 삭제 (다이어리의 자식)
 	// 사용자의 모든 다이어리 ID를 먼저 가져와서 해당 엔트리들 삭제
 	var diaryIDs []uint
 	h.db.Model(&models.GrowthDiary{}).Where("user_id = ?", userID).Pluck("id", &diaryIDs)
 	if len(diaryIDs) > 0 {
-		if err := h.db.Where("diary_id IN ?", diaryIDs).Delete(&models.DiaryEntry{}).Error; err != nil {
+		if err := h.db.Unscoped().Where("diary_id IN ?", diaryIDs).Delete(&models.DiaryEntry{}).Error; err != nil {
 			errors = append(errors, fmt.Sprintf("Failed to delete diary entries: %v", err))
 		}
 	}
 
-	// 4. 사용자의 게시글들 삭제
-	if err := h.db.Where("user_id = ?", userID).Delete(&models.CommunityPost{}).Error; err != nil {
+	// 4. 사용자의 게시글들 하드 삭제
+	if err := h.db.Unscoped().Where("user_id = ?", userID).Delete(&models.CommunityPost{}).Error; err != nil {
 		errors = append(errors, fmt.Sprintf("Failed to delete posts: %v", err))
 	}
 
-	// 5. 사용자의 다이어리 삭제
-	if err := h.db.Where("user_id = ?", userID).Delete(&models.GrowthDiary{}).Error; err != nil {
+	// 5. 사용자의 다이어리 하드 삭제
+	if err := h.db.Unscoped().Where("user_id = ?", userID).Delete(&models.GrowthDiary{}).Error; err != nil {
 		errors = append(errors, fmt.Sprintf("Failed to delete diaries: %v", err))
 	}
 
-	// 6. 사용자의 진단 기록 삭제
-	if err := h.db.Where("user_id = ?", userID).Delete(&models.DiagnosisRequest{}).Error; err != nil {
+	// 6. 사용자의 진단 기록 하드 삭제
+	if err := h.db.Unscoped().Where("user_id = ?", userID).Delete(&models.DiagnosisRequest{}).Error; err != nil {
 		errors = append(errors, fmt.Sprintf("Failed to delete diagnosis records: %v", err))
 	}
 
-	// 7. 사용자 계정 삭제 (가장 마지막, 가장 중요한 부분)
-	if err := h.db.Delete(&user).Error; err != nil {
+	// 7. 사용자 계정 하드 삭제 (가장 마지막, 가장 중요한 부분)
+	if err := h.db.Unscoped().Delete(&user).Error; err != nil {
 		// 계정 삭제 실패는 치명적이므로 에러 반환
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Failed to delete user account",
