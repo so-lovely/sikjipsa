@@ -12,12 +12,13 @@ const TiptapEditor = ({ content, onChange }) => {
 
   // 이미지 업로드 처리 함수
   const handleImageUpload = useCallback(async (file) => {
+    console.log(file, '을 받았습니다');
     try {
       // 실제 구현 시 서버로 업로드하고 URL을 받아와야 합니다
       // 여기서는 임시로 File API를 사용합니다
       const formData = new FormData();
       formData.append('image', file);
-      
+      console.log(formData, '폼데이터');
       const response = await fetch('/community/upload-image', {
       method: 'POST',
       body: formData,
@@ -67,6 +68,7 @@ const TiptapEditor = ({ content, onChange }) => {
 
   // 이미지 삽입 함수
   const insertImage = useCallback(async (file) => {
+    console.log(file, 'insertImage함수에서 받은')
     if (!editor) return;
 
     const imageUrl = await handleImageUpload(file);
@@ -78,6 +80,7 @@ const TiptapEditor = ({ content, onChange }) => {
   // 파일 선택 핸들러
   const handleFileSelect = useCallback((event) => {
     const file = event.target.files[0];
+    console.log(file,'handleFileSelect에서 파일받은')
     if (file && file.type.startsWith('image/')) {
       insertImage(file);
     }
