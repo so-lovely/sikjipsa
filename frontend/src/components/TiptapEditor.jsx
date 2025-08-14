@@ -211,7 +211,7 @@ const TiptapEditor = ({ content, onChange }) => {
           }
         }}
       >
-        <RichTextEditor.Toolbar sticky stickyOffset={60}>
+        <RichTextEditor.Toolbar>
           <Group gap="xs">
             <RichTextEditor.ControlsGroup>
               <RichTextEditor.Bold />

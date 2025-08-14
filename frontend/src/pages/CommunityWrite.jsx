@@ -10,7 +10,7 @@ const PostEditor = () => {
     <Container 
       size="lg" 
       style={{ 
-        height: '100vh', 
+        height: 'calc(100vh - 80px)', // Account for header height
         display: 'flex', 
         flexDirection: 'column',
         paddingTop: 'var(--space-lg)',
@@ -23,17 +23,17 @@ const PostEditor = () => {
       <Box mb="xl">
         <Group justify="center" gap="sm">
           <ActionIcon
-            variant="light"
-            color="primary"
-            size="lg"
+            variant="filled"
+            size="xl"
             radius="xl"
             style={{
-              backgroundColor: 'var(--primary-gradient)',
+              background: 'var(--primary-gradient)',
               color: 'white',
-              boxShadow: 'var(--shadow-md)'
+              boxShadow: 'var(--shadow-md)',
+              border: 'none'
             }}
           >
-            <IconPencil size="1.5rem" />
+            <IconPencil size="1.5rem" stroke={2} />
           </ActionIcon>
           <Text 
             size="xl" 
