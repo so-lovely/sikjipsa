@@ -8,15 +8,12 @@ const PostEditor = () => {
 
   return (
     <Container 
-      size="lg" 
+      size="xl" 
       style={{ 
-        height: 'calc(100vh - 80px)', // Account for header height
+        height: '100vh',
         display: 'flex', 
         flexDirection: 'column',
-        paddingTop: 'var(--space-lg)',
-        paddingBottom: 'var(--space-md)',
-        paddingLeft: 'var(--space-md)',
-        paddingRight: 'var(--space-md)'
+        padding: '2rem 3rem'
       }}
     >
       {/* Header with centered pencil icon */}
@@ -55,7 +52,8 @@ const PostEditor = () => {
           flex: 1, 
           display: 'flex', 
           flexDirection: 'column',
-          minHeight: 0 // Important for flex child overflow
+          minHeight: 0, // Important for flex child overflow
+          overflow: 'hidden'
         }}
       >
         <TiptapEditor 

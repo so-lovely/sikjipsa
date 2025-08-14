@@ -48,7 +48,7 @@ const TiptapEditor = ({ content, onChange }) => {
         inline: true,
         allowBase64: true,
         HTMLAttributes: {
-          style: 'max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);'
+          style: 'max-width: 100%; height: auto; border-radius: var(--mantine-radius-md); box-shadow: 0 0.125rem 0.5rem rgba(0,0,0,0.1);'
         },
       }),
     ],
@@ -100,17 +100,18 @@ const TiptapEditor = ({ content, onChange }) => {
 
   return (
     <Paper
-      shadow="sm"
+      shadow="md"
       radius="lg"
       p={0}
       style={{
-        border: '1px solid #e5e7eb',
+        border: '0.125rem solid #e5e7eb',
         backgroundColor: 'white',
         overflow: 'hidden',
         flex: 1,
         display: 'flex',
         flexDirection: 'column',
-        minHeight: 0
+        minHeight: 0,
+        boxShadow: '0 0.625rem 2.5rem rgba(0, 0, 0, 0.08)',
       }}
     >
       <RichTextEditor
@@ -123,89 +124,112 @@ const TiptapEditor = ({ content, onChange }) => {
             display: 'flex',
             flexDirection: 'column',
             flex: 1,
-            minHeight: 0
+            minHeight: 0,
+            height: '100%',
           },
           toolbar: {
-            backgroundColor: '#fafbfc',
-            borderBottom: '1px solid #e5e7eb',
-            padding: 'var(--space-sm) var(--space-md)',
+            backgroundColor: '#f8fafc',
+            borderBottom: '0.125rem solid #e5e7eb',
+            padding: 'var(--mantine-spacing-sm) var(--mantine-spacing-md)',
             borderRadius: 0,
             flexShrink: 0,
+            position: 'sticky',
+            top: 0,
+            zIndex: 10,
           },
           content: {
             backgroundColor: 'white',
             flex: 1,
-            padding: 'var(--space-md)',
-            fontSize: '16px',
-            lineHeight: '1.6',
+            padding: 'var(--mantine-spacing-lg) var(--mantine-spacing-xl)',
+            fontSize: 'var(--mantine-font-size-md)',
+            lineHeight: '1.8',
             fontFamily: 'Pretendard, system-ui, sans-serif',
             display: 'flex',
             flexDirection: 'column',
+            overflow: 'auto',
             '& .ProseMirror': {
               outline: 'none',
               flex: 1,
-              minHeight: '100%',
-              overflowY: 'auto',
+              minHeight: 'min(25rem, 50vh)',
+              maxWidth: '100%',
+              position: 'relative',
+              zIndex: 1,
               '& p': {
-                marginBottom: '0.75rem',
+                marginBottom: 'var(--mantine-spacing-md)',
               },
               '& h1': {
-                fontSize: '2rem',
+                fontSize: 'clamp(1.5rem, 4vw, 2rem)',
                 fontWeight: 700,
-                marginBottom: '1rem',
-                marginTop: '1.5rem',
+                marginBottom: 'var(--mantine-spacing-lg)',
+                marginTop: 'var(--mantine-spacing-xl)',
                 color: '#0f1724',
               },
               '& h2': {
-                fontSize: '1.5rem',
+                fontSize: 'clamp(1.25rem, 3vw, 1.5rem)',
                 fontWeight: 600,
-                marginBottom: '0.875rem',
-                marginTop: '1.25rem',
+                marginBottom: 'var(--mantine-spacing-md)',
+                marginTop: 'var(--mantine-spacing-lg)',
                 color: '#0f1724',
               },
               '& h3': {
-                fontSize: '1.25rem',
+                fontSize: 'clamp(1.125rem, 2.5vw, 1.25rem)',
                 fontWeight: 600,
-                marginBottom: '0.75rem',
-                marginTop: '1rem',
+                marginBottom: 'var(--mantine-spacing-sm)',
+                marginTop: 'var(--mantine-spacing-md)',
                 color: '#0f1724',
               },
               '& ul, & ol': {
-                paddingLeft: '1.5rem',
-                marginBottom: '1rem',
+                paddingLeft: 'var(--mantine-spacing-xl)',
+                marginBottom: 'var(--mantine-spacing-md)',
               },
               '& li': {
-                marginBottom: '0.25rem',
+                marginBottom: 'var(--mantine-spacing-xs)',
               },
               '& img': {
                 maxWidth: '100%',
                 height: 'auto',
-                borderRadius: 'var(--radius-sm)',
-                boxShadow: 'var(--shadow-sm)',
-                margin: '0.75rem 0',
+                borderRadius: 'var(--mantine-radius-md)',
+                boxShadow: '0 0.125rem 0.5rem rgba(0,0,0,0.1)',
+                margin: 'var(--mantine-spacing-md) 0',
               },
               '& blockquote': {
                 borderLeft: '0.25rem solid #16a34a',
-                paddingLeft: '1rem',
+                paddingLeft: 'var(--mantine-spacing-md)',
                 marginLeft: '0',
                 fontStyle: 'italic',
                 color: '#6b7280',
+              },
+              '@media (max-width: 48em)': {
+                '& h1': {
+                  fontSize: '1.5rem',
+                },
+                '& h2': {
+                  fontSize: '1.25rem',
+                },
+                '& h3': {
+                  fontSize: '1.125rem',
+                },
               }
             }
           },
           control: {
-            border: 'none',
+            border: '0.0625rem solid transparent',
             backgroundColor: 'transparent',
             color: '#6b7280',
+            borderRadius: 'var(--mantine-radius-sm)',
+            transition: 'all 0.2s ease',
             '&:hover': {
               backgroundColor: '#f3f4f6',
               color: '#0f1724',
+              transform: 'translateY(-0.0625rem)',
             },
             '&[data-active]': {
-              backgroundColor: '#16a34a',
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
               color: 'white',
+              boxShadow: '0 0.125rem 0.5rem rgba(102, 126, 234, 0.3)',
               '&:hover': {
-                backgroundColor: '#15803d',
+                transform: 'translateY(-0.0625rem)',
+                boxShadow: '0 0.25rem 0.75rem rgba(102, 126, 234, 0.4)',
               }
             }
           }
@@ -220,27 +244,37 @@ const TiptapEditor = ({ content, onChange }) => {
               <RichTextEditor.Strikethrough />
             </RichTextEditor.ControlsGroup>
 
+            <Box style={{ width: '0.0625rem', height: '1.5rem', backgroundColor: '#e5e7eb' }} />
+
             <RichTextEditor.ControlsGroup>
               <RichTextEditor.H1 />
               <RichTextEditor.H2 />
               <RichTextEditor.H3 />
             </RichTextEditor.ControlsGroup>
 
+            <Box style={{ width: '0.0625rem', height: '1.5rem', backgroundColor: '#e5e7eb' }} />
+
             <RichTextEditor.ControlsGroup>
               <RichTextEditor.BulletList />
               <RichTextEditor.OrderedList />
             </RichTextEditor.ControlsGroup>
+
+            <Box style={{ width: '0.0625rem', height: '1.5rem', backgroundColor: '#e5e7eb' }} />
 
             <RichTextEditor.ControlsGroup>
               <RichTextEditor.Link />
               <RichTextEditor.Unlink />
             </RichTextEditor.ControlsGroup>
 
+            <Box style={{ width: '0.0625rem', height: '1.5rem', backgroundColor: '#e5e7eb' }} />
+
             <RichTextEditor.ControlsGroup>
               <RichTextEditor.AlignLeft />
               <RichTextEditor.AlignCenter />
               <RichTextEditor.AlignRight />
             </RichTextEditor.ControlsGroup>
+
+            <Box style={{ width: '0.0625rem', height: '1.5rem', backgroundColor: '#e5e7eb' }} />
 
             <RichTextEditor.ControlsGroup>
               <ActionIcon
@@ -268,6 +302,8 @@ const TiptapEditor = ({ content, onChange }) => {
                 style={{ display: 'none' }}
               />
             </RichTextEditor.ControlsGroup>
+
+            <Box style={{ width: '0.0625rem', height: '1.5rem', backgroundColor: '#e5e7eb' }} />
 
             <RichTextEditor.ControlsGroup>
               <RichTextEditor.Undo />
