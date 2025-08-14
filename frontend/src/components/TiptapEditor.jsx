@@ -6,7 +6,7 @@ import Link from '@tiptap/extension-link';
 import TextAlign from '@tiptap/extension-text-align';
 import Underline from '@tiptap/extension-underline';
 import './TiptapEditor.css'; // 스타일 파일
-import {apiClient} from  '../api/client'
+import apiClient from  '../api/client'
 
 const TiptapEditor = ({ content, onChange }) => {
   const fileInputRef = useRef(null);
