@@ -21,10 +21,7 @@ const TiptapEditor = ({ content, onChange }) => {
       console.log(formData, '폼데이터');
       const response = await apiClient.post('/community/upload-image', {
       method: 'POST',
-      body: formData,
-      headers: {
-        'Content-Type':'multipart/form-data'
-      }
+      body: formData
       });
       console.log('handleImageUpload에서 받은 response', response)
       const data = await response.json();
