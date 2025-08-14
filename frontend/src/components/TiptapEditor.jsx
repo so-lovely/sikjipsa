@@ -126,6 +126,7 @@ const TiptapEditor = ({ content, onChange }) => {
             flexDirection: 'column',
             height: '100%',
             minHeight: 0,
+            overflow:'auto',
           },
           toolbar: {
             backgroundColor: '#f8fafc',
