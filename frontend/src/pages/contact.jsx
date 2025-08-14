@@ -13,7 +13,6 @@ import {
 } from '@mantine/core';
 import { IconMail, IconPlus } from '@tabler/icons-react';
 
-// FAQ 데이터 (이 부분을 실제 내용으로 채워주세요)
 const faqItems = [
   {
     value: 'ai-diagnosis',
@@ -33,6 +32,19 @@ const faqItems = [
     answer:
       '제휴 및 광고 관련 문의는 페이지 상단에 안내된 이메일로 제안서를 보내주시면, 담당자 검토 후 연락드리겠습니다.',
   },
+  {
+    value: 'encyclopedia',
+    question: '백과사전에 제안하고싶어요',
+    answer:
+    '백과사전 식물 추가, 내용 정정 등은 이메일로 가급적 근거나 출처를 같이 적어 보내주세요.'
+  },
+  {
+    value: 'error',
+    question: '오류가 발생했어요',
+    answer:
+    '이메일로 오류 발생한 사진 또는 내용 설명 등 정보를 제공해주시면 사려깊게 검토 후 해결하도록 노력하겠습니다.'
+  }
+
 ];
 
 function ContactPage() {
