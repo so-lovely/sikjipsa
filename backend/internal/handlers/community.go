@@ -257,7 +257,7 @@ func (h *CommunityHandler) UploadImage(c *fiber.Ctx) error {
 			"error": "Unauthorized",
 		})
 	}
-
+	
 	// Get the image file
 	file, err := c.FormFile("image")
 	log.Printf("image file received: %v", file)
