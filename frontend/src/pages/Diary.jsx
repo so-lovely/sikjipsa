@@ -146,11 +146,11 @@ function Diary() {
 
   const getActivityIcon = (growthStage) => {
     const icons = {
-      seedling: <IconSeedling size={16} />,
-      growing: <IconLeaf size={16} />,
-      flowering: <IconFlower size={16} />,
-      mature: <IconTree size={16} />,
-      dormant: <IconMoon size={16} />
+      seedling: <IconSeedling size={16} color="var(--mantine-color-green-6)"/>,
+      growing: <IconLeaf size={16} color="var(--mantine-color-green-6)"/>,
+      flowering: <IconFlower size={16} color="var(--mantine-color-pink-6)"/>,
+      mature: <IconTree size={16} color="var(--mantine-color-green-7)"/>,
+      dormant: <IconMoon size={16} color="var(--mantine-color-gray-6)"/>
     };
     return icons[growthStage] || <IconNote size={16} />;
   };
