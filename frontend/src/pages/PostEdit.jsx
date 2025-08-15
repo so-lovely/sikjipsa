@@ -116,7 +116,8 @@ function PostEdit() {
       navigate('/community');
     } catch (error) {
       console.error('Error saving post:', error);
-      setError('게시글 저장에 실패했습니다. 다시 시도해주세요.');
+      console.error('Error details:', error.response?.data);
+      setError(`게시글 저장에 실패했습니다: ${error.response?.data?.message || error.message}`);
     } finally {
       setIsLoading(false);
     }
