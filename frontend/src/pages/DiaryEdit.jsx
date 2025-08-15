@@ -446,7 +446,7 @@ function DiaryEdit() {
                   variant="gradient"
                   gradient={{ from: 'green.5', to: 'green.6' }}
                   disabled={isSaving}
-                  leftSection={isSaving ? <Loader size={16} /> : '💾'}
+                  leftSection={isSaving ? <Loader size={16} /> : <IconEdit size={16} />}
                 >
                   {isSaving ? '저장 중...' : '수정 완료'}
                 </Button>

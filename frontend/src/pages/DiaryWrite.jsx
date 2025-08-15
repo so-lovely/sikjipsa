@@ -280,7 +280,7 @@ function DiaryWrite() {
                       value: diary.id.toString(),
                       label: diary.plant_nickname || diary.plant?.name || '식물'
                     })),
-                    { value: 'new', label: '➕ 새 다이어리 만들기' }
+                    { value: 'new', label: <Group gap="xs"><IconPlus size={14} />새 다이어리 만들기</Group> }
                   ]}
                   value={showNewDiaryForm ? 'new' : formData.diaryId}
                   onChange={(value) => handleDiarySelectChange(value)}
@@ -505,7 +505,7 @@ function DiaryWrite() {
                   variant="gradient"
                   gradient={{ from: 'green.5', to: 'green.6' }}
                   disabled={isLoading}
-                  leftSection={isLoading ? <Loader size={16} /> : '📝'}
+                  leftSection={isLoading ? <Loader size={16} /> : <IconPencil size={16} />}
                 >
                   {isLoading ? '저장 중...' : '일기 저장'}
                 </Button>

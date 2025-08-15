@@ -21,7 +21,7 @@ import {
   ActionIcon
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { IconSearch, IconPlus, IconCalendar, IconPlant, IconAlertCircle, IconEye, IconNotebook, IconEdit } from '@tabler/icons-react';
+import { IconSearch, IconPlus, IconCalendar, IconPlant, IconAlertCircle, IconEye, IconNotebook, IconEdit, IconSeedling, IconLeaf, IconFlower, IconTree, IconMoon, IconNote } from '@tabler/icons-react';
 import { useAuth } from '../context/AuthContext';
 import { diaryAPI } from '../api/diary';
 
@@ -146,13 +146,13 @@ function Diary() {
 
   const getActivityIcon = (growthStage) => {
     const icons = {
-      seedling: '🌱',
-      growing: '🌿',
-      flowering: '🌸',
-      mature: '🌳',
-      dormant: '😴'
+      seedling: <IconSeedling size={16} />,
+      growing: <IconLeaf size={16} />,
+      flowering: <IconFlower size={16} />,
+      mature: <IconTree size={16} />,
+      dormant: <IconMoon size={16} />
     };
-    return icons[growthStage] || '📝';
+    return icons[growthStage] || <IconNote size={16} />;
   };
 
   const handleImageClick = (image, e) => {
@@ -225,8 +225,8 @@ function Diary() {
             value={view}
             onChange={setView}
             data={[
-              { label: '🌱 내 식물들', value: 'plants' },
-              { label: '📅 타임라인', value: 'timeline' }
+              { label: '내 식물들', value: 'plants' },
+              { label: '타임라인', value: 'timeline' }
             ]}
             color="green"
           />
@@ -273,13 +273,16 @@ function Diary() {
       {/* Plants View */}
       {view === 'plants' && !isLoading && (
         <div>
-          <Title order={2} size="xl" mb="lg" c="gray.8">
-            🌿 내가 키우는 식물들
-          </Title>
+          <Group gap="xs" mb="lg">
+            <IconPlant size={24} color="var(--mantine-color-gray-8)" />
+            <Title order={2} size="xl" c="gray.8">
+              내가 키우는 식물들
+            </Title>
+          </Group>
           {diaries.length === 0 ? (
             <Card shadow="sm" radius="md" padding="xl" style={{ textAlign: 'center' }}>
               <Stack align="center" gap="md">
-                <Text size="xl">🌱</Text>
+                <IconSeedling size={48} color="var(--mantine-color-green-6)" />
                 <Title order={3} c="gray.6">
                   아직 등록된 식물이 없습니다
                 </Title>
@@ -357,12 +360,15 @@ function Diary() {
                           padding: 'var(--mantine-spacing-sm)'
                         }}
                       >
-                        <Text size="sm" c="gray.7">
-                          💭 {diary.entries?.length > 0 ? 
-                            diary.entries[diary.entries.length - 1].title || 
-                            diary.entries[diary.entries.length - 1].content?.substring(0, 30) + '...' 
-                            : '아직 기록이 없습니다'}
-                        </Text>
+                        <Group gap="xs">
+                          <IconNote size={16} color="var(--mantine-color-gray-7)" />
+                          <Text size="sm" c="gray.7">
+                            {diary.entries?.length > 0 ? 
+                              diary.entries[diary.entries.length - 1].title || 
+                              diary.entries[diary.entries.length - 1].content?.substring(0, 30) + '...' 
+                              : '아직 기록이 없습니다'}
+                          </Text>
+                        </Group>
                       </Box>
                     </Stack>
                   </Card>
@@ -376,9 +382,12 @@ function Diary() {
       {/* Timeline View */}
       {view === 'timeline' && !isLoading && (
         <div>
-          <Title order={2} size="xl" mb="lg" c="gray.8">
-            📝 성장 기록
-          </Title>
+          <Group gap="xs" mb="lg">
+            <IconNotebook size={24} color="var(--mantine-color-gray-8)" />
+            <Title order={2} size="xl" c="gray.8">
+              성장 기록
+            </Title>
+          </Group>
           
           {/* Filters */}
           <Group mb="xl" align="flex-end">
@@ -482,7 +491,7 @@ function Diary() {
                             {new Date(entry.entry_date).toLocaleDateString('ko-KR')}
                           </Text>
                           <Group gap="sm" mb="sm">
-                            <Text size="lg">{activityIcon}</Text>
+                            <div>{activityIcon}</div>
                             <Text size="sm" fw={500} c="gray.8">
                               {entry.growth_stage || '기록'}
                             </Text>
@@ -584,7 +593,7 @@ function Diary() {
           ) : (
             <Card shadow="sm" radius="md" padding="xl" style={{ textAlign: 'center' }}>
               <Stack align="center" gap="md">
-                <Text size="xl">📝</Text>
+                <IconNotebook size={48} color="var(--mantine-color-gray-6)" />
                 <Title order={3} c="gray.6">
                   기록이 없습니다
                 </Title>

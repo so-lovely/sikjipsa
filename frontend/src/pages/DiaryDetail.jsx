@@ -29,7 +29,14 @@ import {
   IconPlant,
   IconCalendar,
   IconEye,
-  IconTrashX
+  IconTrashX,
+  IconSeedling,
+  IconLeaf,
+  IconFlower,
+  IconTree,
+  IconMoon,
+  IconNote,
+  IconCamera
 } from '@tabler/icons-react';
 import { useAuth } from '../context/AuthContext';
 import { diaryAPI } from '../api/diary';
@@ -124,13 +131,13 @@ function DiaryDetail() {
 
   const getGrowthStageIcon = (stage) => {
     const icons = {
-      seedling: '🌱',
-      growing: '🌿',
-      flowering: '🌸',
-      mature: '🌳',
-      dormant: '😴'
+      seedling: <IconSeedling size={16} />,
+      growing: <IconLeaf size={16} />,
+      flowering: <IconFlower size={16} />,
+      mature: <IconTree size={16} />,
+      dormant: <IconMoon size={16} />
     };
-    return icons[stage] || '📝';
+    return icons[stage] || <IconNote size={16} />;
   };
 
   const getGrowthStageColor = (stage) => {
@@ -351,9 +358,12 @@ function DiaryDetail() {
           {/* Entry Images */}
           {images.length > 0 && (
             <Box>
-              <Title order={3} size="lg" mb="md" c="gray.8">
-                📷 사진 ({images.length}장)
-              </Title>
+              <Group gap="xs" mb="md">
+                <IconCamera size={20} color="var(--mantine-color-gray-8)" />
+                <Title order={3} size="lg" c="gray.8">
+                  사진 ({images.length}장)
+                </Title>
+              </Group>
               <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="md">
                 {images.map((image, index) => (
                   <Box key={index} pos="relative">
