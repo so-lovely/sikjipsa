@@ -5,7 +5,7 @@ go 1.23
 toolchain go1.24.6
 
 require (
-	github.com/cloudinary/cloudinary-go/v2 v2.7.0
+	github.com/cloudinary/cloudinary-go/v2 v2.12.0
 	github.com/gofiber/fiber/v2 v2.48.0
 	github.com/golang-jwt/jwt/v5 v5.0.0
 	github.com/joho/godotenv v1.5.1

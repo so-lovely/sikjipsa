@@ -8,7 +8,6 @@ import {
   Button,
   Group,
   Card,
-  SimpleGrid,
   Box,
   Stack,
   Badge,
@@ -20,6 +19,8 @@ import { useDebouncedValue } from '@mantine/hooks';
 import { IconSearch, IconHeart, IconMessage, IconPlus } from '@tabler/icons-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { communityAPI } from '../api/community.js';
+import InfiniteVirtualizedList from '../components/InfiniteVirtualizedList.jsx';
+import LazyLoad from '../components/LazyLoad.jsx';
 
 function Community() {
   const navigate = useNavigate();
@@ -107,20 +108,8 @@ const loadPosts = useCallback(async (options = {}) => {
 
 }, [debouncedSearchTerm, selectedCategory]); // debouncedSearchTerm이나 selectedCategory가 바뀔 때마다 이 useEffect가 실행됩니다.
 
-  // --- 3. 스크롤 감지 로직 ---
-const observer = useRef();
-const lastPostElementRef = useCallback(node => {
-  if (isLoading) return;
-  if (observer.current) observer.current.disconnect();
-
-  observer.current = new IntersectionObserver(entries => {
-    if (entries[0].isIntersecting && hasMore) {
-      loadPosts(); // [수정] fetchPosts() -> loadPosts()로 변경. (reset 옵션 없이 호출)
-    }
-  });
-
-  if (node) observer.current.observe(node);
-}, [isLoading, hasMore, loadPosts]); // [수정] fetchPosts -> loadPosts
+  // --- 3. 스크롤 감지 로직 (가상화로 대체됨) ---
+  // 가상화 사용 시 무한 스크롤은 VirtualizedList 내부에서 처리됨
 
   // --- 4. 핸들러 및 유틸리티 함수들 (이 부분은 기존 코드와 거의 동일) ---
   const handlePostClick = (postId) => {
@@ -222,61 +211,64 @@ const lastPostElementRef = useCallback(node => {
         </Group>
       </ScrollArea>
 
-      {/* Posts Grid */}
-      <SimpleGrid cols={1} spacing="md">
-        {/* 🚨 이 부분이 가장 중요하게 바뀐 부분입니다! */}
-        {posts.map((post, index) => {
-          const postCard = (
-            <Card
-              key={post.id}
-              shadow="sm"
-              radius="md"
-              padding="lg"
-              style={{ cursor: 'pointer', transition: 'all 0.2s ease' }}
-              styles={{ root: { '&:hover': { transform: 'translateY(-2px)', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)' } } }}
-              onClick={() => handlePostClick(post.id)}
-            >
-              <Stack gap="sm">
-                <Group justify="space-between" align="flex-start">
-                  <Group>
-                    <Avatar src={post.user.profile_image} alt={post.user.username} size="sm" color="green">
-                      {post.user.username.charAt(0)}
-                    </Avatar>
-                    <div>
-                      <Text size="sm" fw={500}>{post.user.username}</Text>
-                      <Text size="xs" c="dimmed">{formatDate(post.created_at)}</Text>
-                    </div>
+      {/* Posts Grid - Infinite Virtualized */}
+      {posts.length > 0 && (
+        <InfiniteVirtualizedList
+          items={posts}
+          itemHeight={200}
+          height="60vh"
+          hasMore={hasMore}
+          isLoading={isLoading}
+          loadMoreItems={loadPosts}
+          renderItem={(post) => (
+            <LazyLoad height="11.25rem">
+              <Card
+                shadow="sm"
+                radius="md"
+                padding="lg"
+                style={{ 
+                  cursor: 'pointer', 
+                  transition: 'all 0.2s ease',
+                  marginBottom: 'var(--mantine-spacing-md)'
+                }}
+                styles={{ root: { '&:hover': { transform: 'translateY(-0.125rem)', boxShadow: '0 0.25rem 0.75rem rgba(0, 0, 0, 0.1)' } } }}
+                onClick={() => handlePostClick(post.id)}
+              >
+                <Stack gap="sm">
+                  <Group justify="space-between" align="flex-start">
+                    <Group>
+                      <Avatar src={post.user.profile_image} alt={post.user.username} size="sm" color="green">
+                        {post.user.username.charAt(0)}
+                      </Avatar>
+                      <div>
+                        <Text size="sm" fw={500}>{post.user.username}</Text>
+                        <Text size="xs" c="dimmed">{formatDate(post.created_at)}</Text>
+                      </div>
+                    </Group>
+                    <Badge color={getCategoryColor(post.post_type)} variant="light" size="sm">
+                      {getCategoryLabel(post.post_type)}
+                    </Badge>
                   </Group>
-                  <Badge color={getCategoryColor(post.post_type)} variant="light" size="sm">
-                    {getCategoryLabel(post.post_type)}
-                  </Badge>
-                </Group>
-                <div>
-                  <Title order={3} size="lg" fw={600} mb="xs" c="gray.8">{post.title}</Title>
-                  <Text size="sm" c="gray.6" lineClamp={2}>{cleanContent(post.content)}</Text>
-                </div>
-                <Group gap="lg" justify="flex-start">
-                  <Group gap="xs">
-                    <IconHeart size={16} color="var(--mantine-color-red-5)" />
-                    <Text size="sm" c="dimmed">{post.likes_count || 0}</Text>
+                  <div>
+                    <Title order={3} size="lg" fw={600} mb="xs" c="gray.8">{post.title}</Title>
+                    <Text size="sm" c="gray.6" lineClamp={2}>{cleanContent(post.content)}</Text>
+                  </div>
+                  <Group gap="lg" justify="flex-start">
+                    <Group gap="xs">
+                      <IconHeart size={16} color="var(--mantine-color-red-5)" />
+                      <Text size="sm" c="dimmed">{post.likes_count || 0}</Text>
+                    </Group>
+                    <Group gap="xs">
+                      <IconMessage size={16} color="var(--mantine-color-blue-5)" />
+                      <Text size="sm" c="dimmed">{post.comments?.length || 0}</Text>
+                    </Group>
                   </Group>
-                  <Group gap="xs">
-                    <IconMessage size={16} color="var(--mantine-color-blue-5)" />
-                    <Text size="sm" c="dimmed">{post.comments?.length || 0}</Text>
-                  </Group>
-                </Group>
-              </Stack>
-            </Card>
-          );
-
-          // 마지막 게시글이라면, 감시용 div로 감싸서 반환
-          if (posts.length === index + 1) {
-            return <div ref={lastPostElementRef} key={post.id}>{postCard}</div>;
-          }
-          // 아니라면 그냥 카드만 반환
-          return postCard;
-        })}
-      </SimpleGrid>
+                </Stack>
+              </Card>
+            </LazyLoad>
+          )}
+        />
+      )}
 
       {/* 로딩 중일 때와 데이터가 없을 때의 UI */}
       {isLoading && (
