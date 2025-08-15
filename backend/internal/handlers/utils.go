@@ -4,6 +4,8 @@ import (
 	"mime/multipart"
 	"path/filepath"
 	"strings"
+	"sync"
+	"time"
 )
 
 // isValidImageFile validates if the uploaded file is a valid image
@@ -24,4 +26,54 @@ func isValidImageFile(file *multipart.FileHeader) bool {
 	}
 	
 	return false
+}
+
+// Cache implementation
+type CacheItem struct {
+	Data      interface{}
+	ExpiresAt time.Time
+}
+
+var (
+	plantCache = sync.Map{}
+	cacheTTL   = 5 * time.Minute
+)
+
+// GetFromCache retrieves data from cache if it exists and hasn't expired
+func GetFromCache(key string) (interface{}, bool) {
+	if item, ok := plantCache.Load(key); ok {
+		cacheItem := item.(CacheItem)
+		if time.Now().Before(cacheItem.ExpiresAt) {
+			return cacheItem.Data, true
+		}
+		plantCache.Delete(key)
+	}
+	return nil, false
+}
+
+// SetCache stores data in cache with TTL
+func SetCache(key string, data interface{}) {
+	plantCache.Store(key, CacheItem{
+		Data:      data,
+		ExpiresAt: time.Now().Add(cacheTTL),
+	})
+}
+
+// ClearCache removes all cached data
+func ClearCache() {
+	plantCache.Range(func(key, value interface{}) bool {
+		plantCache.Delete(key)
+		return true
+	})
+}
+
+// GenerateCacheKey creates a cache key from query parameters
+func GenerateCacheKey(prefix string, params ...string) string {
+	key := prefix
+	for _, param := range params {
+		if param != "" {
+			key += "_" + param
+		}
+	}
+	return key
 }

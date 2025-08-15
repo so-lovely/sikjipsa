@@ -8,6 +8,7 @@ require (
 	github.com/cloudinary/cloudinary-go/v2 v2.7.0
 	github.com/gofiber/fiber/v2 v2.48.0
 	github.com/golang-jwt/jwt/v5 v5.0.0
+	github.com/joho/godotenv v1.5.1
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.8.4
 	github.com/swaggo/swag v1.16.6
