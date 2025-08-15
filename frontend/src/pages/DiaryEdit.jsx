@@ -185,9 +185,7 @@ function DiaryEdit() {
 
   return (
     <Container size="lg" py="xl">
-      {/* Header */}
-      <Stack align="center" gap="xl" mb={60}>
-        <Title order={1} size={48} fw={700} ta="center" c="gray.8">
+      <Group justify="center" gap="sm">
           <ActionIcon
                       variant="filled"
                       size="xl"
@@ -212,11 +210,10 @@ function DiaryEdit() {
                     >
                       Edit Diary
                     </Text>
-        </Title>
+       </Group>
         <Text size="lg" ta="center" c="gray.6" maw={600}>
           {diary?.plant_nickname || '식물'}의 성장 기록을 수정해보세요
         </Text>
-      </Stack>
 
       <Button
         variant="subtle"
