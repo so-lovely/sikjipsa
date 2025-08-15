@@ -36,7 +36,7 @@ type CacheItem struct {
 
 var (
 	plantCache = sync.Map{}
-	cacheTTL   = 5 * time.Minute
+	cacheTTL   = 24 * time.Hour
 )
 
 // GetFromCache retrieves data from cache if it exists and hasn't expired
