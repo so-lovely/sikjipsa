@@ -201,7 +201,17 @@ function DiaryEdit() {
                     >
                       <IconPencil size="1.5rem" stroke={2} />
                     </ActionIcon>
-          <Text component="span" c="green.6">일기 수정</Text>
+          <Text 
+                      size="xl" 
+                      fw={700} 
+                      c="var(--charcoal)"
+                      style={{ 
+                        fontFamily: 'var(--font-heading)',
+                        letterSpacing: '-0.5px'
+                      }}
+                    >
+                      Edit Diary
+                    </Text>
         </Title>
         <Text size="lg" ta="center" c="gray.6" maw={600}>
           {diary?.plant_nickname || '식물'}의 성장 기록을 수정해보세요
