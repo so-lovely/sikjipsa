@@ -93,16 +93,23 @@ function PostEdit() {
       setError('내용을 입력해주세요.');
       return;
     }
+
+    if (!formData.category) {
+      setError('카테고리를 선택해주세요.');
+      return;
+    }
     
     setIsLoading(true);
     setError('');
     
     try {
       const postData = {
-        title: formData.title,
-        content: formData.content,
+        title: formData.title.trim(),
+        content: formData.content.trim(),
         post_type: formData.category
       };
+
+      console.log('Sending post data:', postData);
       
       if (postId) {
         // 수정 모드
