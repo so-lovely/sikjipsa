@@ -120,15 +120,15 @@ export const diaryAPI = {
     return iconMap[activityType] || iconMap.default;
   },
 
-  // 성장 단계별 색상 매핑
+  // 성장 단계별 색상 매핑 (Mantine color variables와 일치)
   getGrowthStageColor: (stage) => {
     const colorMap = {
-      seedling: '#10B981',
-      growing: '#3B82F6', 
-      flowering: '#F59E0B',
-      mature: '#6366F1',
-      dormant: '#6B7280',
-      default: '#22C55E'
+      seedling: 'var(--mantine-color-green-6)',
+      growing: 'var(--mantine-color-green-6)', 
+      flowering: 'var(--mantine-color-pink-6)',
+      mature: 'var(--mantine-color-green-7)',
+      dormant: 'var(--mantine-color-gray-6)',
+      default: 'var(--mantine-color-green-6)'
     };
     
     return colorMap[stage] || colorMap.default;
