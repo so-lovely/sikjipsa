@@ -2,7 +2,6 @@ import React, { useCallback, useRef } from 'react';
 import { RichTextEditor, Link } from '@mantine/tiptap';
 import { useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import Underline from '@tiptap/extension-underline';
 import TextAlign from '@tiptap/extension-text-align';
 import Superscript from '@tiptap/extension-superscript';
 import SubScript from '@tiptap/extension-subscript';
@@ -37,11 +36,7 @@ const TiptapEditor = ({ content, onChange }) => {
 
   const editor = useEditor({
     extensions: [
-      StarterKit.configure({
-        // StarterKit에서 Link를 제외하고 별도로 추가
-        link: false,
-      }),
-      Underline,
+      StarterKit,
       Link,
       Superscript,
       SubScript,

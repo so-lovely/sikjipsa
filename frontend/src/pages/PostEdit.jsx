@@ -18,7 +18,7 @@ import {
 import { IconAlertCircle, IconPencil } from '@tabler/icons-react';
 import { useAuth } from '../context/AuthContext';
 import TiptapEditor from '../components/TiptapEditor';
-import apiClient from '../api/client';
+import { communityAPI } from '../api/community';
 
 function PostEdit() {
   const { isLoggedIn } = useAuth();
@@ -52,8 +52,7 @@ function PostEdit() {
       if (postId) {
         try {
           setIsLoading(true);
-          const response = await apiClient.get(`/community/posts/${postId}`);
-          const postData = response.data;
+          const postData = await communityAPI.getPost(postId);
           setFormData({
             title: postData.title || '',
             content: postData.content || '',
@@ -113,10 +112,10 @@ function PostEdit() {
       
       if (postId) {
         // 수정 모드
-        await apiClient.put(`/community/posts/${postId}`, postData);
+        await communityAPI.updatePost(postId, postData, [], []);
       } else {
         // 새 게시글 생성 모드
-        await apiClient.post('/community/posts', postData);
+        await communityAPI.createPost(postData);
       }
       
       // 성공 시 커뮤니티 페이지로 이동
