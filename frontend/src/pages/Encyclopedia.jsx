@@ -79,7 +79,22 @@ function Encyclopedia() {
 
   const getFirstImage = (plant) => {
     const images = parseImages(plant.images);
-    return images.length > 0 ? images[0] : 'https://via.placeholder.com/400x250?text=🌱';
+    const originalUrl = images.length > 0 ? images[0] : 'https://via.placeholder.com/400x250?text=🌱';
+    
+    // Add Cloudinary optimization without resizing
+    if (originalUrl.includes('cloudinary.com')) {
+      // Insert optimization parameters before the version or image path
+      const optimizedUrl = originalUrl.replace(
+        /\/v\d+\//, 
+        '/f_auto,q_auto/v1/'
+      ).replace(
+        /\/upload\//,
+        '/upload/f_auto,q_auto/'
+      );
+      return optimizedUrl;
+    }
+    
+    return originalUrl;
   };
 
   const parseCareInstructions = (instructions) => {
