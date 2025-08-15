@@ -32,6 +32,7 @@ import AnnouncementDetail from './pages/AnnouncementDetail.jsx';
 import Terms from './pages/Terms.jsx';
 import PrivacyPolicy from './pages/PrivacyPolicy.jsx';
 import ContactPage from './pages/contact.jsx';
+import PostEdit from './pages/PostEdit.jsx';
 
 const queryClient = new QueryClient();
 
@@ -83,6 +84,8 @@ function App() {
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/terms" element={<Terms />} />
                     <Route path="/privacy" element={<PrivacyPolicy />} />
+                    <Route path="/posts/edit" element={<PostEdit />} />
+                    <Route path="/posts/edit/:postId" element={<PostEdit />} />
                     <Route path="/auth/callback/:provider" element={<AuthCallback />} />
                   </Routes>
                 </div>
