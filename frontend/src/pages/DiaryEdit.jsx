@@ -266,14 +266,29 @@ function DiaryEdit() {
                 <Select
                   label="성장 단계"
                   data={[
-                    { value: 'seedling', label: '🌱 새싹' },
-                    { value: 'growing', label: '🌿 성장중' },
-                    { value: 'flowering', label: '🌸 개화중' },
-                    { value: 'mature', label: '🌳 성숙' },
-                    { value: 'dormant', label: '😴 휴면' }
+                    { value: 'seedling', label: '새싹' },
+                    { value: 'growing', label: '성장중' },
+                    { value: 'flowering', label: '개화중' },
+                    { value: 'mature', label: '성숙' },
+                    { value: 'dormant', label: '휴면' }
                   ]}
                   value={formData.growthStage}
                   onChange={(value) => handleInputChange('growthStage', value)}
+                  renderOption={({ option }) => {
+                                      const icons = {
+                                        seedling: <IconSeedling size={14} color="var(--mantine-color-green-6)" />,
+                                        growing: <IconLeaf size={14} color="var(--mantine-color-green-6)" />,
+                                        flowering: <IconFlower size={14} color="var(--mantine-color-pink-6)" />,
+                                        mature: <IconTree size={14} color="var(--mantine-color-green-7)" />,
+                                        dormant: <IconMoon size={14} color="var(--mantine-color-gray-6)" />
+                                      };
+                                      return (
+                                        <Group gap="xs">
+                                          {icons[option.value]}
+                                          {option.label}
+                                        </Group>
+                                      );
+                                    }}
                 />
               </Group>
 
