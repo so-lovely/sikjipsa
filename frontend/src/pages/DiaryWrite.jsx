@@ -5,6 +5,7 @@ import {
   Title,
   Text,
   TextInput,
+  DateInput,
   Textarea,
   Button,
   Group,
@@ -20,6 +21,7 @@ import {
   Loader,
   rem
 } from '@mantine/core';
+import { DateInput } from '@mantine/dates';
 import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone';
 import { IconUpload, IconPhoto, IconX, IconAlertCircle, IconCalendar, IconSeedling, IconLeaf, IconFlower, IconTree, IconMoon, IconPencil } from '@tabler/icons-react';
 import { useAuth } from '../context/AuthContext';
@@ -330,13 +332,13 @@ function DiaryWrite() {
                       required
                     />
                     
-                    <TextInput
+                    <DateInput
                       label="키우기 시작한 날"
-                      type="date"
-                      value={newDiaryData.startDate}
-                      onChange={(e) => handleNewDiaryInputChange('startDate', e.target.value)}
+                      value={new Date(newDiaryData.startDate)}
+                      onChange={(value) => handleNewDiaryInputChange('startDate', value ? value.toISOString().split('T')[0] : '')}
                       required
                       leftSection={<IconCalendar size={16} />}
+                      placeholder="날짜를 선택하세요"
                     />
                   </Stack>
                 </Card>
@@ -344,13 +346,13 @@ function DiaryWrite() {
 
               {/* 기록 정보 */}
               <Group grow>
-                <TextInput
+                <DateInput
                   label="기록 날짜"
-                  type="date"
-                  value={formData.entryDate}
-                  onChange={(e) => handleInputChange('entryDate', e.target.value)}
+                  value={new Date(formData.entryDate)}
+                  onChange={(value) => handleInputChange('entryDate', value ? value.toISOString().split('T')[0] : '')}
                   required
                   leftSection={<IconCalendar size={16} />}
+                  placeholder="날짜를 선택하세요"
                 />
                 <Select
                   label="성장 단계"

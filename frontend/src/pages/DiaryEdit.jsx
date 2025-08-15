@@ -5,6 +5,7 @@ import {
   Title,
   Text,
   TextInput,
+  DateInput,
   Textarea,
   Button,
   Group,
@@ -20,6 +21,7 @@ import {
   Loader,
   rem
 } from '@mantine/core';
+import { DateInput } from '@mantine/dates';
 import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone';
 import { IconUpload, IconPhoto, IconX, IconAlertCircle, IconCalendar, IconArrowLeft, IconSeedling,IconPencil, IconLeaf, IconFlower, IconTree, IconMoon, IconEdit } from '@tabler/icons-react';
 import { useAuth } from '../context/AuthContext';
@@ -251,13 +253,13 @@ function DiaryEdit() {
             <Stack gap="xl">
               {/* Basic Info */}
               <Group grow>
-                <TextInput
+                <DateInput
                   label="기록 날짜"
-                  type="date"
-                  value={formData.entryDate}
-                  onChange={(e) => handleInputChange('entryDate', e.target.value)}
+                  value={new Date(formData.entryDate)}
+                  onChange={(value) => handleInputChange('entryDate', value ? value.toISOString().split('T')[0] : '')}
                   required
                   leftSection={<IconCalendar size={16} />}
+                  placeholder="날짜를 선택하세요"
                 />
                 <Select
                   label="성장 단계"
