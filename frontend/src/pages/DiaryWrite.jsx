@@ -21,7 +21,7 @@ import {
   rem
 } from '@mantine/core';
 import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone';
-import { IconUpload, IconPhoto, IconX, IconAlertCircle, IconCalendar, IconSeedling, IconLeaf, IconFlower, IconTree, IconMoon, IconPencil, IconPlus } from '@tabler/icons-react';
+import { IconUpload, IconPhoto, IconX, IconAlertCircle, IconCalendar, IconSeedling, IconLeaf, IconFlower, IconTree, IconMoon, IconPencil } from '@tabler/icons-react';
 import { useAuth } from '../context/AuthContext';
 import { diaryAPI } from '../api/diary';
 import { plantAPI } from '../api/plants';
@@ -277,7 +277,7 @@ function DiaryWrite() {
                       value: diary.id.toString(),
                       label: diary.plant_nickname || diary.plant?.name || '식물'
                     })),
-                    { value: 'new', label: <Group gap="xs"><IconPlus size={14} />새 다이어리 만들기</Group> }
+                    { value: 'new', label: '➕ 새 다이어리 만들기' }
                   ]}
                   value={showNewDiaryForm ? 'new' : formData.diaryId}
                   onChange={(value) => handleDiarySelectChange(value)}
