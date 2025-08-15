@@ -185,32 +185,34 @@ function DiaryEdit() {
 
   return (
     <Container size="lg" py="xl">
-      <Group justify="center" gap="sm">
-          <ActionIcon
-                      variant="filled"
-                      size="xl"
-                      radius="xl"
-                      style={{
-                        background: 'linear-gradient(135deg, #A9E5C4 0%, #79D1A0 100%)',
-                        color: 'white',
-                        boxShadow: 'var(--shadow-md)',
-                        border: 'none'
-                      }}
-                    >
-                      <IconPencil size="1.5rem" stroke={2} />
-                    </ActionIcon>
-          <Text 
-                      size="xl" 
-                      fw={700} 
-                      c="var(--charcoal)"
-                      style={{ 
-                        fontFamily: 'var(--font-heading)',
-                        letterSpacing: '-0.5px'
-                      }}
-                    >
-                      Edit Diary
-                    </Text>
-       </Group>
+      <Box mb="xl">
+        <Group justify="center" gap="sm">
+            <ActionIcon
+                        variant="filled"
+                        size="xl"
+                        radius="xl"
+                        style={{
+                          background: 'linear-gradient(135deg, #A9E5C4 0%, #79D1A0 100%)',
+                          color: 'white',
+                          boxShadow: 'var(--shadow-md)',
+                          border: 'none'
+                        }}
+                      >
+                        <IconPencil size="1.5rem" stroke={2} />
+                      </ActionIcon>
+            <Text 
+                        size="xl" 
+                        fw={700} 
+                        c="var(--charcoal)"
+                        style={{ 
+                          fontFamily: 'var(--font-heading)',
+                          letterSpacing: '-0.5px'
+                        }}
+                      >
+                        Edit Diary
+                      </Text>
+         </Group>
+       </Box>
         <Text size="lg" ta="center" c="gray.6" maw={600}>
           {diary?.plant_nickname || '식물'}의 성장 기록을 수정해보세요
         </Text>

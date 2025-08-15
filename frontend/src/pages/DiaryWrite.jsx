@@ -213,8 +213,8 @@ function DiaryWrite() {
   return (
     <Container size="md" py={50}>
       {/* Hero Section */}
-      <Stack align="center" gap="lg" mb={40}>
-        <Title order={1} size={48} fw={700} ta="center" c="gray.8">
+      <Box mb="xl">
+        <Group justify="center" gap="sm">
                   <ActionIcon
                               variant="filled"
                               size="xl"
@@ -239,11 +239,11 @@ function DiaryWrite() {
                             >
                               Edit Diary
                             </Text>
-                </Title>
+              </Group> 
+            </Box>
         <Text size="md" ta="center" c="gray.6" maw={500}>
           식물의 소중한 순간을 기록해보세요
         </Text>
-      </Stack>
 
       <Card shadow="sm" radius="md" p={30}>
         {error && (
