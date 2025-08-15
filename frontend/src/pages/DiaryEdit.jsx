@@ -302,6 +302,7 @@ function DiaryEdit() {
                 value={formData.content}
                 onChange={(e) => handleInputChange('content', e.target.value)}
                 required
+                overflow='auto'
               />
 
               {/* Existing Images */}

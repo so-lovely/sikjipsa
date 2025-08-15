@@ -395,6 +395,7 @@ function DiaryWrite() {
                 value={formData.content}
                 onChange={(e) => handleInputChange('content', e.target.value)}
                 required
+                overflow='auto'
               />
 
               {/* 사진 업로드 */}
