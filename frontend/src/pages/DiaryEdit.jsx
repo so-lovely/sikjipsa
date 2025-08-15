@@ -188,7 +188,20 @@ function DiaryEdit() {
       {/* Header */}
       <Stack align="center" gap="xl" mb={60}>
         <Title order={1} size={48} fw={700} ta="center" c="gray.8">
-          ✏️ <Text component="span" c="green.6">일기 수정</Text>
+          <ActionIcon
+                      variant="filled"
+                      size="xl"
+                      radius="xl"
+                      style={{
+                        background: 'linear-gradient(135deg, #A9E5C4 0%, #79D1A0 100%)',
+                        color: 'white',
+                        boxShadow: 'var(--shadow-md)',
+                        border: 'none'
+                      }}
+                    >
+                      <IconPencil size="1.5rem" stroke={2} />
+                    </ActionIcon>
+          <Text component="span" c="green.6">일기 수정</Text>
         </Title>
         <Text size="lg" ta="center" c="gray.6" maw={600}>
           {diary?.plant_nickname || '식물'}의 성장 기록을 수정해보세요
