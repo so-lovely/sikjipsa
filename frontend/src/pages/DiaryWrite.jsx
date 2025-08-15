@@ -241,9 +241,6 @@ function DiaryWrite() {
                             </Text>
               </Group> 
             </Box>
-        <Text size="md" ta="center" c="gray.6" maw={500}>
-          식물의 소중한 순간을 기록해보세요
-        </Text>
 
       <Card shadow="sm" radius="md" p={30}>
         {error && (

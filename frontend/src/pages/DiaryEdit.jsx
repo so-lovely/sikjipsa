@@ -213,9 +213,6 @@ function DiaryEdit() {
                       </Text>
          </Group>
        </Box>
-        <Text size="lg" ta="center" c="gray.6" maw={600}>
-          {diary?.plant_nickname || '식물'}의 성장 기록을 수정해보세요
-        </Text>
 
       <Button
         variant="subtle"
