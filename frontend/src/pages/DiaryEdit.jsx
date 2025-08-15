@@ -21,7 +21,7 @@ import {
   rem
 } from '@mantine/core';
 import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone';
-import { IconUpload, IconPhoto, IconX, IconAlertCircle, IconCalendar, IconArrowLeft, IconSeedling,IconPencil, IconLeaf, IconFlower, IconTree, IconMoon } from '@tabler/icons-react';
+import { IconUpload, IconPhoto, IconX, IconAlertCircle, IconCalendar, IconArrowLeft, IconSeedling,IconPencil, IconLeaf, IconFlower, IconTree, IconMoon, IconEdit } from '@tabler/icons-react';
 import { useAuth } from '../context/AuthContext';
 import { diaryAPI } from '../api/diary';
 
