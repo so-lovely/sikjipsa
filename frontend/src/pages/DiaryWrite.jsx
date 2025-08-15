@@ -214,9 +214,32 @@ function DiaryWrite() {
     <Container size="md" py={50}>
       {/* Hero Section */}
       <Stack align="center" gap="lg" mb={40}>
-        <Title order={1} ta="center" c="green.7" fw={700}>
-          성장 일기 쓰기
-        </Title>
+        <Title order={1} size={48} fw={700} ta="center" c="gray.8">
+                  <ActionIcon
+                              variant="filled"
+                              size="xl"
+                              radius="xl"
+                              style={{
+                                background: 'linear-gradient(135deg, #A9E5C4 0%, #79D1A0 100%)',
+                                color: 'white',
+                                boxShadow: 'var(--shadow-md)',
+                                border: 'none'
+                              }}
+                            >
+                              <IconPencil size="1.5rem" stroke={2} />
+                            </ActionIcon>
+                  <Text 
+                              size="xl" 
+                              fw={700} 
+                              c="var(--charcoal)"
+                              style={{ 
+                                fontFamily: 'var(--font-heading)',
+                                letterSpacing: '-0.5px'
+                              }}
+                            >
+                              Edit Diary
+                            </Text>
+                </Title>
         <Text size="md" ta="center" c="gray.6" maw={500}>
           식물의 소중한 순간을 기록해보세요
         </Text>
