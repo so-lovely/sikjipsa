@@ -7,7 +7,7 @@ import (
 	"sikjipsa-backend/internal/handlers"
 	"sikjipsa-backend/internal/middleware"
 	"sikjipsa-backend/pkg/config"
-	"sikjipsa-backend/tests"
+	"sikjipsa-backend/pkg/database"
 	"testing"
 	"time"
 
@@ -25,7 +25,9 @@ type RateLimitTestSuite struct {
 }
 
 func (suite *RateLimitTestSuite) SetupSuite() {
-	suite.db = tests.SetupTestDB(suite.T())
+	// Setup test database
+	testDBURL := "sqlite://test.db"
+	suite.db = database.Connect(testDBURL)
 	
 	suite.cfg = &config.Config{
 		JWTSecret:      "test-jwt-secret",

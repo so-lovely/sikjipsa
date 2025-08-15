@@ -8,7 +8,7 @@ import (
 	"sikjipsa-backend/internal/middleware"
 	"sikjipsa-backend/internal/models"
 	"sikjipsa-backend/pkg/config"
-	"sikjipsa-backend/tests"
+	"sikjipsa-backend/pkg/database"
 	"testing"
 
 	"github.com/gofiber/fiber/v2"
@@ -26,7 +26,9 @@ type APITestSuite struct {
 }
 
 func (suite *APITestSuite) SetupSuite() {
-	suite.db = tests.SetupTestDB(suite.T())
+	// Setup test database
+	testDBURL := "sqlite://test.db"
+	suite.db = database.Connect(testDBURL)
 	
 	// Setup test config
 	suite.cfg = &config.Config{
@@ -54,21 +56,29 @@ func (suite *APITestSuite) SetupSuite() {
 	// Migrate models
 	suite.db.AutoMigrate(
 		&models.User{},
+		&models.PlantCategory{},
 		&models.Plant{},
-		&models.Diary{},
-		&models.Community{},
+		&models.CommunityPost{},
+		&models.PostComment{},
+		&models.PostLike{},
+		&models.GrowthDiary{},
+		&models.DiaryEntry{},
+		&models.DiagnosisRequest{},
 		&models.Announcement{},
-		&models.Diagnosis{},
 	)
 }
 
 func (suite *APITestSuite) SetupTest() {
 	// Clean database before each test
-	suite.db.Exec("DELETE FROM diagnoses")
+	suite.db.Exec("DELETE FROM diagnosis_requests")
 	suite.db.Exec("DELETE FROM announcements") 
-	suite.db.Exec("DELETE FROM communities")
-	suite.db.Exec("DELETE FROM diaries")
+	suite.db.Exec("DELETE FROM post_likes")
+	suite.db.Exec("DELETE FROM post_comments")
+	suite.db.Exec("DELETE FROM community_posts")
+	suite.db.Exec("DELETE FROM diary_entries")
+	suite.db.Exec("DELETE FROM growth_diaries")
 	suite.db.Exec("DELETE FROM plants")
+	suite.db.Exec("DELETE FROM plant_categories")
 	suite.db.Exec("DELETE FROM users")
 }
 
@@ -94,7 +104,7 @@ func (suite *APITestSuite) TestCORSHeaders() {
 
 func (suite *APITestSuite) TestUnauthorizedAccess() {
 	// Test accessing protected endpoint without token
-	req := httptest.NewRequest("GET", "/api/v1/plants", nil)
+	req := httptest.NewRequest("GET", "/api/v1/diary", nil)
 	resp, err := suite.app.Test(req)
 	
 	assert.NoError(suite.T(), err)

@@ -7,7 +7,7 @@ import (
 	"sikjipsa-backend/internal/handlers"
 	"sikjipsa-backend/internal/models"
 	"sikjipsa-backend/pkg/config"
-	"sikjipsa-backend/tests"
+	"sikjipsa-backend/pkg/database"
 	"testing"
 
 	"github.com/gofiber/fiber/v2"
@@ -24,7 +24,9 @@ type AuthHandlerTestSuite struct {
 }
 
 func (suite *AuthHandlerTestSuite) SetupSuite() {
-	suite.db = tests.SetupTestDB(suite.T())
+	// Setup test database
+	testDBURL := "sqlite://test.db"
+	suite.db = database.Connect(testDBURL)
 	
 	// Migrate test models
 	suite.db.AutoMigrate(&models.User{})
@@ -64,6 +66,9 @@ func (suite *AuthHandlerTestSuite) TestCreateUser() {
 }
 
 func (suite *AuthHandlerTestSuite) TestSocialLoginRequestValidation() {
+	// Setup route for this test
+	suite.app.Post("/auth/naver", suite.authHandler.NaverLogin)
+	
 	// Test invalid request (missing required fields)
 	invalidReq := map[string]interface{}{
 		"state": "test-state",

@@ -1,7 +1,7 @@
 
 
 
-//이 파일은 실제호스팅과 관계없는 파일입니다. 로컬 테스트용입니다.
+// Production configuration for Render deployment
 
 package config
 
