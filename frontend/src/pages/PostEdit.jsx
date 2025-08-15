@@ -7,15 +7,16 @@ import {
   TextInput,
   Button,
   Group,
-  Card,
   Stack,
   Alert,
   Box,
   Center,
   Loader,
-  rem
+  rem,
+  Select,
+  ActionIcon
 } from '@mantine/core';
-import { IconAlertCircle, IconEdit, IconArrowLeft } from '@tabler/icons-react';
+import { IconAlertCircle, IconArrowLeft, IconPencil } from '@tabler/icons-react';
 import { useAuth } from '../context/AuthContext';
 import TiptapEditor from '../components/TiptapEditor';
 import apiClient from '../api/client';
@@ -27,10 +28,19 @@ function PostEdit() {
   
   const [formData, setFormData] = useState({
     title: '',
-    content: ''
+    content: '',
+    category: ''
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const categories = [
+    { value: 'general', label: '일반' },
+    { value: 'question', label: '질문' },
+    { value: 'tip', label: '꿀팁' },
+    { value: 'share', label: '자랑' },
+    { value: 'trade', label: '나눔' },
+  ];
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -47,7 +57,8 @@ function PostEdit() {
           const postData = response.data;
           setFormData({
             title: postData.title || '',
-            content: postData.content || ''
+            content: postData.content || '',
+            category: postData.post_type || ''
           });
         } catch (error) {
           console.error('Error loading post data:', error);
@@ -90,7 +101,8 @@ function PostEdit() {
     try {
       const postData = {
         title: formData.title,
-        content: formData.content
+        content: formData.content,
+        post_type: formData.category
       };
       
       if (postId) {
@@ -116,106 +128,132 @@ function PostEdit() {
   }
 
   return (
-    <Container size="md" py={50}>
-      {/* Hero Section */}
-      <Stack align="center" gap="lg" mb={40}>
-        <Group gap="md" align="center">
-          <Button
-            variant="subtle"
-            color="gray"
-            leftSection={<IconArrowLeft size={16} />}
-            onClick={() => navigate(-1)}
+    <Container 
+      size="xl" 
+      style={{ 
+        height: '100vh',
+        display: 'flex', 
+        flexDirection: 'column',
+        padding: 'clamp(1rem, 4vw, 3rem) clamp(1rem, 5vw, 3rem)'
+      }}
+    >
+      {/* Header with centered pencil icon */}
+      <Box mb="xl">
+        <Group justify="center" gap="sm">
+          <ActionIcon
+            variant="filled"
+            size="xl"
+            radius="xl"
+            style={{
+              background: 'linear-gradient(135deg, #A9E5C4 0%, #79D1A0 100%)',
+              color: 'white',
+              boxShadow: 'var(--shadow-md)',
+              border: 'none'
+            }}
           >
-            뒤로가기
-          </Button>
+            <IconPencil size="1.5rem" stroke={2} />
+          </ActionIcon>
+          <Text 
+            size="xl" 
+            fw={700} 
+            c="var(--charcoal)"
+            style={{ 
+              fontFamily: 'var(--font-heading)',
+              letterSpacing: '-0.5px'
+            }}
+          >
+            {postId ? 'Edit Post' : 'New Post'}
+          </Text>
         </Group>
-        <Title order={1} ta="center" c="blue.7" fw={700}>
-          {postId ? '게시글 수정' : '게시글 작성'}
-        </Title>
-        <Text size="md" ta="center" c="gray.6" maw={500}>
-          {postId ? '게시글을 수정해보세요' : '새로운 게시글을 작성해보세요'}
-        </Text>
-      </Stack>
-
-      <Card shadow="sm" radius="md" p={30}>
-        {error && (
-          <Alert
-            icon={<IconAlertCircle size={16} />}
-            title="오류 발생"
-            color="red"
-            mb="xl"
-            variant="light"
-          >
-            {error}
-          </Alert>
-        )}
-        
-        {isLoading ? (
-          <Center py="xl">
-            <Stack align="center" gap="md">
-              <Loader color="blue" size="lg" />
-              <Text size="lg" fw={600} c="gray.7">
-                {postId ? '게시글을 수정하고 있습니다...' : '게시글을 작성하고 있습니다...'}
-              </Text>
-            </Stack>
-          </Center>
-        ) : (
-          <form onSubmit={handleSubmit}>
-            <Stack spacing="xl">
-              <TextInput
-                label="제목"
-                placeholder="게시글 제목을 입력하세요"
-                value={formData.title}
-                onChange={(e) => handleInputChange('title', e.target.value)}
+      </Box>
+      {error && (
+        <Alert
+          icon={<IconAlertCircle size={16} />}
+          title="오류 발생"
+          color="red"
+          mb="xl"
+          variant="light"
+        >
+          {error}
+        </Alert>
+      )}
+      
+      {isLoading ? (
+        <Center py="xl">
+          <Stack align="center" gap="md">
+            <Loader color="green" size="lg" />
+            <Text size="lg" fw={600} c="gray.7">
+              {postId ? '게시글을 수정하고 있습니다...' : '게시글을 작성하고 있습니다...'}
+            </Text>
+          </Stack>
+        </Center>
+      ) : (
+        <>
+          {/* Form fields */}
+          <Stack gap="lg" mb="xl">
+            <Group grow>
+              <Select
+                label="카테고리"
+                placeholder="카테고리를 선택하세요"
+                data={categories}
+                value={formData.category}
+                onChange={(value) => handleInputChange('category', value)}
+                size="md"
+                radius="lg"
                 required
-                leftSection={<IconEdit size={16} />}
               />
+            </Group>
+            
+            <TextInput
+              label="제목"
+              placeholder="제목을 입력하세요"
+              value={formData.title}
+              onChange={(e) => handleInputChange('title', e.target.value)}
+              size="md"
+              radius="lg"
+              required
+            />
+          </Stack>
 
-              {/* Tiptap Editor */}
-              <Box>
-                <Text size="sm" fw={500} mb="xs">내용</Text>
-                <Box style={{ 
-                  border: '0.0625rem solid #e5e7eb',
-                  borderRadius: 'var(--mantine-radius-md)',
-                  overflow: 'hidden',
-                  height: '25rem',
-                  display: 'flex',
-                  flexDirection: 'column'
-                }}>
-                  <TiptapEditor
-                    content={formData.content}
-                    onChange={handleContentChange}
-                  />
-                </Box>
-              </Box>
+          {/* Editor container with flex: 1 */}
+          <Box 
+            style={{ 
+              flex: 1, 
+              height: 'calc(100vh - clamp(17.5rem, 25vh, 22rem))',
+              display: 'flex', 
+              flexDirection: 'column',
+              minHeight: 0,
+              border: '0.125rem solid #d1d5db',
+              borderRadius: '1rem',
+              overflow: 'hidden',
+              backgroundColor: '#fff'
+            }}
+          >
+            <TiptapEditor 
+              content={formData.content} 
+              onChange={handleContentChange} 
+            />
+          </Box>
 
-              {/* 액션 버튼 */}
-              <Group justify="flex-end" gap="md">
-                <Button
-                  variant="light"
-                  color="gray"
-                  onClick={() => navigate(-1)}
-                  disabled={isLoading}
-                >
-                  취소
-                </Button>
-                <Button
-                  type="submit"
-                  variant="gradient"
-                  gradient={{ from: 'blue.5', to: 'blue.6' }}
-                  disabled={isLoading}
-                  leftSection={isLoading ? <Loader size={16} /> : '✨'}
-                >
-                  {isLoading ? 
-                    (postId ? '수정 중...' : '작성 중...') : 
-                    (postId ? '게시글 수정' : '게시글 작성')
-                  }
-                </Button>
-              </Group>
-            </Stack>
-          </form>
-        )}
-      </Card>
+          {/* Action buttons */}
+          <Group justify="flex-end" gap="md" pt="lg">
+            <Button
+              variant="gradient"
+              gradient={{ from: 'green.5', to: 'green.6' }}
+              size="md"
+              radius="lg"
+              onClick={handleSubmit}
+              disabled={!formData.title.trim() || !formData.category || !formData.content.trim() || isLoading}
+              loading={isLoading}
+            >
+              {isLoading ? 
+                (postId ? '수정하는 중...' : '게시하는 중...') : 
+                (postId ? '수정하기' : '게시하기')
+              }
+            </Button>
+          </Group>
+        </>
+      )}
     </Container>
   );
 }
