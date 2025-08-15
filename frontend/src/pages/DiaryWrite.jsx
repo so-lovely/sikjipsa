@@ -237,7 +237,7 @@ function DiaryWrite() {
                                 letterSpacing: '-0.5px'
                               }}
                             >
-                              Edit Diary
+                              New Diary
                             </Text>
               </Group> 
             </Box>
