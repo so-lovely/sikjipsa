@@ -383,7 +383,7 @@ function Diary() {
       {view === 'timeline' && !isLoading && (
         <div>
           <Group gap="xs" mb="lg">
-            <IconNotebook size={24} color="var(--mantine-color-gray-8)" />
+            <IconNotebook size={24} color="var(--mantine-color-green-6)" />
             <Title order={2} size="xl" c="gray.8">
               성장 기록
             </Title>
