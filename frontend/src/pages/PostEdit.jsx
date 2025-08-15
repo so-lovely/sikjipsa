@@ -12,11 +12,10 @@ import {
   Box,
   Center,
   Loader,
-  rem,
   Select,
   ActionIcon
 } from '@mantine/core';
-import { IconAlertCircle, IconArrowLeft, IconPencil } from '@tabler/icons-react';
+import { IconAlertCircle, IconPencil } from '@tabler/icons-react';
 import { useAuth } from '../context/AuthContext';
 import TiptapEditor from '../components/TiptapEditor';
 import apiClient from '../api/client';

@@ -84,8 +84,8 @@ function App() {
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/terms" element={<Terms />} />
                     <Route path="/privacy" element={<PrivacyPolicy />} />
-                    <Route path="/posts/edit" element={<PostEdit />} />
-                    <Route path="/posts/edit/:postId" element={<PostEdit />} />
+                    <Route path="/community/edit" element={<PostEdit />} />
+                    <Route path="/community/edit/:postId" element={<PostEdit />} />
                     <Route path="/auth/callback/:provider" element={<AuthCallback />} />
                   </Routes>
                 </div>
