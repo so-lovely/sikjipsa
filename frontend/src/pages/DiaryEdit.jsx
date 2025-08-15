@@ -343,7 +343,7 @@ function DiaryEdit() {
                 <Text size="sm" fw={500} mb="xs">새 사진 추가</Text>
                 <Dropzone
                   onDrop={handleFileSelect}
-                  onReject={(files) => {
+                  onReject={() => {
                     setError('지원하지 않는 파일 형식이거나 파일이 너무 큽니다.');
                   }}
                   maxSize={5 * 1024 ** 2}
