@@ -200,15 +200,7 @@ function PostDetail() {
   };
 
   const handleEditPost = () => {
-    const images = parseImages(post.images);
-    setEditPostData({
-      title: post.title,
-      content: post.content,
-      category: post.post_type
-    });
-    setExistingImages(images);
-    setEditImages([]);
-    setEditingPost(true);
+    navigate(`/community/edit/${post.id}`);
   };
 
   const handleCancelEditPost = () => {
