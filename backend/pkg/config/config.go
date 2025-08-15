@@ -53,7 +53,7 @@ func Load() *Config {
 		DatabaseURL: dbURL, // DATABASE_URL을 직접 사용합니다.
 		JWTSecret:   getEnv("JWT_SECRET", "your-secret-key"),
 
-		AllowedOrigins: getEnv("ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:3001"),
+		AllowedOrigins: getEnv("ALLOWED_ORIGINS", "http://sikjipsa.com:3000"),
 
 		CloudinaryCloudName: getEnv("CLOUDINARY_CLOUD_NAME", ""),
 		CloudinaryAPIKey:    getEnv("CLOUDINARY_API_KEY", ""),
