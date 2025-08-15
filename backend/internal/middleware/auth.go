@@ -1,10 +1,10 @@
 package middleware
 
 import (
+	"sikjipsa-backend/pkg/utils"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt/v5"
 )
 
 func AuthRequired(secret string) fiber.Handler {
@@ -18,20 +18,15 @@ func AuthRequired(secret string) fiber.Handler {
 
 		tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
 		
-		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-			return []byte(secret), nil
-		})
-
-		if err != nil || !token.Valid {
+		claims, err := utils.ValidateToken(tokenString, secret)
+		if err != nil {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 				"error": "Invalid token",
 			})
 		}
 
-		if claims, ok := token.Claims.(jwt.MapClaims); ok {
-			c.Locals("userID", claims["user_id"])
-			c.Locals("email", claims["email"])
-		}
+		c.Locals("userID", claims.UserID)
+		c.Locals("email", claims.Email)
 
 		return c.Next()
 	}
@@ -43,15 +38,10 @@ func OptionalAuth(secret string) fiber.Handler {
 		if authHeader != "" {
 			tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
 			
-			token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-				return []byte(secret), nil
-			})
-
-			if err == nil && token.Valid {
-				if claims, ok := token.Claims.(jwt.MapClaims); ok {
-					c.Locals("userID", claims["user_id"])
-					c.Locals("email", claims["email"])
-				}
+			claims, err := utils.ValidateToken(tokenString, secret)
+			if err == nil {
+				c.Locals("userID", claims.UserID)
+				c.Locals("email", claims.Email)
 			}
 		}
 		

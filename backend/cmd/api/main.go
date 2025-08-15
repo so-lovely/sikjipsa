@@ -24,10 +24,17 @@ func main() {
 
 	app.Use(logger.New())
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: "*",
-		AllowMethods: "GET,POST,HEAD,PUT,DELETE,PATCH",
-		AllowHeaders: "Origin,Content-Type,Accept,Authorization",
+		AllowOrigins:     cfg.AllowedOrigins,
+		AllowMethods:     "GET,POST,HEAD,PUT,DELETE,PATCH",
+		AllowHeaders:     "Origin,Content-Type,Accept,Authorization",
+		AllowCredentials: true,
 	}))
+
+	// Add rate limiting
+	app.Use(middleware.SetupRateLimit())
+	
+	// Add input sanitization
+	app.Use(middleware.SanitizeInput())
 
 	api := app.Group("/api/v1")
 	

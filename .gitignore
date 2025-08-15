@@ -1,2 +1,4 @@
 .claude
 docker-compose.yml
+frontend/.env
+backend/.env

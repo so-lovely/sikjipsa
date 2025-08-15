@@ -140,3 +140,42 @@ h3 {
 html {
   scroll-behavior: smooth;
 }
+
+/* Mobile responsiveness fixes */
+@media (max-width: 768px) {
+  /* Ensure containers don't overflow */
+  .mantine-Container-root {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    max-width: 100% !important;
+  }
+
+  /* Fix any remaining text size issues on mobile */
+  body {
+    font-size: 16px !important;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* Improve mobile touch targets */
+  button, .mantine-Button-root {
+    min-height: 44px !important;
+  }
+
+  /* Fix drawer positioning */
+  .mantine-Drawer-content {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Ensure proper spacing on mobile */
+  .mantine-SimpleGrid-root {
+    gap: 1rem !important;
+  }
+}
+
+/* Ensure proper full-width on all screen sizes */
+html, body, #root {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}

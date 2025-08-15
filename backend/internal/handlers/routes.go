@@ -1,94 +1,74 @@
 package handlers
 
 import (
-	"log"
+	"fmt"
 	"sikjipsa-backend/internal/middleware"
 	"sikjipsa-backend/internal/models"
 	"sikjipsa-backend/pkg/config"
+	"sikjipsa-backend/pkg/logger"
 
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
 
 func SetupRoutes(app fiber.Router, db *gorm.DB, cfg *config.Config) {
-    // 하나씩 마이그레이션
-    log.Println("Migrating User...")
-    if err := db.AutoMigrate(&models.User{}); err != nil {
-        log.Printf("Failed to migrate User: %v", err)
+    // Database migrations
+    logger.Info("Starting database migrations")
+    
+    models := []interface{}{
+        &models.User{},
+        &models.PlantCategory{},
+        &models.Plant{},
+        &models.CommunityPost{},
+        &models.PostComment{},
+        &models.PostLike{},
+        &models.GrowthDiary{},
+        &models.DiaryEntry{},
+        &models.DiagnosisRequest{},
+        &models.Announcement{},
     }
     
-    log.Println("Migrating PlantCategory...")
-    if err := db.AutoMigrate(&models.PlantCategory{}); err != nil {
-        log.Printf("Failed to migrate PlantCategory: %v", err)
+    for _, model := range models {
+        if err := db.AutoMigrate(model); err != nil {
+            logger.Error("Migration failed", "model", fmt.Sprintf("%T", model), "error", err)
+        }
     }
     
-    log.Println("Migrating Plant...")
-    if err := db.AutoMigrate(&models.Plant{}); err != nil {
-        log.Printf("Failed to migrate Plant: %v", err)
-    }
-    
-    
-    log.Println("Migrating CommunityPost...")
-    if err := db.AutoMigrate(&models.CommunityPost{}); err != nil {
-        log.Printf("Failed to migrate CommunityPost: %v", err)
-    }
-    
-    log.Println("Migrating PostComment...")
-    if err := db.AutoMigrate(&models.PostComment{}); err != nil {
-        log.Printf("Failed to migrate PostComment: %v", err)
-    }
-    
-    log.Println("Migrating PostLike...")
-    if err := db.AutoMigrate(&models.PostLike{}); err != nil {
-        log.Printf("Failed to migrate PostLike: %v", err)
-    }
-    
-    log.Println("Migrating GrowthDiary...")
-    if err := db.AutoMigrate(&models.GrowthDiary{}); err != nil {
-        log.Printf("Failed to migrate GrowthDiary: %v", err)
-    }
-    
-    log.Println("Migrating DiaryEntry...")
-    if err := db.AutoMigrate(&models.DiaryEntry{}); err != nil {
-        log.Printf("Failed to migrate DiaryEntry: %v", err)
-    }
-    
-    log.Println("Migrating DiagnosisRequest...")
-    if err := db.AutoMigrate(&models.DiagnosisRequest{}); err != nil {
-        log.Printf("Failed to migrate DiagnosisRequest: %v", err)
-    }
-    
-    log.Println("Migrating Announcement...")
-    if err := db.AutoMigrate(&models.Announcement{}); err != nil {
-        log.Printf("Failed to migrate Announcement: %v", err)
-    }
-    
-    log.Println("All migrations completed successfully")
+    logger.Info("Database migrations completed")
     
     // 나머지 핸들러 초기화 코드...
 
 	// Initialize handlers
 	authHandler := NewAuthHandler(db, cfg)
+	tokenHandler := NewTokenHandler(db, cfg)
 	plantHandler := NewPlantHandler(db, cfg)
 	communityHandler := NewCommunityHandler(db, cfg)
 	diaryHandler := NewDiaryHandler(db, cfg)
 	diagnosisHandler := NewDiagnosisHandler(db, cfg)
 	announcementHandler := NewAnnouncementHandler(db, cfg)
 
-	// Auth routes - Social login only
+	// Auth routes - Social login only with strict rate limiting
 	auth := app.Group("/auth")
-	auth.Post("/naver", authHandler.NaverLogin)
-	auth.Post("/kakao", authHandler.KakaoLogin)
+	auth.Post("/naver", middleware.SetupAuthRateLimit(), authHandler.NaverLogin)
+	auth.Post("/kakao", middleware.SetupAuthRateLimit(), authHandler.KakaoLogin)
 	auth.Get("/me", middleware.AuthRequired(cfg.JWTSecret), authHandler.Me)
 	auth.Put("/profile", middleware.AuthRequired(cfg.JWTSecret), authHandler.UpdateProfile)
 	auth.Delete("/account", middleware.AuthRequired(cfg.JWTSecret), authHandler.DeleteAccount)
 	
-	log.Println("✅ Auth routes registered:")
-	log.Println("  POST /api/v1/auth/naver")
-	log.Println("  POST /api/v1/auth/kakao")
-	log.Println("  GET  /api/v1/auth/me")
-	log.Println("  PUT  /api/v1/auth/profile")
-	log.Println("  DELETE /api/v1/auth/account")
+	// Token management routes
+	auth.Post("/refresh", tokenHandler.RefreshToken)
+	auth.Post("/revoke", middleware.AuthRequired(cfg.JWTSecret), tokenHandler.RevokeToken)
+	
+	logger.Info("Auth routes registered", 
+		"routes", []string{
+			"POST /api/v1/auth/naver",
+			"POST /api/v1/auth/kakao", 
+			"GET /api/v1/auth/me",
+			"PUT /api/v1/auth/profile",
+			"DELETE /api/v1/auth/account",
+			"POST /api/v1/auth/refresh",
+			"POST /api/v1/auth/revoke",
+		})
 
 	// Plant routes
 	plants := app.Group("/plants")
@@ -109,29 +89,31 @@ func SetupRoutes(app fiber.Router, db *gorm.DB, cfg *config.Config) {
 	community.Put("/posts/:id/comments/:commentId", middleware.AuthRequired(cfg.JWTSecret), communityHandler.UpdateComment)
 	community.Delete("/posts/:id/comments/:commentId", middleware.AuthRequired(cfg.JWTSecret), communityHandler.DeleteComment)
 	
-	// Image upload for rich text editor
-	community.Post("/upload-image", middleware.AuthRequired(cfg.JWTSecret), communityHandler.UploadImage)
+	// Image upload for rich text editor with upload rate limiting
+	community.Post("/upload-image", middleware.SetupUploadRateLimit(), middleware.AuthRequired(cfg.JWTSecret), communityHandler.UploadImage)
 
-	// Diary routes
+	// Diary routes with upload rate limiting for image uploads
 	diary := app.Group("/diary")
 	diary.Get("/", middleware.AuthRequired(cfg.JWTSecret), diaryHandler.GetUserDiaries)
 	diary.Post("/", middleware.AuthRequired(cfg.JWTSecret), diaryHandler.CreateDiary)
 	diary.Get("/:id", middleware.AuthRequired(cfg.JWTSecret), diaryHandler.GetDiary)
-	diary.Post("/:id/entries", middleware.AuthRequired(cfg.JWTSecret), diaryHandler.AddEntry)
-	diary.Put("/:id/entries/:entryId", middleware.AuthRequired(cfg.JWTSecret), diaryHandler.UpdateEntry)
+	diary.Post("/:id/entries", middleware.SetupUploadRateLimit(), middleware.AuthRequired(cfg.JWTSecret), diaryHandler.AddEntry)
+	diary.Put("/:id/entries/:entryId", middleware.SetupUploadRateLimit(), middleware.AuthRequired(cfg.JWTSecret), diaryHandler.UpdateEntry)
 	diary.Delete("/:id/entries/:entryId", middleware.AuthRequired(cfg.JWTSecret), diaryHandler.DeleteEntry)
 	
-	log.Println("✅ Diary routes registered:")
-	log.Println("  GET  /api/v1/diary")
-	log.Println("  POST /api/v1/diary")
-	log.Println("  GET  /api/v1/diary/:id")
-	log.Println("  POST /api/v1/diary/:id/entries")
-	log.Println("  PUT  /api/v1/diary/:id/entries/:entryId")
-	log.Println("  DELETE /api/v1/diary/:id/entries/:entryId")
+	logger.Info("Diary routes registered",
+		"routes", []string{
+			"GET /api/v1/diary",
+			"POST /api/v1/diary",
+			"GET /api/v1/diary/:id",
+			"POST /api/v1/diary/:id/entries",
+			"PUT /api/v1/diary/:id/entries/:entryId",
+			"DELETE /api/v1/diary/:id/entries/:entryId",
+		})
 
-	// Diagnosis routes
+	// Diagnosis routes with upload rate limiting for image analysis
 	diagnosis := app.Group("/diagnosis")
-	diagnosis.Post("/analyze", middleware.AuthRequired(cfg.JWTSecret), diagnosisHandler.AnalyzePlant)
+	diagnosis.Post("/analyze", middleware.SetupUploadRateLimit(), middleware.AuthRequired(cfg.JWTSecret), diagnosisHandler.AnalyzePlant)
 	diagnosis.Get("/result/:id", diagnosisHandler.GetDiagnosisResult)
 	diagnosis.Get("/history", middleware.AuthRequired(cfg.JWTSecret), diagnosisHandler.GetDiagnosisHistory)
 
@@ -143,12 +125,14 @@ func SetupRoutes(app fiber.Router, db *gorm.DB, cfg *config.Config) {
 	announcements.Put("/:id", middleware.AuthRequired(cfg.JWTSecret), announcementHandler.UpdateAnnouncement)
 	announcements.Delete("/:id", middleware.AuthRequired(cfg.JWTSecret), announcementHandler.DeleteAnnouncement)
 	
-	log.Println("✅ Announcement routes registered:")
-	log.Println("  GET  /api/v1/announcements")
-	log.Println("  GET  /api/v1/announcements/:id")
-	log.Println("  POST /api/v1/announcements")
-	log.Println("  PUT  /api/v1/announcements/:id")
-	log.Println("  DELETE /api/v1/announcements/:id")
+	logger.Info("Announcement routes registered",
+		"routes", []string{
+			"GET /api/v1/announcements",
+			"GET /api/v1/announcements/:id",
+			"POST /api/v1/announcements",
+			"PUT /api/v1/announcements/:id",
+			"DELETE /api/v1/announcements/:id",
+		})
 
 	// Health check
 	app.Get("/health", func(c *fiber.Ctx) error {

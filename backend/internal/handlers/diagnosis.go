@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"sikjipsa-backend/internal/models"
 	"sikjipsa-backend/pkg/config"
+	"sikjipsa-backend/pkg/logger"
 	"strconv"
 	"time"
 
@@ -267,7 +268,7 @@ func (h *DiagnosisHandler) processPlantAnalysis(diagnosisID uint, base64Image st
 	
 	identificationResult, err := h.callPlantAPI(identificationURL, identificationData)
 	if err != nil {
-		fmt.Printf("Identification API failed: %v\n", err)
+		logger.Error("Plant identification failed", "error", err)
 		// 식별 실패해도 건강 진단은 시도
 	}
 	
@@ -299,9 +300,7 @@ func (h *DiagnosisHandler) callPlantAPI(apiURL string, requestData PlantIDReques
 		return nil, fmt.Errorf("failed to marshal request data: %v", err)
 	}
 
-	fmt.Printf("=== Plant.id API Request to %s ===\n", apiURL)
-	fmt.Printf("Request Data: %s\n", string(jsonData))
-	fmt.Printf("=== End of Request ===\n")
+	logger.Info("Calling Plant.id API", "url", apiURL)
 
 	// HTTP 클라이언트 설정
 	client := &http.Client{
@@ -325,6 +324,7 @@ func (h *DiagnosisHandler) callPlantAPI(apiURL string, requestData PlantIDReques
 
 	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
 		body, _ := io.ReadAll(resp.Body)
+		logger.Error("Plant.id API error", "statusCode", resp.StatusCode, "response", string(body))
 		return nil, fmt.Errorf("API error %d: %s", resp.StatusCode, string(body))
 	}
 
@@ -335,45 +335,18 @@ func (h *DiagnosisHandler) callPlantAPI(apiURL string, requestData PlantIDReques
 		return nil, fmt.Errorf("failed to read response body: %v", err)
 	}
 	
-	fmt.Printf("=== Plant.id API Response from %s ===\n", apiURL)
-	fmt.Printf("Status Code: %d\n", resp.StatusCode)
-	fmt.Printf("Response Body: %s\n", string(body))
-	fmt.Printf("=== End of Response ===\n")
+	logger.Info("Plant.id API response received", "url", apiURL, "statusCode", resp.StatusCode)
 	
 	if err := json.Unmarshal(body, &apiResponse); err != nil {
-		fmt.Printf("JSON Unmarshal Error: %v\n", err)
+		logger.Error("Failed to parse Plant.id API response", "error", err)
 		return nil, fmt.Errorf("failed to parse API response: %v", err)
 	}
 
-	fmt.Printf("=== Parsed Response Structure ===\n")
-	fmt.Printf("Access Token: %s\n", apiResponse.AccessToken)
-	fmt.Printf("Model Version: %s\n", apiResponse.ModelVersion)
-	fmt.Printf("Status: %s\n", apiResponse.Status)
-	
-	if apiResponse.Result.IsPlant.Probability > 0 {
-		fmt.Printf("Is Plant - Binary: %v, Probability: %.3f\n", 
-			apiResponse.Result.IsPlant.Binary, apiResponse.Result.IsPlant.Probability)
-	}
-	
-	if len(apiResponse.Result.Classification.Suggestions) > 0 {
-		fmt.Printf("Classification Suggestions: %d found\n", len(apiResponse.Result.Classification.Suggestions))
-		for i, suggestion := range apiResponse.Result.Classification.Suggestions {
-			fmt.Printf("  [%d] %s - %.3f%%\n", i, suggestion.Name, suggestion.Probability*100)
-		}
-	}
-	
-	if apiResponse.Result.IsHealthy.Probability > 0 {
-		fmt.Printf("Health - Binary: %v, Probability: %.3f\n", 
-			apiResponse.Result.IsHealthy.Binary, apiResponse.Result.IsHealthy.Probability)
-	}
-	
-	if len(apiResponse.Result.Disease.Suggestions) > 0 {
-		fmt.Printf("Disease Suggestions: %d found\n", len(apiResponse.Result.Disease.Suggestions))
-		for i, disease := range apiResponse.Result.Disease.Suggestions {
-			fmt.Printf("  [%d] %s - %.3f%%\n", i, disease.Name, disease.Probability*100)
-		}
-	}
-	fmt.Printf("=== End of Parsed Response ===\n")
+	logger.Info("Plant.id API analysis completed", 
+		"status", apiResponse.Status,
+		"classificationCount", len(apiResponse.Result.Classification.Suggestions),
+		"diseaseCount", len(apiResponse.Result.Disease.Suggestions),
+		"isHealthy", apiResponse.Result.IsHealthy.Binary)
 
 	return &apiResponse, nil
 }
@@ -412,10 +385,10 @@ func (h *DiagnosisHandler) saveCombinedDiagnosisResult(diagnosisID uint, identif
 	var suggestions []models.DiagnosisSuggestion
 
 	if healthResult != nil && len(healthResult.Result.Disease.Suggestions) > 0 {
-		fmt.Printf("Processing %d disease suggestions...\n", len(healthResult.Result.Disease.Suggestions))
+		logger.Info("Processing disease suggestions", "count", len(healthResult.Result.Disease.Suggestions))
 		
 		for i, disease := range healthResult.Result.Disease.Suggestions {
-			fmt.Printf("Disease %d: Name=%s, Probability=%.2f\n", i, disease.Name, disease.Probability)
+			logger.Debug("Processing disease suggestion", "index", i, "name", disease.Name, "probability", disease.Probability)
 			
 			// 신뢰도가 10% 이상인 것만 표시
 			if disease.Probability >= 0.10 {

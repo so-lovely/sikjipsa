@@ -15,6 +15,9 @@ type Config struct {
 	DatabaseURL string // DB 관련 변수는 이것 하나만 남깁니다.
 	JWTSecret   string
 
+	// CORS Configuration
+	AllowedOrigins string
+
 	// Cloudinary
 	CloudinaryCloudName string
 	CloudinaryAPIKey    string
@@ -49,6 +52,8 @@ func Load() *Config {
 		Port:        getEnv("PORT", "8080"),
 		DatabaseURL: dbURL, // DATABASE_URL을 직접 사용합니다.
 		JWTSecret:   getEnv("JWT_SECRET", "your-secret-key"),
+
+		AllowedOrigins: getEnv("ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:3001"),
 
 		CloudinaryCloudName: getEnv("CLOUDINARY_CLOUD_NAME", ""),
 		CloudinaryAPIKey:    getEnv("CLOUDINARY_API_KEY", ""),

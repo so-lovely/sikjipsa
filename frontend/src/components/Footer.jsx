@@ -50,7 +50,13 @@ function Footer() {
       bg="gray.8"
       style={{ marginTop: 'auto' }}
     >
-      <Container size="md" py={50}>
+      <Container 
+        size="xl" 
+        py={50}
+        px={{ base: "1rem", sm: "1.5rem", md: "2rem" }}
+        w="100%"
+        maw="100%"
+      >
         <SimpleGrid cols={{ base: 1, sm: 2, md: 4 }} spacing="lg">
           {/* Brand Section */}
           <Stack>

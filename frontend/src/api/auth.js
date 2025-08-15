@@ -18,8 +18,8 @@ export const authAPI = {
   // 소셜 로그인
   socialLogin: async (provider, authData) => {
     const response = await apiClient.post(`/auth/${provider}`, authData);
-    if (response.data.token) {
-      localStorage.setItem('token', response.data.token);
+    if (response.data.access_token) {
+      localStorage.setItem('token', response.data.access_token);
       localStorage.setItem('user', JSON.stringify(response.data.user));
     }
     return response.data;

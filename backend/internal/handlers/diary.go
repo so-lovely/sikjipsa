@@ -3,9 +3,9 @@ package handlers
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"sikjipsa-backend/internal/models"
 	"sikjipsa-backend/pkg/config"
+	"sikjipsa-backend/pkg/logger"
 	"strconv"
 	"time"
 
@@ -127,12 +127,7 @@ func (h *DiaryHandler) GetDiary(c *fiber.Ctx) error {
 		})
 	}
 
-	// Debug: Print entries with images
-	for i, entry := range diary.Entries {
-		fmt.Printf("Entry %d images raw: %v\n", i, entry.Images)
-		fmt.Printf("Entry %d images string: %s\n", i, string(entry.Images))
-		fmt.Printf("Entry %d images type: %T\n", i, entry.Images)
-	}
+	// Note: Image data is stored as JSON in the database
 
 	return c.JSON(diary)
 }
@@ -206,12 +201,12 @@ func (h *DiaryHandler) AddEntry(c *fiber.Ctx) error {
 		})
 	}
 
-	fmt.Printf("Creating diary entry - Title: %s, Content: %s, GrowthStage: %s\n", title, content, growthStage)
+	logger.Info("Creating diary entry", "title", title, "growthStage", growthStage)
 
 	// Cloudinary 설정
 	cld, err := cloudinary.NewFromParams(h.cfg.CloudinaryCloudName, h.cfg.CloudinaryAPIKey, h.cfg.CloudinaryAPISecret)
 	if err != nil {
-		fmt.Printf("Cloudinary initialization error: %v\n", err)
+		logger.Error("Failed to initialize Cloudinary", "error", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Failed to initialize image upload service",
 		})
@@ -223,19 +218,19 @@ func (h *DiaryHandler) AddEntry(c *fiber.Ctx) error {
 	
 	if err == nil && form.File["images"] != nil {
 		files := form.File["images"]
-		fmt.Printf("Found %d image files\n", len(files))
+		logger.Info("Processing diary entry images", "count", len(files))
 		
 		for _, file := range files {
 			// 파일 검증
 			if !isValidImageFile(file) {
-				fmt.Printf("Invalid file: %s\n", file.Filename)
+				logger.Warn("Invalid image file skipped", "filename", file.Filename)
 				continue
 			}
 			
 			// 파일 열기
 			src, err := file.Open()
 			if err != nil {
-				fmt.Printf("Error opening file %s: %v\n", file.Filename, err)
+				logger.Error("Failed to open image file", "filename", file.Filename, "error", err)
 				continue
 			}
 			defer src.Close()
@@ -248,12 +243,12 @@ func (h *DiaryHandler) AddEntry(c *fiber.Ctx) error {
 			})
 			
 			if err != nil {
-				fmt.Printf("Error uploading to Cloudinary: %v\n", err)
+				logger.Error("Failed to upload image to Cloudinary", "filename", file.Filename, "error", err)
 				continue
 			}
 
 			imageUrls = append(imageUrls, uploadResult.SecureURL)
-			fmt.Printf("Successfully uploaded: %s\n", uploadResult.SecureURL)
+			logger.Info("Image uploaded successfully", "url", uploadResult.SecureURL)
 		}
 	}
 
@@ -274,17 +269,17 @@ func (h *DiaryHandler) AddEntry(c *fiber.Ctx) error {
 			})
 		}
 		entry.Images = jsonImages
-		fmt.Printf("Storing images JSON: %s\n", string(jsonImages))
+		logger.Info("Stored diary entry images", "imageCount", len(imageUrls))
 	}
 
 	if err := h.db.Create(&entry).Error; err != nil {
-		fmt.Printf("Database error: %v\n", err)
+		logger.Error("Failed to create diary entry in database", "error", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Failed to add entry",
 		})
 	}
 
-	fmt.Printf("Diary entry created successfully with ID: %d\n", entry.ID)
+	logger.Info("Diary entry created successfully", "entryID", entry.ID)
 	return c.JSON(entry)
 }
 
@@ -361,12 +356,12 @@ func (h *DiaryHandler) UpdateEntry(c *fiber.Ctx) error {
 		}
 	}
 
-	fmt.Printf("Updating diary entry - Title: %s, Content: %s, GrowthStage: %s\n", title, content, growthStage)
+	logger.Info("Updating diary entry", "title", title, "growthStage", growthStage)
 
 	// Cloudinary 설정
 	cld, err := cloudinary.NewFromParams(h.cfg.CloudinaryCloudName, h.cfg.CloudinaryAPIKey, h.cfg.CloudinaryAPISecret)
 	if err != nil {
-		fmt.Printf("Cloudinary initialization error: %v\n", err)
+		logger.Error("Failed to initialize Cloudinary", "error", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Failed to initialize image upload service",
 		})
@@ -378,19 +373,19 @@ func (h *DiaryHandler) UpdateEntry(c *fiber.Ctx) error {
 	
 	if err == nil && form.File["images"] != nil {
 		files := form.File["images"]
-		fmt.Printf("Found %d new image files\n", len(files))
+		logger.Info("Processing new images for diary entry update", "count", len(files))
 		
 		for _, file := range files {
 			// 파일 검증
 			if !isValidImageFile(file) {
-				fmt.Printf("Invalid file: %s\n", file.Filename)
+				logger.Warn("Invalid image file skipped", "filename", file.Filename)
 				continue
 			}
 			
 			// 파일 열기
 			src, err := file.Open()
 			if err != nil {
-				fmt.Printf("Error opening file %s: %v\n", file.Filename, err)
+				logger.Error("Failed to open image file", "filename", file.Filename, "error", err)
 				continue
 			}
 			defer src.Close()
@@ -403,12 +398,12 @@ func (h *DiaryHandler) UpdateEntry(c *fiber.Ctx) error {
 			})
 			
 			if err != nil {
-				fmt.Printf("Error uploading to Cloudinary: %v\n", err)
+				logger.Error("Failed to upload image to Cloudinary", "filename", file.Filename, "error", err)
 				continue
 			}
 
 			newImageUrls = append(newImageUrls, uploadResult.SecureURL)
-			fmt.Printf("Successfully uploaded: %s\n", uploadResult.SecureURL)
+			logger.Info("Image uploaded successfully", "url", uploadResult.SecureURL)
 		}
 	}
 
@@ -430,19 +425,19 @@ func (h *DiaryHandler) UpdateEntry(c *fiber.Ctx) error {
 			})
 		}
 		entry.Images = jsonImages
-		fmt.Printf("Updated images JSON: %s\n", string(jsonImages))
+		logger.Info("Updated diary entry images", "totalImages", len(allImages))
 	} else {
 		entry.Images = nil
 	}
 
 	if err := h.db.Save(&entry).Error; err != nil {
-		fmt.Printf("Database error: %v\n", err)
+		logger.Error("Failed to update diary entry in database", "error", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Failed to update entry",
 		})
 	}
 
-	fmt.Printf("Diary entry updated successfully with ID: %d\n", entry.ID)
+	logger.Info("Diary entry updated successfully", "entryID", entry.ID)
 	return c.JSON(entry)
 }
 
@@ -490,13 +485,13 @@ func (h *DiaryHandler) DeleteEntry(c *fiber.Ctx) error {
 
 	// Delete the entry
 	if err := h.db.Delete(&entry).Error; err != nil {
-		fmt.Printf("Database error: %v\n", err)
+		logger.Error("Failed to delete diary entry from database", "error", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Failed to delete entry",
 		})
 	}
 
-	fmt.Printf("Diary entry deleted successfully with ID: %d\n", entry.ID)
+	logger.Info("Diary entry deleted successfully", "entryID", entry.ID)
 	return c.JSON(fiber.Map{
 		"message": "Entry deleted successfully",
 	})

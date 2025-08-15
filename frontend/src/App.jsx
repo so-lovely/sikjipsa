@@ -46,11 +46,24 @@ function App() {
               minHeight: '100vh',
               display: 'flex',
               flexDirection: 'column',
-              backgroundColor: 'var(--bg)'
+              backgroundColor: 'var(--bg)',
+              width: '100%',
+              maxWidth: '100%',
+              overflowX: 'hidden'
             }}>
               <Header />
-              <main style={{ flex: 1, paddingTop: '80px', display: 'flex'}}>
-                <div style={{ flex: 1 }}>
+              <main style={{ 
+                flex: 1, 
+                paddingTop: '80px', 
+                display: 'flex',
+                width: '100%',
+                maxWidth: '100%'
+              }}>
+                <div style={{ 
+                  flex: 1,
+                  width: '100%',
+                  maxWidth: '100%'
+                }}>
                   <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/encyclopedia" element={<Encyclopedia />} />

@@ -66,7 +66,13 @@ function Header() {
         boxShadow: 'var(--shadow-sm)'
       }}
     >
-      <Container size="lg" h="100%">
+      <Container 
+        size="xl" 
+        h="100%"
+        px={{ base: "1rem", sm: "1.5rem", md: "2rem" }}
+        w="100%"
+        maw="100%"
+      >
         <Group justify="space-between" h="100%">
           {/* Logo Section */}
           <Group>
@@ -193,6 +199,9 @@ function Header() {
       <Drawer
         opened={opened}
         onClose={close}
+        position="right"
+        size="100%"
+        withCloseButton={true}
         title={
           <Group>
             <IconSeedling size={24} color="var(--primary-600)" />
@@ -209,8 +218,21 @@ function Header() {
           </Group>
         }
         overlayProps={{ backgroundOpacity: 0.5, blur: 4 }}
+        styles={{
+          content: {
+            height: '100vh',
+            display: 'flex',
+            flexDirection: 'column',
+          },
+          body: {
+            padding: '1rem',
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+          }
+        }}
       >
-        <Stack gap="sm">
+        <Stack gap="lg" h="100%" justify="flex-start" p="md">
           {navItems.map((item) => (
             <Button
               key={item.path}
@@ -222,8 +244,9 @@ function Header() {
               onClick={() => handleNavClick(item.path)}
               style={{
                 borderRadius: 'var(--radius-md)',
-                height: '44px',
-                fontWeight: 500
+                height: '56px',
+                fontWeight: 500,
+                fontSize: '16px'
               }}
             >
               {item.label}
@@ -241,8 +264,9 @@ function Header() {
                 onClick={() => handleNavClick('/profile')}
                 style={{
                   borderRadius: 'var(--radius-md)',
-                  height: '44px',
-                  fontWeight: 500
+                  height: '56px',
+                  fontWeight: 500,
+                  fontSize: '16px'
                 }}
               >
                 프로필
@@ -252,8 +276,9 @@ function Header() {
                   background: 'var(--primary-gradient)',
                   border: 'none',
                   borderRadius: 'var(--radius-md)',
-                  height: '44px',
-                  fontWeight: 500
+                  height: '56px',
+                  fontWeight: 500,
+                  fontSize: '16px'
                 }}
                 fullWidth
                 onClick={handleLogout}
@@ -267,8 +292,9 @@ function Header() {
                 background: 'var(--primary-gradient)',
                 border: 'none',
                 borderRadius: 'var(--radius-md)',
-                height: '44px',
-                fontWeight: 500
+                height: '56px',
+                fontWeight: 500,
+                fontSize: '16px'
               }}
               fullWidth
               onClick={() => handleNavClick('/login')}

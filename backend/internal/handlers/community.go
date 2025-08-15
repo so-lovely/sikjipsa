@@ -3,10 +3,10 @@ package handlers
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"sikjipsa-backend/internal/models"
 	"sikjipsa-backend/pkg/config"
+	"sikjipsa-backend/pkg/logger"
 	"strconv"
 
 	"github.com/cloudinary/cloudinary-go/v2"
@@ -25,22 +25,24 @@ func NewCommunityHandler(db *gorm.DB, cfg *config.Config) *CommunityHandler {
 }
 
 type CreatePostRequest struct {
-	Title    string   `json:"title"`
-	Content  string   `json:"content"`
-	Images   []string `json:"images"`
-	PostType string   `json:"post_type"`
+	Title    string   `json:"title" validate:"required,noempty,min=1,max=200"`
+	Content  string   `json:"content" validate:"required,noempty,min=1,max=5000"`
+	Images   []string `json:"images" validate:"max=10,dive,url"`
+	PostType string   `json:"post_type" validate:"max=50"`
 }
 
 type UpdatePostRequest struct {
-	Title         string   `json:"title"`
-	Content       string   `json:"content"`
-	PostType      string   `json:"post_type"`
-	ExistingImages []string `json:"existing_images"` // 유지할 기존 이미지들
+	Title         string   `json:"title" validate:"required,noempty,min=1,max=200"`
+	Content       string   `json:"content" validate:"required,noempty,min=1,max=5000"`
+	PostType      string   `json:"post_type" validate:"max=50"`
+	ExistingImages []string `json:"existing_images" validate:"max=10,dive,url"` // 유지할 기존 이미지들
 }
 
 func (h *CommunityHandler) GetPosts(c *fiber.Ctx) error {
-	fmt.Printf("GetPosts called with params: page=%s, type=%s, search=%s\n", 
-		c.Query("page", "1"), c.Query("type", ""), c.Query("search", ""))
+	logger.Info("Getting posts", 
+		"page", c.Query("page", "1"),
+		"type", c.Query("type", ""),
+		"search", c.Query("search", ""))
 
 	var posts []models.CommunityPost
 	var totalCount int64
@@ -75,7 +77,7 @@ func (h *CommunityHandler) GetPosts(c *fiber.Ctx) error {
 
 	// Order by creation date and fetch posts
 	if err := query.Order("created_at DESC").Limit(limit).Offset(offset).Find(&posts).Error; err != nil {
-		fmt.Printf("Database error in GetPosts: %v\n", err)
+		logger.Error("Failed to fetch posts from database", "error", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Failed to fetch posts",
 		})
@@ -92,7 +94,10 @@ func (h *CommunityHandler) GetPosts(c *fiber.Ctx) error {
 		"hasMore":      page < totalPages,
 	}
 
-	fmt.Printf("GetPosts response: found %d posts, page %d/%d\n", len(posts), page, totalPages)
+	logger.Info("Posts retrieved successfully", 
+		"count", len(posts), 
+		"page", page, 
+		"totalPages", totalPages)
 	return c.JSON(response)
 }
 
@@ -153,7 +158,7 @@ func (h *CommunityHandler) CreatePost(c *fiber.Ctx) error {
 		postType = "general"
 	}
 
-	fmt.Printf("Creating post - Title: %s, PostType: %s\n", title, postType)
+	logger.Info("Creating post", "title", title, "postType", postType)
 
 	// JSON 방식인 경우 이미지 업로드 처리 없음 (이미 content에 포함됨)
 	// Form 방식인 경우에만 이미지 파일 처리
@@ -163,7 +168,7 @@ func (h *CommunityHandler) CreatePost(c *fiber.Ctx) error {
 		// Cloudinary 설정
 		cld, err := cloudinary.NewFromParams(h.cfg.CloudinaryCloudName, h.cfg.CloudinaryAPIKey, h.cfg.CloudinaryAPISecret)
 		if err != nil {
-			fmt.Printf("Cloudinary initialization error: %v\n", err)
+			logger.Error("Failed to initialize Cloudinary", "error", err)
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"error": "Failed to initialize image upload service",
 			})
@@ -174,7 +179,7 @@ func (h *CommunityHandler) CreatePost(c *fiber.Ctx) error {
 		
 		if err == nil && form.File["images"] != nil {
 			files := form.File["images"]
-			fmt.Printf("Found %d image files\n", len(files))
+			logger.Info("Processing image files", "count", len(files))
 			
 			// Limit to maximum 5 images
 			if len(files) > 5 {
@@ -186,14 +191,14 @@ func (h *CommunityHandler) CreatePost(c *fiber.Ctx) error {
 			for _, file := range files {
 				// 파일 검증
 				if !isValidImageFile(file) {
-					fmt.Printf("Invalid file: %s\n", file.Filename)
+					logger.Warn("Invalid image file skipped", "filename", file.Filename)
 					continue
 				}
 				
 				// 파일 열기
 				src, err := file.Open()
 				if err != nil {
-					fmt.Printf("Error opening file %s: %v\n", file.Filename, err)
+					logger.Error("Failed to open image file", "filename", file.Filename, "error", err)
 					continue
 				}
 				defer src.Close()
@@ -206,12 +211,12 @@ func (h *CommunityHandler) CreatePost(c *fiber.Ctx) error {
 				})
 				
 				if err != nil {
-					fmt.Printf("Error uploading to Cloudinary: %v\n", err)
+					logger.Error("Failed to upload image to Cloudinary", "filename", file.Filename, "error", err)
 					continue
 				}
 
 				imageUrls = append(imageUrls, uploadResult.SecureURL)
-				fmt.Printf("Successfully uploaded: %s\n", uploadResult.SecureURL)
+				logger.Info("Image uploaded successfully", "url", uploadResult.SecureURL)
 			}
 		}
 	}
@@ -235,7 +240,7 @@ func (h *CommunityHandler) CreatePost(c *fiber.Ctx) error {
 	}
 
 	if err := h.db.Create(&post).Error; err != nil {
-		fmt.Printf("Database error: %v\n", err)
+		logger.Error("Failed to create post in database", "error", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Failed to create post",
 		})
@@ -244,7 +249,7 @@ func (h *CommunityHandler) CreatePost(c *fiber.Ctx) error {
 	// Load with user data
 	h.db.Preload("User").First(&post, post.ID)
 
-	fmt.Printf("Post created successfully with ID: %d\n", post.ID)
+	logger.Info("Post created successfully", "postID", post.ID)
 	return c.JSON(post)
 }
 
@@ -300,7 +305,7 @@ func (h *CommunityHandler) UploadImage(c *fiber.Ctx) error {
 	})
 
 	if err != nil {
-		fmt.Printf("Error uploading to Cloudinary: %v\n", err)
+		logger.Error("Failed to upload image to Cloudinary", "error", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Failed to upload image",
 		})
@@ -374,12 +379,12 @@ func (h *CommunityHandler) UpdatePost(c *fiber.Ctx) error {
 		}
 	}
 
-	fmt.Printf("Updating post - Title: %s, Content: %s, PostType: %s\n", title, content, postType)
+	logger.Info("Updating post", "title", title, "postType", postType)
 
 	// Cloudinary 설정
 	cld, err := cloudinary.NewFromParams(h.cfg.CloudinaryCloudName, h.cfg.CloudinaryAPIKey, h.cfg.CloudinaryAPISecret)
 	if err != nil {
-		fmt.Printf("Cloudinary initialization error: %v\n", err)
+		logger.Error("Failed to initialize Cloudinary", "error", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Failed to initialize image upload service",
 		})
@@ -391,7 +396,7 @@ func (h *CommunityHandler) UpdatePost(c *fiber.Ctx) error {
 	
 	if err == nil && form.File["images"] != nil {
 		files := form.File["images"]
-		fmt.Printf("Found %d new image files\n", len(files))
+		logger.Info("Processing new image files for update", "count", len(files))
 		
 		// Check total image count (existing + new) doesn't exceed 5
 		if len(existingImages)+len(files) > 5 {
@@ -403,14 +408,14 @@ func (h *CommunityHandler) UpdatePost(c *fiber.Ctx) error {
 		for _, file := range files {
 			// 파일 검증
 			if !isValidImageFile(file) {
-				fmt.Printf("Invalid file: %s\n", file.Filename)
+				logger.Warn("Invalid image file skipped", "filename", file.Filename)
 				continue
 			}
 			
 			// 파일 열기
 			src, err := file.Open()
 			if err != nil {
-				fmt.Printf("Error opening file %s: %v\n", file.Filename, err)
+				logger.Error("Failed to open image file", "filename", file.Filename, "error", err)
 				continue
 			}
 			defer src.Close()
@@ -423,12 +428,12 @@ func (h *CommunityHandler) UpdatePost(c *fiber.Ctx) error {
 			})
 			
 			if err != nil {
-				fmt.Printf("Error uploading to Cloudinary: %v\n", err)
+				logger.Error("Failed to upload image to Cloudinary", "filename", file.Filename, "error", err)
 				continue
 			}
 
 			newImageUrls = append(newImageUrls, uploadResult.SecureURL)
-			fmt.Printf("Successfully uploaded: %s\n", uploadResult.SecureURL)
+			logger.Info("Image uploaded successfully", "url", uploadResult.SecureURL)
 		}
 	}
 
@@ -456,7 +461,7 @@ func (h *CommunityHandler) UpdatePost(c *fiber.Ctx) error {
 	}
 
 	if err := h.db.Save(&post).Error; err != nil {
-		fmt.Printf("Database error: %v\n", err)
+		logger.Error("Failed to update post in database", "error", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Failed to update post",
 		})
@@ -465,7 +470,7 @@ func (h *CommunityHandler) UpdatePost(c *fiber.Ctx) error {
 	// Load with user data
 	h.db.Preload("User").First(&post, post.ID)
 
-	fmt.Printf("Post updated successfully with ID: %d\n", post.ID)
+	logger.Info("Post updated successfully", "postID", post.ID)
 	return c.JSON(post)
 }
 

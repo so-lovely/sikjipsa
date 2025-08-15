@@ -63,7 +63,7 @@ function AuthCallback() {
         }
 
         // 로그인 성공 처리
-        if (response?.token) {
+        if (response?.access_token) {
           // AuthContext를 통해 로그인 처리 (localStorage는 authAPI에서 자동 처리됨)
           login(response.user);
           setStatus('success');
