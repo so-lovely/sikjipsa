@@ -14,7 +14,7 @@ func Connect(databaseURL string) *gorm.DB {
 	var err error
 
 	// Support both PostgreSQL and SQLite for local development
-	if strings.Contains(databaseURL, "sqlite") || strings.HasSuffix(databaseURL, ".db") {
+	if strings.Contains(databaseURL, "sqlite"){
 		// SQLite connection
 		db, err = gorm.Open(sqlite.Open(databaseURL), &gorm.Config{})
 	} else {
