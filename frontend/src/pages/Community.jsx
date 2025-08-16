@@ -15,10 +15,11 @@ import {
   ScrollArea,
   Loader,
   Image,
-  SimpleGrid
+  Modal,
+  ActionIcon
 } from '@mantine/core';
-import { useDebouncedValue } from '@mantine/hooks';
-import { IconSearch, IconHeart, IconMessage, IconPlus } from '@tabler/icons-react';
+import { useDebouncedValue, useDisclosure } from '@mantine/hooks';
+import { IconSearch, IconHeart, IconMessage, IconPlus, IconEye } from '@tabler/icons-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { communityAPI } from '../api/community.js';
 import InfiniteVirtualizedList from '../components/InfiniteVirtualizedList.jsx';
@@ -39,6 +40,10 @@ function Community() {
   // 무한 스크롤 상태
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  
+  // 이미지 모달 상태
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [opened, { open, close }] = useDisclosure(false);
 
   // 새 게시글 상태 (모달 제거)
 
@@ -116,6 +121,12 @@ const loadPosts = useCallback(async (options = {}) => {
   // --- 4. 핸들러 및 유틸리티 함수들 (이 부분은 기존 코드와 거의 동일) ---
   const handlePostClick = (postId) => {
     navigate(`/community/post/${postId}`);
+  };
+  
+  const handleImageClick = (image, e) => {
+    e.stopPropagation(); // Prevent post click
+    setSelectedImage(image);
+    open();
   };
 
 
@@ -273,35 +284,82 @@ const loadPosts = useCallback(async (options = {}) => {
                   
                       {/* 이미지 미리보기 추가 */}
                       {images && images.length > 0 && (
-                        <SimpleGrid cols={{ base: 2, sm: 3 }} spacing="xs" mt="sm">
-                          {images.slice(0, 3).map((image, index) => (
-                            <Image
-                              key={index}
-                              src={image}
-                              alt={`${post.title} 사진 ${index + 1}`}
-                              radius="md"
-                              h={80}
-                              style={{ objectFit: 'cover' }}
-                              fallbackSrc="https://via.placeholder.com/80x80?text=이미지+없음"
-                            />
+                        <Group gap="sm" mt="sm">
+                          {images.slice(0, 4).map((image, index) => (
+                            <Box key={index} pos="relative">
+                              <Image
+                                src={image}
+                                alt={`${post.title} 사진 ${index + 1}`}
+                                w={80}
+                                h={80}
+                                radius="md"
+                                style={{ 
+                                  objectFit: 'cover',
+                                  cursor: 'pointer',
+                                  transition: 'transform 0.2s ease'
+                                }}
+                                styles={{
+                                  root: {
+                                    '&:hover': {
+                                      transform: 'scale(1.05)'
+                                    }
+                                  }
+                                }}
+                                onClick={(e) => handleImageClick(image, e)}
+                                fallbackSrc="https://via.placeholder.com/80x80?text=이미지+없음"
+                              />
+                              <ActionIcon
+                                variant="filled"
+                                color="dark"
+                                size="sm"
+                                radius="xl"
+                                style={{
+                                  position: 'absolute',
+                                  top: 4,
+                                  right: 4,
+                                  opacity: 0.8,
+                                  transition: 'opacity 0.2s ease'
+                                }}
+                                onClick={(e) => handleImageClick(image, e)}
+                              >
+                                <IconEye size={12} />
+                              </ActionIcon>
+                            </Box>
                           ))}
-                          {images.length > 3 && (
+                          {images.length > 4 && (
                             <Box
                               style={{
+                                width: 80,
                                 height: 80,
                                 borderRadius: 'var(--mantine-radius-md)',
                                 background: 'var(--mantine-color-gray-2)',
                                 display: 'flex',
                                 alignItems: 'center',
-                                justifyContent: 'center'
+                                justifyContent: 'center',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease'
+                              }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                // Navigate to post detail to see all images
+                                handlePostClick(post.id);
+                              }}
+                              styles={{
+                                '&:hover': {
+                                  background: 'var(--mantine-color-gray-3)',
+                                  transform: 'scale(1.02)'
+                                }
                               }}
                             >
-                              <Text size="sm" c="dimmed" fw={600}>
-                                +{images.length - 3}
-                              </Text>
+                              <Stack align="center" gap={2}>
+                                <IconEye size={14} color="var(--mantine-color-gray-6)" />
+                                <Text size="xs" c="dimmed" fw={600}>
+                                  +{images.length - 4}
+                                </Text>
+                              </Stack>
                             </Box>
                           )}
-                        </SimpleGrid>
+                        </Group>
                       )}
                       <Group gap="lg" justify="flex-start">
                         <Group gap="xs">
@@ -348,6 +406,44 @@ const loadPosts = useCallback(async (options = {}) => {
           </Stack>
         </Card>
       )}
+
+      {/* Image Preview Modal */}
+      <Modal
+        opened={opened}
+        onClose={() => {
+          close();
+          setSelectedImage(null);
+        }}
+        size="xl"
+        centered
+        withCloseButton={false}
+        padding={0}
+        styles={{
+          content: {
+            background: 'transparent'
+          },
+          body: {
+            padding: 0
+          }
+        }}
+      >
+        {selectedImage && (
+          <Image
+            src={selectedImage}
+            alt="확대된 사진"
+            style={{
+              maxHeight: '90vh',
+              maxWidth: '90vw',
+              objectFit: 'contain',
+              cursor: 'pointer'
+            }}
+            onClick={() => {
+              close();
+              setSelectedImage(null);
+            }}
+          />
+        )}
+      </Modal>
     </Container>
   );
 }
