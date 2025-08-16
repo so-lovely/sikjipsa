@@ -8,18 +8,14 @@ import {
   Button,
   Group,
   Card,
-  Box,
   Stack,
   Badge,
   Avatar,
   ScrollArea,
-  Loader,
-  Image,
-  Modal,
-  ActionIcon
+  Loader
 } from '@mantine/core';
-import { useDebouncedValue, useDisclosure } from '@mantine/hooks';
-import { IconSearch, IconHeart, IconMessage, IconPlus, IconEye } from '@tabler/icons-react';
+import { useDebouncedValue } from '@mantine/hooks';
+import { IconSearch, IconHeart, IconMessage, IconPlus } from '@tabler/icons-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { communityAPI } from '../api/community.js';
 import InfiniteVirtualizedList from '../components/InfiniteVirtualizedList.jsx';
@@ -40,10 +36,6 @@ function Community() {
   // 무한 스크롤 상태
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  
-  // 이미지 모달 상태
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [opened, { open, close }] = useDisclosure(false);
 
   // 새 게시글 상태 (모달 제거)
 
@@ -121,12 +113,6 @@ const loadPosts = useCallback(async (options = {}) => {
   // --- 4. 핸들러 및 유틸리티 함수들 (이 부분은 기존 코드와 거의 동일) ---
   const handlePostClick = (postId) => {
     navigate(`/community/post/${postId}`);
-  };
-  
-  const handleImageClick = (image, e) => {
-    e.stopPropagation(); // Prevent post click
-    setSelectedImage(image);
-    open();
   };
 
 
@@ -233,22 +219,7 @@ const loadPosts = useCallback(async (options = {}) => {
           hasMore={hasMore}
           isLoading={isLoading}
           loadMoreItems={loadPosts}
-          renderItem={(post) => {
-            // 이미지 데이터 안전하게 파싱
-            let images = [];
-            if (post.images) {
-              try {
-                if (Array.isArray(post.images)) {
-                  images = post.images;
-                } else if (typeof post.images === 'string') {
-                  images = JSON.parse(post.images);
-                }
-              } catch (e) {
-                console.warn('Failed to parse post images:', post.images);
-              }
-            }
-            
-            return (
+          renderItem={(post) => (
               <LazyLoad height="11.25rem">
                 <Card
                   shadow="sm"
@@ -279,88 +250,8 @@ const loadPosts = useCallback(async (options = {}) => {
                       </Group>
                       <div>
                         <Title order={3} size="lg" fw={600} mb="xs" c="gray.8">{post.title}</Title>
-                        {/* 내용 제거 - 제목과 이미지 미리보기만 표시 */}
+                        {/* 내용 제거 - 제목만 표시 */}
                       </div>
-                  
-                      {/* 이미지 미리보기 추가 */}
-                      {images && images.length > 0 && (
-                        <Group gap="sm" mt="sm">
-                          {images.slice(0, 4).map((image, index) => (
-                            <Box key={index} pos="relative">
-                              <Image
-                                src={image}
-                                alt={`${post.title} 사진 ${index + 1}`}
-                                w={80}
-                                h={80}
-                                radius="md"
-                                style={{ 
-                                  objectFit: 'cover',
-                                  cursor: 'pointer',
-                                  transition: 'transform 0.2s ease'
-                                }}
-                                styles={{
-                                  root: {
-                                    '&:hover': {
-                                      transform: 'scale(1.05)'
-                                    }
-                                  }
-                                }}
-                                onClick={(e) => handleImageClick(image, e)}
-                                fallbackSrc="https://via.placeholder.com/80x80?text=이미지+없음"
-                              />
-                              <ActionIcon
-                                variant="filled"
-                                color="dark"
-                                size="sm"
-                                radius="xl"
-                                style={{
-                                  position: 'absolute',
-                                  top: 4,
-                                  right: 4,
-                                  opacity: 0.8,
-                                  transition: 'opacity 0.2s ease'
-                                }}
-                                onClick={(e) => handleImageClick(image, e)}
-                              >
-                                <IconEye size={12} />
-                              </ActionIcon>
-                            </Box>
-                          ))}
-                          {images.length > 4 && (
-                            <Box
-                              style={{
-                                width: 80,
-                                height: 80,
-                                borderRadius: 'var(--mantine-radius-md)',
-                                background: 'var(--mantine-color-gray-2)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                cursor: 'pointer',
-                                transition: 'all 0.2s ease'
-                              }}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                // Navigate to post detail to see all images
-                                handlePostClick(post.id);
-                              }}
-                              styles={{
-                                '&:hover': {
-                                  background: 'var(--mantine-color-gray-3)',
-                                  transform: 'scale(1.02)'
-                                }
-                              }}
-                            >
-                              <Stack align="center" gap={2}>
-                                <IconEye size={14} color="var(--mantine-color-gray-6)" />
-                                <Text size="xs" c="dimmed" fw={600}>
-                                  +{images.length - 4}
-                                </Text>
-                              </Stack>
-                            </Box>
-                          )}
-                        </Group>
-                      )}
                       <Group gap="lg" justify="flex-start">
                         <Group gap="xs">
                           <IconHeart size={16} color="var(--mantine-color-red-5)" />
@@ -374,8 +265,7 @@ const loadPosts = useCallback(async (options = {}) => {
                     </Stack>
                   </Card>
                 </LazyLoad>
-            );
-          }}
+          )}
         />
       )}
 
@@ -407,43 +297,6 @@ const loadPosts = useCallback(async (options = {}) => {
         </Card>
       )}
 
-      {/* Image Preview Modal */}
-      <Modal
-        opened={opened}
-        onClose={() => {
-          close();
-          setSelectedImage(null);
-        }}
-        size="xl"
-        centered
-        withCloseButton={false}
-        padding={0}
-        styles={{
-          content: {
-            background: 'transparent'
-          },
-          body: {
-            padding: 0
-          }
-        }}
-      >
-        {selectedImage && (
-          <Image
-            src={selectedImage}
-            alt="확대된 사진"
-            style={{
-              maxHeight: '90vh',
-              maxWidth: '90vw',
-              objectFit: 'contain',
-              cursor: 'pointer'
-            }}
-            onClick={() => {
-              close();
-              setSelectedImage(null);
-            }}
-          />
-        )}
-      </Modal>
     </Container>
   );
 }
