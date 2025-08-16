@@ -13,7 +13,9 @@ import {
   Badge,
   Avatar,
   ScrollArea,
-  Loader
+  Loader,
+  Image,
+  SimpleGrid
 } from '@mantine/core';
 import { useDebouncedValue } from '@mantine/hooks';
 import { IconSearch, IconHeart, IconMessage, IconPlus } from '@tabler/icons-react';
@@ -220,53 +222,102 @@ const loadPosts = useCallback(async (options = {}) => {
           hasMore={hasMore}
           isLoading={isLoading}
           loadMoreItems={loadPosts}
-          renderItem={(post) => (
-            <LazyLoad height="11.25rem">
-              <Card
-                shadow="sm"
-                radius="md"
-                padding="lg"
-                style={{ 
-                  cursor: 'pointer', 
-                  transition: 'all 0.2s ease',
-                  marginBottom: 'var(--mantine-spacing-md)'
-                }}
-                styles={{ root: { '&:hover': { transform: 'translateY(-0.125rem)', boxShadow: '0 0.25rem 0.75rem rgba(0, 0, 0, 0.1)' } } }}
-                onClick={() => handlePostClick(post.id)}
-              >
-                <Stack gap="sm">
-                  <Group justify="space-between" align="flex-start">
-                    <Group>
-                      <Avatar src={post.user.profile_image} alt={post.user.username} size="sm" color="green">
-                        {post.user.username.charAt(0)}
-                      </Avatar>
+          renderItem={(post) => {
+            // 이미지 데이터 안전하게 파싱
+            let images = [];
+            if (post.images) {
+              try {
+                if (Array.isArray(post.images)) {
+                  images = post.images;
+                } else if (typeof post.images === 'string') {
+                  images = JSON.parse(post.images);
+                }
+              } catch (e) {
+                console.warn('Failed to parse post images:', post.images);
+              }
+            }
+            
+            return (
+              <LazyLoad height="11.25rem">
+                <Card
+                  shadow="sm"
+                  radius="md"
+                  padding="lg"
+                  style={{ 
+                    cursor: 'pointer', 
+                    transition: 'all 0.2s ease',
+                    marginBottom: 'var(--mantine-spacing-md)'
+                  }}
+                  styles={{ root: { '&:hover': { transform: 'translateY(-0.125rem)', boxShadow: '0 0.25rem 0.75rem rgba(0, 0, 0, 0.1)' } } }}
+                  onClick={() => handlePostClick(post.id)}
+                >
+                    <Stack gap="sm">
+                      <Group justify="space-between" align="flex-start">
+                        <Group>
+                          <Avatar src={post.user.profile_image} alt={post.user.username} size="sm" color="green">
+                            {post.user.username.charAt(0)}
+                          </Avatar>
+                          <div>
+                            <Text size="sm" fw={500}>{post.user.username}</Text>
+                            <Text size="xs" c="dimmed">{formatDate(post.created_at)}</Text>
+                          </div>
+                        </Group>
+                        <Badge color={getCategoryColor(post.post_type)} variant="light" size="sm">
+                          {getCategoryLabel(post.post_type)}
+                        </Badge>
+                      </Group>
                       <div>
-                        <Text size="sm" fw={500}>{post.user.username}</Text>
-                        <Text size="xs" c="dimmed">{formatDate(post.created_at)}</Text>
+                        <Title order={3} size="lg" fw={600} mb="xs" c="gray.8">{post.title}</Title>
+                        {/* 내용 제거 - 제목과 이미지 미리보기만 표시 */}
                       </div>
-                    </Group>
-                    <Badge color={getCategoryColor(post.post_type)} variant="light" size="sm">
-                      {getCategoryLabel(post.post_type)}
-                    </Badge>
-                  </Group>
-                  <div>
-                    <Title order={3} size="lg" fw={600} mb="xs" c="gray.8">{post.title}</Title>
-                    <Text size="sm" c="gray.6" lineClamp={2}>{cleanContent(post.content)}</Text>
-                  </div>
-                  <Group gap="lg" justify="flex-start">
-                    <Group gap="xs">
-                      <IconHeart size={16} color="var(--mantine-color-red-5)" />
-                      <Text size="sm" c="dimmed">{post.likes_count || 0}</Text>
-                    </Group>
-                    <Group gap="xs">
-                      <IconMessage size={16} color="var(--mantine-color-blue-5)" />
-                      <Text size="sm" c="dimmed">{post.comments?.length || 0}</Text>
-                    </Group>
-                  </Group>
-                </Stack>
-              </Card>
-            </LazyLoad>
-          )}
+                  
+                      {/* 이미지 미리보기 추가 */}
+                      {images && images.length > 0 && (
+                        <SimpleGrid cols={{ base: 2, sm: 3 }} spacing="xs" mt="sm">
+                          {images.slice(0, 3).map((image, index) => (
+                            <Image
+                              key={index}
+                              src={image}
+                              alt={`${post.title} 사진 ${index + 1}`}
+                              radius="md"
+                              h={80}
+                              style={{ objectFit: 'cover' }}
+                              fallbackSrc="https://via.placeholder.com/80x80?text=이미지+없음"
+                            />
+                          ))}
+                          {images.length > 3 && (
+                            <Box
+                              style={{
+                                height: 80,
+                                borderRadius: 'var(--mantine-radius-md)',
+                                background: 'var(--mantine-color-gray-2)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                              }}
+                            >
+                              <Text size="sm" c="dimmed" fw={600}>
+                                +{images.length - 3}
+                              </Text>
+                            </Box>
+                          )}
+                        </SimpleGrid>
+                      )}
+                      <Group gap="lg" justify="flex-start">
+                        <Group gap="xs">
+                          <IconHeart size={16} color="var(--mantine-color-red-5)" />
+                          <Text size="sm" c="dimmed">{post.likes_count || 0}</Text>
+                        </Group>
+                        <Group gap="xs">
+                          <IconMessage size={16} color="var(--mantine-color-blue-5)" />
+                          <Text size="sm" c="dimmed">{post.comments?.length || 0}</Text>
+                        </Group>
+                      </Group>
+                    </Stack>
+                  </Card>
+                </LazyLoad>
+            );
+          }}
         />
       )}
 
