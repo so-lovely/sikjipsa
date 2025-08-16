@@ -12,7 +12,6 @@ import {
   Box,
   Stack,
   Image,
-  SegmentedControl,
   Select,
   Loader,
   Center,
@@ -21,14 +20,13 @@ import {
   ActionIcon
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { IconSearch, IconPlus, IconCalendar, IconPlant, IconAlertCircle, IconEye, IconNotebook, IconEdit, IconSeedling, IconLeaf, IconFlower, IconTree, IconMoon, IconNote } from '@tabler/icons-react';
+import { IconSearch, IconPlus, IconAlertCircle, IconEye, IconNotebook, IconSeedling, IconLeaf, IconFlower, IconTree, IconMoon, IconNote } from '@tabler/icons-react';
 import { useAuth } from '../context/AuthContext';
 import { diaryAPI } from '../api/diary';
 
 function Diary() {
   const { isLoggedIn } = useAuth();
   const navigate = useNavigate();
-  const [view, setView] = useState('timeline');
   const [diaries, setDiaries] = useState([]);
   const [allEntries, setAllEntries] = useState([]);
   const [filteredEntries, setFilteredEntries] = useState([]);
@@ -80,7 +78,9 @@ function Diary() {
                 entries.push({
                   ...entry,
                   diaryId: diary.id,
-                  plantName: diary.plant_nickname || diary.plant?.name || '식물',
+                  plantNickname: diary.plant_nickname || '식물',
+                  plantName: diary.plant?.name || '식물',
+                  categoryName: diary.plant?.category?.name || '',
                   plantImage: plantImage
                 });
               } catch (entryError) {
@@ -124,7 +124,9 @@ function Diary() {
       filtered = filtered.filter(entry => 
         (entry.content && entry.content.toLowerCase().includes(searchTerm.toLowerCase())) ||
         (entry.title && entry.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (entry.plantName && entry.plantName.toLowerCase().includes(searchTerm.toLowerCase()))
+        (entry.plantNickname && entry.plantNickname.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (entry.plantName && entry.plantName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (entry.categoryName && entry.categoryName.toLowerCase().includes(searchTerm.toLowerCase()))
       );
     }
 
@@ -135,10 +137,6 @@ function Diary() {
     navigate('/diary/write');
   };
 
-  const handleDiaryClick = (diary) => {
-    setSelectedDiary(diary.id.toString());
-    setView('timeline');
-  };
 
   const handleEntryClick = (entry) => {
     navigate(`/diary/${entry.diaryId}/${entry.id}`);
@@ -161,15 +159,6 @@ function Diary() {
     open();
   };
 
-  // 통계 계산
-  const totalEntries = allEntries.length;
-  const totalPlants = diaries.length;
-  const thisWeekEntries = allEntries.filter(entry => {
-    const entryDate = new Date(entry.entry_date);
-    const weekAgo = new Date();
-    weekAgo.setDate(weekAgo.getDate() - 7);
-    return entryDate >= weekAgo;
-  }).length;
 
   // 로그인하지 않은 경우
   if (!isLoggedIn) {
@@ -219,18 +208,7 @@ function Diary() {
       {/* Stats Section */}
 
       {/* Header Controls */}
-      <Group justify="space-between" mb="xl">
-        <Group>
-          <SegmentedControl
-            value={view}
-            onChange={setView}
-            data={[
-              { label: '내 식물들', value: 'plants' },
-              { label: '타임라인', value: 'timeline' }
-            ]}
-            color="green"
-          />
-        </Group>
+      <Group justify="flex-end" mb="xl">
         <Button
           leftSection={<IconPlus size={16} />}
           onClick={handleAddEntry}
@@ -270,117 +248,9 @@ function Diary() {
         </Center>
       )}
 
-      {/* Plants View */}
-      {view === 'plants' && !isLoading && (
-        <div>
-          <Group gap="xs" mb="lg">
-            <IconPlant size={24} color="var(--mantine-color-gray-8)" />
-            <Title order={2} size="xl" c="gray.8">
-              내가 키우는 식물들
-            </Title>
-          </Group>
-          {diaries.length === 0 ? (
-            <Card shadow="sm" radius="md" padding="xl" style={{ textAlign: 'center' }}>
-              <Stack align="center" gap="md">
-                <IconSeedling size={48} color="var(--mantine-color-green-6)" />
-                <Title order={3} c="gray.6">
-                  아직 등록된 식물이 없습니다
-                </Title>
-                <Text c="dimmed">
-                  첫 번째 식물을 등록해보세요!
-                </Text>
-                <Button
-                  variant="gradient"
-                  gradient={{ from: 'green.5', to: 'green.6' }}
-                  onClick={handleAddEntry}
-                >
-                  첫 번째 식물 등록하기
-                </Button>
-              </Stack>
-            </Card>
-          ) : (
-            <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="xl">
-              {diaries.map(diary => {
-                // plant 이미지 안전하게 파싱
-                let plantImageSrc = 'https://via.placeholder.com/400x180?text=식물+사진';
-                if (diary.plant?.images) {
-                  try {
-                    const parsedImages = JSON.parse(diary.plant.images);
-                    if (Array.isArray(parsedImages) && parsedImages.length > 0) {
-                      plantImageSrc = parsedImages[0];
-                    }
-                  } catch (e) {
-                    console.warn('Failed to parse plant images:', diary.plant.images);
-                  }
-                }
-                
-                return (
-                  <Card
-                    key={diary.id}
-                    shadow="md"
-                    radius="lg"
-                    style={{ 
-                      cursor: 'pointer',
-                      transition: 'all 0.3s ease'
-                    }}
-                    styles={{
-                      root: {
-                        '&:hover': {
-                          transform: 'translateY(-2px)',
-                          boxShadow: '0 20px 25px rgba(0, 0, 0, 0.1), 0 8px 10px rgba(0, 0, 0, 0.04)'
-                        }
-                      }
-                    }}
-                    onClick={() => handleDiaryClick(diary)}
-                  >
-                    <Card.Section>
-                      <Image
-                        src={plantImageSrc}
-                        height={180}
-                        alt={diary.plant_nickname || diary.plant?.name}
-                        fallbackSrc="https://via.placeholder.com/400x180?text=식물+사진"
-                      />
-                    </Card.Section>
-                    <Stack gap="sm" p="md">
-                      <Title order={3} size="lg" fw={600} c="gray.8">
-                        {diary.plant_nickname || diary.plant?.name || '식물'}
-                      </Title>
-                      <Group justify="space-between">
-                        <Text size="sm" c="dimmed">
-                          시작: {new Date(diary.start_date).toLocaleDateString('ko-KR')}
-                        </Text>
-                        <Text size="sm" c="dimmed">
-                          기록: {diary.entries?.length || 0}개
-                        </Text>
-                      </Group>
-                      <Box
-                        style={{
-                          background: 'var(--mantine-color-gray-1)',
-                          borderRadius: 'var(--mantine-radius-md)',
-                          padding: 'var(--mantine-spacing-sm)'
-                        }}
-                      >
-                        <Group gap="xs">
-                          <IconNote size={16} color="var(--mantine-color-gray-7)" />
-                          <Text size="sm" c="gray.7">
-                            {diary.entries?.length > 0 ? 
-                              diary.entries[diary.entries.length - 1].title || 
-                              diary.entries[diary.entries.length - 1].content?.substring(0, 30) + '...' 
-                              : '아직 기록이 없습니다'}
-                          </Text>
-                        </Group>
-                      </Box>
-                    </Stack>
-                  </Card>
-                );
-              })}
-            </SimpleGrid>
-          )}
-        </div>
-      )}
 
       {/* Timeline View */}
-      {view === 'timeline' && !isLoading && (
+      {!isLoading && (
         <div>
           <Group gap="xs" mb="lg">
             <IconNotebook size={24} color="var(--mantine-color-green-6)" />
@@ -400,7 +270,7 @@ function Diary() {
                 { value: 'all', label: '모든 식물' },
                 ...diaries.map(diary => ({
                   value: diary.id.toString(),
-                  label: diary.plant_nickname || diary.plant?.name || '식물'
+                  label: `${diary.plant_nickname || '식물'} (${diary.plant?.category?.name || diary.plant?.name || '식물'})`
                 }))
               ]}
               maw={200}
@@ -485,7 +355,7 @@ function Diary() {
                       <Group justify="space-between" align="flex-start">
                         <div style={{ flex: 1 }}>
                           <Title order={3} size="lg" fw={600} c="green.7" mb="xs">
-                            {entry.plantName}
+                            {entry.plantNickname} {entry.categoryName && `(${entry.categoryName})`}
                           </Title>
                           <Text size="sm" c="dimmed" mb="sm">
                             {new Date(entry.entry_date).toLocaleDateString('ko-KR')}
@@ -513,7 +383,7 @@ function Diary() {
                             <Box key={index} pos="relative">
                               <Image
                                 src={image}
-                                alt={`${entry.plantName} 사진 ${index + 1}`}
+                                alt={`${entry.plantNickname} 사진 ${index + 1}`}
                                 w={100}
                                 h={100}
                                 radius="md"

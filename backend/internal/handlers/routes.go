@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"sikjipsa-backend/internal/middleware"
 	"sikjipsa-backend/internal/models"
+	"sikjipsa-backend/pkg/cache"
 	"sikjipsa-backend/pkg/config"
 	"sikjipsa-backend/pkg/logger"
 
@@ -11,7 +12,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func SetupRoutes(app fiber.Router, db *gorm.DB, cfg *config.Config) {
+func SetupRoutes(app fiber.Router, db *gorm.DB, cfg *config.Config, redisCache *cache.RedisCache) {
     // Database migrations
     logger.Info("Starting database migrations")
     
@@ -41,11 +42,11 @@ func SetupRoutes(app fiber.Router, db *gorm.DB, cfg *config.Config) {
 	// Initialize handlers
 	authHandler := NewAuthHandler(db, cfg)
 	tokenHandler := NewTokenHandler(db, cfg)
-	plantHandler := NewPlantHandler(db, cfg)
-	communityHandler := NewCommunityHandler(db, cfg)
-	diaryHandler := NewDiaryHandler(db, cfg)
-	diagnosisHandler := NewDiagnosisHandler(db, cfg)
-	announcementHandler := NewAnnouncementHandler(db, cfg)
+	plantHandler := NewPlantHandler(db, cfg, redisCache)
+	communityHandler := NewCommunityHandler(db, cfg, redisCache)
+	diaryHandler := NewDiaryHandler(db, cfg, redisCache)
+	diagnosisHandler := NewDiagnosisHandler(db, cfg, redisCache)
+	announcementHandler := NewAnnouncementHandler(db, cfg, redisCache)
 
 	// Auth routes - Social login only with strict rate limiting
 	auth := app.Group("/auth")

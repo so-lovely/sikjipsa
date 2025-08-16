@@ -4,6 +4,7 @@ import (
 	"log"
 	"sikjipsa-backend/internal/handlers"
 	"sikjipsa-backend/internal/middleware"
+	"sikjipsa-backend/pkg/cache"
 	"sikjipsa-backend/pkg/config"
 	"sikjipsa-backend/pkg/database"
 
@@ -15,14 +16,19 @@ import (
 
 func main() {
 	// Load .env file
-	if err := godotenv.Load(); err != nil {
-		log.Println("No .env file found")
+	if err := godotenv.Load("../../.env"); err != nil {
+		if err := godotenv.Load(".env"); err != nil {
+			log.Println("No .env file found")
+		}
 	}
 	
 	cfg := config.Load()
 	
 	// Connect to database
 	db := database.Connect(cfg.DatabaseURL)
+
+	// Initialize Redis cache
+	redisCache := cache.NewRedisCache(cfg.RedisAddr, cfg.RedisPassword, cfg.RedisDB)
 
 	app := fiber.New(fiber.Config{
 		ErrorHandler: middleware.ErrorHandler,
@@ -45,7 +51,7 @@ func main() {
 
 	api := app.Group("/api/v1")
 	
-	handlers.SetupRoutes(api, db, cfg)
+	handlers.SetupRoutes(api, db, cfg, redisCache)
 
 	log.Printf("Server starting on port %s", cfg.Port)
 	log.Fatal(app.Listen(":" + cfg.Port))

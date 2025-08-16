@@ -1,28 +1,45 @@
 package handlers
 
 import (
+	"context"
+	"fmt"
 	"sikjipsa-backend/internal/models"
+	"sikjipsa-backend/pkg/cache"
 	"sikjipsa-backend/pkg/config"
 	"strconv"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
 
 type AnnouncementHandler struct {
-	db  *gorm.DB
-	cfg *config.Config
+	db    *gorm.DB
+	cfg   *config.Config
+	cache *cache.RedisCache
 }
 
-func NewAnnouncementHandler(db *gorm.DB, cfg *config.Config) *AnnouncementHandler {
+func NewAnnouncementHandler(db *gorm.DB, cfg *config.Config, redisCache *cache.RedisCache) *AnnouncementHandler {
 	return &AnnouncementHandler{
-		db:  db,
-		cfg: cfg,
+		db:    db,
+		cfg:   cfg,
+		cache: redisCache,
 	}
 }
 
 // GetAnnouncements 공지사항 목록 조회
 func (h *AnnouncementHandler) GetAnnouncements(c *fiber.Ctx) error {
+	ctx := context.Background()
+	cacheKey := "announcements"
+	
+	// Check cache first
+	var result fiber.Map
+	if h.cache.IsAvailable() {
+		if err := h.cache.Get(ctx, cacheKey, &result); err == nil {
+			return c.JSON(result)
+		}
+	}
+
 	var announcements []models.Announcement
 	
 	query := h.db.Model(&models.Announcement{}).
@@ -36,18 +53,39 @@ func (h *AnnouncementHandler) GetAnnouncements(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.JSON(fiber.Map{
+	result = fiber.Map{
 		"announcements": announcements,
-	})
+	}
+
+	// Cache the result for 30 minutes
+	if h.cache.IsAvailable() {
+		h.cache.Set(ctx, cacheKey, result, 30*time.Minute)
+	}
+
+	return c.JSON(result)
 }
 
 // GetAnnouncement 특정 공지사항 조회
 func (h *AnnouncementHandler) GetAnnouncement(c *fiber.Ctx) error {
+	ctx := context.Background()
 	id, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": "Invalid announcement ID",
 		})
+	}
+
+	cacheKey := fmt.Sprintf("announcement_%d", id)
+	
+	// Check cache first
+	var result fiber.Map
+	if h.cache.IsAvailable() {
+		if err := h.cache.Get(ctx, cacheKey, &result); err == nil {
+			// Still increment view count for cached items
+			h.db.Model(&models.Announcement{}).Where("id = ?", id).
+				Update("view_count", gorm.Expr("view_count + 1"))
+			return c.JSON(result)
+		}
 	}
 
 	var announcement models.Announcement
@@ -65,9 +103,16 @@ func (h *AnnouncementHandler) GetAnnouncement(c *fiber.Ctx) error {
 	// 조회수 증가
 	h.db.Model(&announcement).Update("view_count", announcement.ViewCount+1)
 
-	return c.JSON(fiber.Map{
+	result = fiber.Map{
 		"announcement": announcement,
-	})
+	}
+
+	// Cache the result for 1 hour
+	if h.cache.IsAvailable() {
+		h.cache.Set(ctx, cacheKey, result, time.Hour)
+	}
+
+	return c.JSON(result)
 }
 
 // CreateAnnouncement 공지사항 생성 (관리자 전용)
@@ -120,6 +165,12 @@ func (h *AnnouncementHandler) CreateAnnouncement(c *fiber.Ctx) error {
 
 	// 생성된 공지사항을 Author와 함께 조회
 	h.db.Preload("Author").First(&announcement, announcement.ID)
+
+	// Invalidate announcements cache
+	ctx := context.Background()
+	if h.cache.IsAvailable() {
+		h.cache.Delete(ctx, "announcements")
+	}
 
 	return c.Status(201).JSON(fiber.Map{
 		"announcement": announcement,
@@ -186,6 +237,13 @@ func (h *AnnouncementHandler) UpdateAnnouncement(c *fiber.Ctx) error {
 	// 업데이트된 공지사항을 Author와 함께 조회
 	h.db.Preload("Author").First(&announcement, announcement.ID)
 
+	// Invalidate related caches
+	ctx := context.Background()
+	if h.cache.IsAvailable() {
+		h.cache.Delete(ctx, "announcements")
+		h.cache.Delete(ctx, fmt.Sprintf("announcement_%d", id))
+	}
+
 	return c.JSON(fiber.Map{
 		"announcement": announcement,
 	})
@@ -216,6 +274,13 @@ func (h *AnnouncementHandler) DeleteAnnouncement(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{
 			"error": "Failed to delete announcement",
 		})
+	}
+
+	// Invalidate related caches
+	ctx := context.Background()
+	if h.cache.IsAvailable() {
+		h.cache.Delete(ctx, "announcements")
+		h.cache.Delete(ctx, fmt.Sprintf("announcement_%d", id))
 	}
 
 	return c.JSON(fiber.Map{

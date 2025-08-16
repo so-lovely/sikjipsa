@@ -32,6 +32,11 @@ type Config struct {
 	// AI Plant Diagnosis
 	PlantAIAPIKey string
 	PlantAIAPIURL string
+
+	// Redis Cache
+	RedisAddr     string
+	RedisPassword string
+	RedisDB       int
 }
 
 func Load() *Config {
@@ -66,6 +71,10 @@ func Load() *Config {
 
 		PlantAIAPIKey: getEnv("PLANT_AI_API_KEY", ""),
 		PlantAIAPIURL: getEnv("PLANT_AI_API_URL", ""),
+
+		RedisAddr:     getEnv("REDIS_ADDR", "localhost:6379"),
+		RedisPassword: getEnv("REDIS_PASSWORD", ""),
+		RedisDB:       0,
 	}
 }
 

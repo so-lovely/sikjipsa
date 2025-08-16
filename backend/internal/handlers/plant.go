@@ -1,32 +1,40 @@
 package handlers
 
 import (
+	"context"
 	"fmt"
 	"sikjipsa-backend/internal/models"
+	"sikjipsa-backend/pkg/cache"
 	"sikjipsa-backend/pkg/config"
 	"strconv"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
 
 type PlantHandler struct {
-	db  *gorm.DB
-	cfg *config.Config
+	db    *gorm.DB
+	cfg   *config.Config
+	cache *cache.RedisCache
 }
 
-func NewPlantHandler(db *gorm.DB, cfg *config.Config) *PlantHandler {
-	return &PlantHandler{db: db, cfg: cfg}
+func NewPlantHandler(db *gorm.DB, cfg *config.Config, redisCache *cache.RedisCache) *PlantHandler {
+	return &PlantHandler{db: db, cfg: cfg, cache: redisCache}
 }
 
 func (h *PlantHandler) GetCategories(c *fiber.Ctx) error {
+	ctx := context.Background()
+	cacheKey := "categories"
+
 	// Check cache first
-	if cachedData, found := GetFromCache("categories"); found {
-		return c.JSON(cachedData)
+	var categories []models.PlantCategory
+	if h.cache.IsAvailable() {
+		if err := h.cache.Get(ctx, cacheKey, &categories); err == nil {
+			return c.JSON(categories)
+		}
 	}
 
-	var categories []models.PlantCategory
-	
 	// Use Table method to be explicit about table name
 	if err := h.db.Table("plant_categories").Find(&categories).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -34,23 +42,30 @@ func (h *PlantHandler) GetCategories(c *fiber.Ctx) error {
 		})
 	}
 
-	// Cache the result
-	SetCache("categories", categories)
+	// Cache the result for 24 hours
+	if h.cache.IsAvailable() {
+		h.cache.Set(ctx, cacheKey, categories, 24*time.Hour)
+	}
 
 	return c.JSON(categories)
 }
 
 func (h *PlantHandler) GetPlants(c *fiber.Ctx) error {
+	ctx := context.Background()
+	
 	// Generate cache key from query parameters
-	cacheKey := GenerateCacheKey("plants", 
+	cacheKey := fmt.Sprintf("plants_%s_%s_%s_%s", 
 		c.Query("category"), 
 		c.Query("search"), 
 		c.Query("page", "1"), 
 		c.Query("limit"))
 	
 	// Check cache first
-	if cachedData, found := GetFromCache(cacheKey); found {
-		return c.JSON(cachedData)
+	var response fiber.Map
+	if h.cache.IsAvailable() {
+		if err := h.cache.Get(ctx, cacheKey, &response); err == nil {
+			return c.JSON(response)
+		}
 	}
 
 	var plants []models.Plant
@@ -96,7 +111,7 @@ func (h *PlantHandler) GetPlants(c *fiber.Ctx) error {
 	}
 	countQuery.Count(&total)
 
-	response := fiber.Map{
+	response = fiber.Map{
 		"plants": plants,
 	}
 
@@ -110,20 +125,36 @@ func (h *PlantHandler) GetPlants(c *fiber.Ctx) error {
 		}
 	}
 
-	// Cache the response
-	SetCache(cacheKey, response)
+	// Cache the response for 1 hour
+	if h.cache.IsAvailable() {
+		h.cache.Set(ctx, cacheKey, response, time.Hour)
+	}
 
 	return c.JSON(response)
 }
 
 func (h *PlantHandler) GetPlant(c *fiber.Ctx) error {
+	ctx := context.Background()
 	id := c.Params("id")
+	cacheKey := fmt.Sprintf("plant_%s", id)
+	
+	// Check cache first
 	var plant models.Plant
+	if h.cache.IsAvailable() {
+		if err := h.cache.Get(ctx, cacheKey, &plant); err == nil {
+			return c.JSON(plant)
+		}
+	}
 
 	if err := h.db.Table("plants").Preload("Category").Where("plants.id = ?", id).First(&plant).Error; err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"error": "Plant not found",
 		})
+	}
+
+	// Cache the result for 24 hours
+	if h.cache.IsAvailable() {
+		h.cache.Set(ctx, cacheKey, plant, 24*time.Hour)
 	}
 
 	return c.JSON(plant)

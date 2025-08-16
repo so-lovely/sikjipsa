@@ -9,6 +9,7 @@ import (
 	"io"
 	"net/http"
 	"sikjipsa-backend/internal/models"
+	"sikjipsa-backend/pkg/cache"
 	"sikjipsa-backend/pkg/config"
 	"sikjipsa-backend/pkg/logger"
 	"strconv"
@@ -21,12 +22,13 @@ import (
 )
 
 type DiagnosisHandler struct {
-	db  *gorm.DB
-	cfg *config.Config
+	db    *gorm.DB
+	cfg   *config.Config
+	cache *cache.RedisCache
 }
 
-func NewDiagnosisHandler(db *gorm.DB, cfg *config.Config) *DiagnosisHandler {
-	return &DiagnosisHandler{db: db, cfg: cfg}
+func NewDiagnosisHandler(db *gorm.DB, cfg *config.Config, redisCache *cache.RedisCache) *DiagnosisHandler {
+	return &DiagnosisHandler{db: db, cfg: cfg, cache: redisCache}
 }
 
 // Plant.id API v3 Request/Response structures

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
 import {
   Container,
   Title,
@@ -159,6 +160,29 @@ function Encyclopedia() {
 
   return (
     <Container size="xl" py="xl">
+      <Helmet>
+        <title>식물 백과사전 - 식집사</title>
+        <meta name="description" content="500+ 식물 품종의 상세한 정보와 전문적인 관리 방법을 확인하세요. 관엽식물, 다육식물, 허브, 화훼식물까지 모든 식물 정보를 한 곳에서!" />
+        <meta name="keywords" content="식물백과사전, 식물도감, 관엽식물, 다육식물, 허브, 화훼식물, 식물관리법, 식물정보" />
+        <meta property="og:title" content="식물 백과사전 - 식집사" />
+        <meta property="og:description" content="500+ 식물 품종의 상세한 정보와 전문적인 관리 방법을 확인하세요" />
+        <meta property="og:url" content="https://www.sikjipsa.com/encyclopedia" />
+        <link rel="canonical" href="https://www.sikjipsa.com/encyclopedia" />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "식물 백과사전",
+            "description": "500+ 식물 품종의 상세한 정보와 전문적인 관리 방법",
+            "url": "https://www.sikjipsa.com/encyclopedia",
+            "mainEntity": {
+              "@type": "ItemList",
+              "name": "식물 목록",
+              "description": "다양한 카테고리의 식물들"
+            }
+          })}
+        </script>
+      </Helmet>
       {/* Hero Section */}
       <Stack align="center" gap="xl" mb={60}>
         <Title order={1} size={48} fw={700} ta="center" c="gray.8">

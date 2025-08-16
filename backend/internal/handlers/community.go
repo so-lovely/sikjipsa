@@ -2,12 +2,16 @@ package handlers
 
 import (
 	"context"
+	"crypto/md5"
 	"encoding/json"
+	"fmt"
 	"log"
 	"sikjipsa-backend/internal/models"
+	"sikjipsa-backend/pkg/cache"
 	"sikjipsa-backend/pkg/config"
 	"sikjipsa-backend/pkg/logger"
 	"strconv"
+	"time"
 
 	"github.com/cloudinary/cloudinary-go/v2"
 	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
@@ -16,12 +20,13 @@ import (
 )
 
 type CommunityHandler struct {
-	db  *gorm.DB
-	cfg *config.Config
+	db    *gorm.DB
+	cfg   *config.Config
+	cache *cache.RedisCache
 }
 
-func NewCommunityHandler(db *gorm.DB, cfg *config.Config) *CommunityHandler {
-	return &CommunityHandler{db: db, cfg: cfg}
+func NewCommunityHandler(db *gorm.DB, cfg *config.Config, redisCache *cache.RedisCache) *CommunityHandler {
+	return &CommunityHandler{db: db, cfg: cfg, cache: redisCache}
 }
 
 type CreatePostRequest struct {
@@ -44,6 +49,23 @@ func (h *CommunityHandler) GetPosts(c *fiber.Ctx) error {
 		"type", c.Query("type", ""),
 		"search", c.Query("search", ""))
 
+	// Generate cache key based on query parameters
+	page := c.Query("page", "1")
+	postType := c.Query("type", "")
+	search := c.Query("search", "")
+	limit := c.Query("limit", "20")
+	
+	cacheKey := h.generateCacheKey("posts", page, postType, search, limit)
+	
+	// Try to get from cache first
+	if h.cache != nil && h.cache.IsAvailable() {
+		var cachedResponse fiber.Map
+		if err := h.cache.Get(context.Background(), cacheKey, &cachedResponse); err == nil {
+			logger.Info("Posts retrieved from cache", "cacheKey", cacheKey)
+			return c.JSON(cachedResponse)
+		}
+	}
+
 	var posts []models.CommunityPost
 	var totalCount int64
 	
@@ -51,32 +73,32 @@ func (h *CommunityHandler) GetPosts(c *fiber.Ctx) error {
 	query := h.db.Where("deleted_at IS NULL").Preload("User").Preload("Comments.User")
 
 	// Filter by post type
-	if postType := c.Query("type"); postType != "" && postType != "all" {
+	if postType != "" && postType != "all" {
 		query = query.Where("post_type = ?", postType)
 	}
 
 	// Search
-	if search := c.Query("search"); search != "" {
+	if search != "" {
 		query = query.Where("title ILIKE ? OR content ILIKE ?", "%"+search+"%", "%"+search+"%")
 	}
 
 	// Get total count for pagination
 	countQuery := h.db.Model(&models.CommunityPost{}).Where("deleted_at IS NULL")
-	if postType := c.Query("type"); postType != "" && postType != "all" {
+	if postType != "" && postType != "all" {
 		countQuery = countQuery.Where("post_type = ?", postType)
 	}
-	if search := c.Query("search"); search != "" {
+	if search != "" {
 		countQuery = countQuery.Where("title ILIKE ? OR content ILIKE ?", "%"+search+"%", "%"+search+"%")
 	}
 	countQuery.Count(&totalCount)
 
 	// Pagination
-	page, _ := strconv.Atoi(c.Query("page", "1"))
-	limit, _ := strconv.Atoi(c.Query("limit", "20"))
-	offset := (page - 1) * limit
+	pageInt, _ := strconv.Atoi(page)
+	limitInt, _ := strconv.Atoi(limit)
+	offset := (pageInt - 1) * limitInt
 
 	// Order by creation date and fetch posts
-	if err := query.Order("created_at DESC").Limit(limit).Offset(offset).Find(&posts).Error; err != nil {
+	if err := query.Order("created_at DESC").Limit(limitInt).Offset(offset).Find(&posts).Error; err != nil {
 		logger.Error("Failed to fetch posts from database", "error", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Failed to fetch posts",
@@ -84,19 +106,28 @@ func (h *CommunityHandler) GetPosts(c *fiber.Ctx) error {
 	}
 
 	// Calculate pagination metadata
-	totalPages := int((totalCount + int64(limit) - 1) / int64(limit))
+	totalPages := int((totalCount + int64(limitInt) - 1) / int64(limitInt))
 	
 	response := fiber.Map{
 		"posts":        posts,
-		"currentPage":  page,
+		"currentPage":  pageInt,
 		"totalPages":   totalPages,
 		"totalCount":   totalCount,
-		"hasMore":      page < totalPages,
+		"hasMore":      pageInt < totalPages,
+	}
+
+	// Cache the response for 5 minutes
+	if h.cache != nil && h.cache.IsAvailable() {
+		if err := h.cache.Set(context.Background(), cacheKey, response, 5*time.Minute); err != nil {
+			logger.Warn("Failed to cache posts response", "error", err)
+		} else {
+			logger.Info("Posts cached successfully", "cacheKey", cacheKey)
+		}
 	}
 
 	logger.Info("Posts retrieved successfully", 
 		"count", len(posts), 
-		"page", page, 
+		"page", pageInt, 
 		"totalPages", totalPages)
 	return c.JSON(response)
 }
@@ -248,6 +279,9 @@ func (h *CommunityHandler) CreatePost(c *fiber.Ctx) error {
 
 	// Load with user data
 	h.db.Preload("User").First(&post, post.ID)
+
+	// Invalidate cache after creating new post
+	h.invalidateCommunityCache()
 
 	logger.Info("Post created successfully", "postID", post.ID)
 	return c.JSON(post)
@@ -470,6 +504,9 @@ func (h *CommunityHandler) UpdatePost(c *fiber.Ctx) error {
 	// Load with user data
 	h.db.Preload("User").First(&post, post.ID)
 
+	// Invalidate cache after updating post
+	h.invalidateCommunityCache()
+
 	logger.Info("Post updated successfully", "postID", post.ID)
 	return c.JSON(post)
 }
@@ -528,6 +565,9 @@ func (h *CommunityHandler) DeletePost(c *fiber.Ctx) error {
 			"error": "Failed to delete post",
 		})
 	}
+
+	// Invalidate cache after deleting post
+	h.invalidateCommunityCache()
 
 	return c.JSON(fiber.Map{
 		"message": "Post deleted successfully",
@@ -692,6 +732,9 @@ func (h *CommunityHandler) AddComment(c *fiber.Ctx) error {
 	// Load with user data
 	h.db.Preload("User").First(&comment, comment.ID)
 
+	// Invalidate cache after adding comment
+	h.invalidateCommunityCache()
+
 	return c.JSON(comment)
 }
 
@@ -829,6 +872,28 @@ func (h *CommunityHandler) DeleteComment(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{
 		"message": "Comment deleted successfully",
 	})
+}
+
+func (h *CommunityHandler) generateCacheKey(prefix string, params ...string) string {
+	key := fmt.Sprintf("community:%s", prefix)
+	for _, param := range params {
+		if param != "" {
+			hasher := md5.New()
+			hasher.Write([]byte(param))
+			key += ":" + fmt.Sprintf("%x", hasher.Sum(nil))[:8]
+		}
+	}
+	return key
+}
+
+func (h *CommunityHandler) invalidateCommunityCache() {
+	if h.cache != nil && h.cache.IsAvailable() {
+		if err := h.cache.DeletePattern(context.Background(), "community:posts*"); err != nil {
+			logger.Warn("Failed to invalidate community cache", "error", err)
+		} else {
+			logger.Info("Community cache invalidated successfully")
+		}
+	}
 }
 
 func mustParseUint(s string) uint64 {

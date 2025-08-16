@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import {
   Container,
   Title,
@@ -64,6 +65,35 @@ function Home() {
 
   return (
     <Box>
+      <Helmet>
+        <title>식집사 - 식물과 함께하는 특별한 경험</title>
+        <meta name="description" content="AI 식물 진단, 식물 백과사전, 커뮤니티, 성장일기까지! 식물 애호가들을 위한 완벽한 솔루션. 초보자부터 전문가까지 모든 식물 관리 정보를 한 곳에서 만나보세요." />
+        <meta name="keywords" content="식물, 식물관리, AI진단, 식물백과사전, 식물커뮤니티, 성장일기, 화분, 관엽식물, 원예" />
+        <meta property="og:title" content="식집사 - 식물과 함께하는 특별한 경험" />
+        <meta property="og:description" content="AI 식물 진단, 식물 백과사전, 커뮤니티, 성장일기까지! 식물 애호가들을 위한 완벽한 솔루션" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://www.sikjipsa.com/" />
+        <meta property="og:image" content="https://res.cloudinary.com/dfn2v65hg/image/upload/v1755009756/Screenshot_2025-08-12_at_11.41.42_PM_dodkwi.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="식집사 - 식물과 함께하는 특별한 경험" />
+        <meta name="twitter:description" content="AI 식물 진단, 식물 백과사전, 커뮤니티, 성장일기까지! 식물 애호가들을 위한 완벽한 솔루션" />
+        <meta name="twitter:image" content="https://res.cloudinary.com/dfn2v65hg/image/upload/v1755009756/Screenshot_2025-08-12_at_11.41.42_PM_dodkwi.png" />
+        <link rel="canonical" href="https://www.sikjipsa.com/" />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "name": "식집사",
+            "description": "식물 AI진단, 커뮤니티, 식물 성장일기, 식물 백과사전 서비스",
+            "url": "https://www.sikjipsa.com",
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": "https://www.sikjipsa.com/encyclopedia?search={search_term_string}",
+              "query-input": "required name=search_term_string"
+            }
+          })}
+        </script>
+      </Helmet>
       {/* Hero Section */}
       <Hero />
 

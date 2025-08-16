@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { Helmet } from 'react-helmet-async';
 import {
   Container,
   Title,
@@ -413,6 +414,29 @@ function Diagnosis() {
 
   return (
     <Container size="lg" py="xl">
+      <Helmet>
+        <title>AI 식물 진단 - 식집사</title>
+        <meta name="description" content="최신 AI 기술로 식물의 건강 상태를 정확하게 진단하고 맞춤 케어 솔루션을 제공받으세요. 95% 정확도의 AI 식물 진단 서비스!" />
+        <meta name="keywords" content="AI식물진단, 식물질병진단, 식물건강체크, 인공지능진단, 식물병해충, 식물케어" />
+        <meta property="og:title" content="AI 식물 진단 - 식집사" />
+        <meta property="og:description" content="최신 AI 기술로 식물의 건강 상태를 정확하게 진단하고 맞춤 케어 솔루션을 제공받으세요" />
+        <meta property="og:url" content="https://www.sikjipsa.com/diagnosis" />
+        <link rel="canonical" href="https://www.sikjipsa.com/diagnosis" />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "AI 식물 진단",
+            "description": "최신 AI 기술로 식물의 건강 상태를 정확하게 진단하고 맞춤 케어 솔루션 제공",
+            "url": "https://www.sikjipsa.com/diagnosis",
+            "mainEntity": {
+              "@type": "Service",
+              "name": "AI 식물 진단 서비스",
+              "description": "95% 정확도의 AI 기술을 활용한 식물 건강 진단"
+            }
+          })}
+        </script>
+      </Helmet>
       <HeroSection />
 
       {/* Upload Section */}

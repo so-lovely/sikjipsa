@@ -34,18 +34,15 @@ function DiaryWrite() {
   
   const [diaries, setDiaries] = useState([]);
   const [plants, setPlants] = useState([]);
-  const [showNewDiaryForm, setShowNewDiaryForm] = useState(false);
+  const [categories, setCategories] = useState([]);
   const [formData, setFormData] = useState({
     diaryId: diaryId || '',
+    selectedPlantId: '',
+    plantNickname: '',
     title: '',
     content: '',
     growthStage: 'seedling',
     entryDate: new Date().toISOString().split('T')[0],
-    category: ''
-  });
-  const [newDiaryData, setNewDiaryData] = useState({
-    plantId: '',
-    plantNickname: '',
     startDate: new Date().toISOString().split('T')[0]
   });
   const [images, setImages] = useState([]);
@@ -61,13 +58,16 @@ function DiaryWrite() {
 
     const loadData = async () => {
       try {
-        // 다이어리 목록 로드
-        const diariesData = await diaryAPI.getUserDiaries();
-        setDiaries(diariesData);
+        // 다이어리 목록, 식물 목록, 카테고리 로드
+        const [diariesData, plantsData, categoriesData] = await Promise.all([
+          diaryAPI.getUserDiaries(),
+          plantAPI.getAllPlants(),
+          plantAPI.getCategories()
+        ]);
         
-        // 식물 목록 로드 (새 다이어리 생성시 선택용)
-        const plantsData = await plantAPI.getAllPlants();
+        setDiaries(diariesData);
         setPlants(Array.isArray(plantsData) ? plantsData : []);
+        setCategories(Array.isArray(categoriesData) ? categoriesData : []);
         
         // diaryId가 URL에 있으면 해당 다이어리로 설정
         if (diaryId) {
@@ -87,38 +87,27 @@ function DiaryWrite() {
     setError('');
   };
 
-  const handleNewDiaryInputChange = (field, value) => {
-    setNewDiaryData(prev => ({ ...prev, [field]: value }));
-    setError('');
-  };
-
   const handleDiarySelectChange = (value) => {
-    if (value === 'new') {
-      setShowNewDiaryForm(true);
-      setFormData(prev => ({ ...prev, diaryId: '' }));
-    } else {
-      setShowNewDiaryForm(false);
-      setFormData(prev => ({ ...prev, diaryId: value }));
-    }
+    setFormData(prev => ({ ...prev, diaryId: value }));
     setError('');
   };
 
   const createNewDiary = async () => {
-    if (!newDiaryData.plantId) {
+    if (!formData.selectedPlantId) {
       setError('식물을 선택해주세요.');
       return null;
     }
     
-    if (!newDiaryData.plantNickname.trim()) {
+    if (!formData.plantNickname.trim()) {
       setError('식물 별명을 입력해주세요.');
       return null;
     }
 
     try {
       const diaryData = {
-        plant_id: parseInt(newDiaryData.plantId),
-        plant_nickname: newDiaryData.plantNickname,
-        start_date: new Date(newDiaryData.startDate).toISOString()
+        plant_id: parseInt(formData.selectedPlantId),
+        plant_nickname: formData.plantNickname,
+        start_date: new Date(formData.startDate).toISOString()
       };
       
       const createdDiary = await diaryAPI.createDiary(diaryData);
@@ -169,20 +158,14 @@ function DiaryWrite() {
     try {
       let targetDiaryId = formData.diaryId;
       
-      // 새 다이어리를 생성해야 하는 경우
-      if (showNewDiaryForm) {
+      // 기존 다이어리가 선택되지 않았으면 새로 생성
+      if (!targetDiaryId) {
         const createdDiaryId = await createNewDiary();
         if (!createdDiaryId) {
           setIsLoading(false);
-          return; // 다이어리 생성 실패시 종료
+          return;
         }
         targetDiaryId = createdDiaryId;
-      }
-      
-      if (!targetDiaryId) {
-        setError('다이어리를 선택하거나 새로 생성해주세요.');
-        setIsLoading(false);
-        return;
       }
       
       const entryData = {
@@ -268,34 +251,25 @@ function DiaryWrite() {
         ) : (
           <form onSubmit={handleSubmit}>
             <Stack spacing="xl">
-              {/* 식물 다이어리 선택 */}
-              <Box>
-                <Select
-                  label="식물 다이어리"
-                  placeholder="다이어리를 선택하세요"
-                  data={[
-                    ...diaries.map(diary => ({
+              {/* 기존 다이어리 선택 (선택사항) */}
+              {diaries.length > 0 && (
+                <Box>
+                  <Select
+                    label="기존 다이어리 선택 (선택사항)"
+                    placeholder="기존 다이어리를 선택하거나 아래에서 새로 만드세요"
+                    data={diaries.map(diary => ({
                       value: diary.id.toString(),
                       label: diary.plant_nickname || diary.plant?.name || '식물'
-                    })),
-                    { value: 'new', label: '➕ 새 다이어리 만들기' }
-                  ]}
-                  value={showNewDiaryForm ? 'new' : formData.diaryId}
-                  onChange={(value) => handleDiarySelectChange(value)}
-                  required
-                  leftSection={
-                    formData.growthStage === 'seedling' ? <IconSeedling size={16} color="var(--mantine-color-green-6)" /> :
-                    formData.growthStage === 'growing' ? <IconLeaf size={16} color="var(--mantine-color-green-6)" /> :
-                    formData.growthStage === 'flowering' ? <IconFlower size={16} color="var(--mantine-color-pink-6)" /> :
-                    formData.growthStage === 'mature' ? <IconTree size={16} color="var(--mantine-color-green-7)" /> :
-                    formData.growthStage === 'dormant' ? <IconMoon size={16} color="var(--mantine-color-gray-6)" /> :
-                    <IconSeedling size={16} color="var(--mantine-color-green-6)" />
-                  }
-                />
-              </Box>
+                    }))}
+                    value={formData.diaryId}
+                    onChange={(value) => handleDiarySelectChange(value)}
+                    clearable
+                  />
+                </Box>
+              )}
 
-              {/* 새 다이어리 폼 */}
-              {showNewDiaryForm && (
+              {/* 새 다이어리 생성 */}
+              {!formData.diaryId && (
                 <Card
                   shadow="sm"
                   radius="md"
@@ -306,19 +280,19 @@ function DiaryWrite() {
                   }}
                 >
                   <Title order={3} c="green.6" mb="md">
-                    새 다이어리 정보
+                    새 다이어리 만들기
                   </Title>
                   
                   <Stack gap="md">
                     <Select
                       label="식물 선택"
                       placeholder="식물을 선택하세요"
-                      data={Array.isArray(plants) ? plants.map(plant => ({
+                      data={plants.map(plant => ({
                         value: plant.id.toString(),
-                        label: `${plant.name} (${plant.scientific_name})`
-                      })) : []}
-                      value={newDiaryData.plantId}
-                      onChange={(value) => handleNewDiaryInputChange('plantId', value)}
+                        label: `${plant.name} ${plant.category ? `(${plant.category.name})` : ''}`
+                      }))}
+                      value={formData.selectedPlantId}
+                      onChange={(value) => handleInputChange('selectedPlantId', value)}
                       required
                       searchable
                     />
@@ -326,15 +300,15 @@ function DiaryWrite() {
                     <TextInput
                       label="식물 별명"
                       placeholder="예: 우리집 몬스테라"
-                      value={newDiaryData.plantNickname}
-                      onChange={(e) => handleNewDiaryInputChange('plantNickname', e.target.value)}
+                      value={formData.plantNickname}
+                      onChange={(e) => handleInputChange('plantNickname', e.target.value)}
                       required
                     />
                     
                     <DateInput
                       label="키우기 시작한 날"
-                      value={new Date(newDiaryData.startDate)}
-                      onChange={(value) => handleNewDiaryInputChange('startDate', value ? value.toISOString().split('T')[0] : '')}
+                      value={new Date(formData.startDate)}
+                      onChange={(value) => handleInputChange('startDate', value ? new Date(value).toISOString().split('T')[0] : '')}
                       required
                       leftSection={<IconCalendar size={16} />}
                       placeholder="날짜를 선택하세요"
@@ -343,12 +317,13 @@ function DiaryWrite() {
                 </Card>
               )}
 
+
               {/* 기록 정보 */}
               <Group grow>
                 <DateInput
                   label="기록 날짜"
                   value={new Date(formData.entryDate)}
-                  onChange={(value) => handleInputChange('entryDate', value ? value.toISOString().split('T')[0] : '')}
+                  onChange={(value) => handleInputChange('entryDate', value ? new Date(value).toISOString().split('T')[0] : '')}
                   required
                   leftSection={<IconCalendar size={16} />}
                   placeholder="날짜를 선택하세요"

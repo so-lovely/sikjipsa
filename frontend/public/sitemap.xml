@@ -33,4 +33,16 @@
         <loc>https://www.sikjipsa.com/login</loc>
     </url>
 
+    <url>
+        <loc>https://www.sikjipsa.com/diary</loc>
+    </url>
+
+    <url>
+        <loc>https://www.sikjipsa.com/profile</loc>
+    </url>
+
+    <url>
+        <loc>https://www.sikjipsa.com/contact</loc>
+    </url>
+
 </urlset>

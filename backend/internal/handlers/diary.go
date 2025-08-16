@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"sikjipsa-backend/internal/models"
+	"sikjipsa-backend/pkg/cache"
 	"sikjipsa-backend/pkg/config"
 	"sikjipsa-backend/pkg/logger"
 	"strconv"
@@ -16,12 +17,13 @@ import (
 )
 
 type DiaryHandler struct {
-	db  *gorm.DB
-	cfg *config.Config
+	db    *gorm.DB
+	cfg   *config.Config
+	cache *cache.RedisCache
 }
 
-func NewDiaryHandler(db *gorm.DB, cfg *config.Config) *DiaryHandler {
-	return &DiaryHandler{db: db, cfg: cfg}
+func NewDiaryHandler(db *gorm.DB, cfg *config.Config, redisCache *cache.RedisCache) *DiaryHandler {
+	return &DiaryHandler{db: db, cfg: cfg, cache: redisCache}
 }
 
 type CreateDiaryRequest struct {

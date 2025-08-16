@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
+import { HelmetProvider } from 'react-helmet-async';
 import '@mantine/core/styles.css';
 import '@mantine/dates/styles.css';
 import '@mantine/notifications/styles.css';
@@ -41,8 +42,9 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <MantineProvider theme={theme}>
         <Notifications />
-        <AuthProvider>
-          <Router>
+        <HelmetProvider>
+          <AuthProvider>
+            <Router>
             <div style={{ 
               minHeight: '100vh',
               display: 'flex',
@@ -94,8 +96,9 @@ function App() {
             </div>
           </Router>
         </AuthProvider>
-      </MantineProvider>
-    </QueryClientProvider>
+      </HelmetProvider>
+    </MantineProvider>
+  </QueryClientProvider>
   );
 }
 
