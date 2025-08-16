@@ -13,13 +13,13 @@ type JWTClaims struct {
 	jwt.RegisteredClaims
 }
 
-// GenerateJWT creates a new access token with 1 hour expiration
+// GenerateJWT creates a new access token with 24 hour expiration
 func GenerateJWT(userID uint, email string, secret string) (string, error) {
 	claims := JWTClaims{
 		UserID: userID,
 		Email:  email,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 1)), // 1 hour
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24)), // 24 hours
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			Subject:   string(rune(userID)),
 		},
@@ -29,12 +29,12 @@ func GenerateJWT(userID uint, email string, secret string) (string, error) {
 	return token.SignedString([]byte(secret))
 }
 
-// GenerateRefreshToken creates a new refresh token with 7 days expiration
+// GenerateRefreshToken creates a new refresh token with 30 days expiration
 func GenerateRefreshToken(userID uint, secret string) (string, error) {
 	claims := jwt.MapClaims{
 		"user_id": userID,
 		"type":    "refresh",
-		"exp":     time.Now().Add(time.Hour * 24 * 7).Unix(), // 7 days
+		"exp":     time.Now().Add(time.Hour * 24 * 30).Unix(), // 30 days
 		"iat":     time.Now().Unix(),
 	}
 
