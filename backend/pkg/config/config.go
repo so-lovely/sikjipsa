@@ -8,6 +8,7 @@ package config
 import (
 	"log"
 	"os"
+	"strconv"
 )
 
 type Config struct {
@@ -74,7 +75,7 @@ func Load() *Config {
 
 		RedisAddr:     getEnv("REDIS_ADDR", "localhost:6379"),
 		RedisPassword: getEnv("REDIS_PASSWORD", ""),
-		RedisDB:       0,
+		RedisDB:       getEnvAsInt("REDIS_DB", 0),
 	}
 }
 
@@ -84,6 +85,16 @@ func getEnv(key, defaultValue string) string {
 	}
 	// 이제 "does not exist" 로그는 찍지 않습니다.
 	// 필수 변수가 없으면 위에서 Fatal로 앱을 종료시키므로 더 명확합니다.
+	return defaultValue
+}
+
+func getEnvAsInt(key string, defaultValue int) int {
+	if value, exists := os.LookupEnv(key); exists {
+		if intValue, err := strconv.Atoi(value); err == nil {
+			return intValue
+		}
+		log.Printf("Warning: Invalid integer value for %s: %s, using default: %d", key, value, defaultValue)
+	}
 	return defaultValue
 }
 
