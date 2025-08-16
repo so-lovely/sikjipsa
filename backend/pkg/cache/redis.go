@@ -4,10 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"time"
 
-	"github.com/redis/go-redis/v9"
 	"sikjipsa-backend/pkg/logger"
+
+	"github.com/redis/go-redis/v9"
 )
 
 type RedisCache struct {
@@ -15,15 +17,21 @@ type RedisCache struct {
 }
 
 func NewRedisCache(addr, password string, db int) *RedisCache {
-	rdb := redis.NewClient(&redis.Options{
-		Addr:     addr,
-		Password: password,
-		DB:       db,
-	})
+	if addr == "" {
+		log.Fatal("REDIS_URL 환경 변수가 설정되지 않았습니다.")
+	}
+
+	opt, err := redis.ParseURL(addr)
+	if err != nil {
+		log.Fatal("Redis URL 파싱 실패: %v", err)
+	}
+
+
+	rdb := redis.NewClient(opt)
 
 	// Test connection
 	ctx := context.Background()
-	_, err := rdb.Ping(ctx).Result()
+	_, err = rdb.Ping(ctx).Result()
 	if err != nil {
 		logger.Warn("Redis connection failed, caching will be disabled", "error", err)
 		return &RedisCache{client: nil}
